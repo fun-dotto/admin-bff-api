@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	api "github.com/fun-dotto/api-template/generated"
 	"github.com/fun-dotto/api-template/internal/handler"
@@ -27,8 +28,13 @@ func main() {
 
 	router.Use(middleware.OapiRequestValidator(spec))
 
+	announcementAPIURL := os.Getenv("ANNOUNCEMENT_API_URL")
+	if announcementAPIURL == "" {
+		log.Fatal("ANNOUNCEMENT_API_URL is required")
+	}
+
 	// Register handlers
-	h := handler.NewHandler()
+	h := handler.NewHandler(announcementAPIURL)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"
