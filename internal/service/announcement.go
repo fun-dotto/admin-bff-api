@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 
-	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/internal/domain"
 	"github.com/fun-dotto/api-template/internal/handler"
 )
 
 type AnnouncementRepository interface {
-	List(ctx context.Context) ([]api.Announcement, error)
-	Create(ctx context.Context, req *api.AnnouncementRequest) (*api.Announcement, error)
-	Update(ctx context.Context, id string, req *api.AnnouncementRequest) (*api.Announcement, error)
+	List(ctx context.Context) ([]domain.Announcement, error)
+	Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error)
+	Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -26,17 +26,17 @@ func NewAnnouncementService(repo AnnouncementRepository) handler.AnnouncementSer
 }
 
 // List 一覧を取得する
-func (s *announcementService) List(ctx context.Context) ([]api.Announcement, error) {
+func (s *announcementService) List(ctx context.Context) ([]domain.Announcement, error) {
 	return s.repo.List(ctx)
 }
 
 // Create 新規作成する
-func (s *announcementService) Create(ctx context.Context, req *api.AnnouncementRequest) (*api.Announcement, error) {
+func (s *announcementService) Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 	return s.repo.Create(ctx, req)
 }
 
 // Update 更新する
-func (s *announcementService) Update(ctx context.Context, id string, req *api.AnnouncementRequest) (*api.Announcement, error) {
+func (s *announcementService) Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 	return s.repo.Update(ctx, id, req)
 }
 
