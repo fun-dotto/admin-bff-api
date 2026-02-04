@@ -6,6 +6,8 @@ import (
 
 	api "github.com/fun-dotto/api-template/generated"
 	"github.com/fun-dotto/api-template/internal/handler"
+	"github.com/fun-dotto/api-template/internal/repository"
+	"github.com/fun-dotto/api-template/internal/service"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -33,8 +35,12 @@ func main() {
 		log.Fatal("ANNOUNCEMENT_API_URL is required")
 	}
 
+	// Initialize layers
+	announcementRepo := repository.NewAnnouncementRepository(announcementAPIURL)
+	announcementService := service.NewAnnouncementService(announcementRepo)
+
 	// Register handlers
-	h := handler.NewHandler(announcementAPIURL)
+	h := handler.NewHandler(announcementService)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"
