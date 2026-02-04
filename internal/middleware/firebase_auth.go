@@ -10,15 +10,10 @@ import (
 )
 
 type firebaseTokenKey struct{}
-type rawIDTokenKey struct{}
 
 // FirebaseTokenContextKey は Gin の context および context.Context に
 // Firebase ID トークンの検証結果を格納するキーです。
 var FirebaseTokenContextKey = firebaseTokenKey{}
-
-// RawIDTokenContextKey は Gin の context および context.Context に
-// 生のID トークン文字列を格納するキーです。外部APIへの転送に使用します。
-var RawIDTokenContextKey = rawIDTokenKey{}
 
 // FirebaseAuth は Authorization: Bearer <Firebase ID Token> を検証する Gin ミドルウェアです。
 // 検証に成功すると、デコードされたトークン（*auth.Token）を context に格納して次のハンドラに渡します。
@@ -57,9 +52,7 @@ func FirebaseAuth(authClient *auth.Client) gin.HandlerFunc {
 		}
 
 		c.Set(FirebaseTokenContextKey, token)
-		c.Set(RawIDTokenContextKey, idToken)
 		ctx = context.WithValue(ctx, FirebaseTokenContextKey, token)
-		ctx = context.WithValue(ctx, RawIDTokenContextKey, idToken)
 		c.Request = c.Request.WithContext(ctx)
 		c.Next()
 	}
@@ -111,16 +104,5 @@ func GetFirebaseTokenFromContext(ctx context.Context) (*auth.Token, bool) {
 		return nil, false
 	}
 	token, ok := val.(*auth.Token)
-	return token, ok
-}
-
-// GetRawIDTokenFromContext は context.Context から生のIDトークン文字列を取得します。
-// 外部APIへのリクエスト転送に使用します。
-func GetRawIDTokenFromContext(ctx context.Context) (string, bool) {
-	val := ctx.Value(RawIDTokenContextKey)
-	if val == nil {
-		return "", false
-	}
-	token, ok := val.(string)
 	return token, ok
 }

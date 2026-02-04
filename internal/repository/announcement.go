@@ -3,12 +3,10 @@ package repository
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/fun-dotto/api-template/generated/external/announcement_api"
 	"github.com/fun-dotto/api-template/internal/domain"
 	"github.com/fun-dotto/api-template/internal/external"
-	"github.com/fun-dotto/api-template/internal/middleware"
 	"github.com/fun-dotto/api-template/internal/service"
 )
 
@@ -20,19 +18,9 @@ func NewAnnouncementRepository(client *announcement_api.ClientWithResponses) ser
 	return &announcementRepository{client: client}
 }
 
-// withAuth はコンテキストからIDトークンを取得し、Authorizationヘッダーを追加するRequestEditorFnを返す
-func withAuth(ctx context.Context) announcement_api.RequestEditorFn {
-	return func(_ context.Context, req *http.Request) error {
-		if token, ok := middleware.GetRawIDTokenFromContext(ctx); ok {
-			req.Header.Set("Authorization", "Bearer "+token)
-		}
-		return nil
-	}
-}
-
 // List 一覧を取得する
 func (r *announcementRepository) List(ctx context.Context) ([]domain.Announcement, error) {
-	response, err := r.client.AnnouncementsV1ListWithResponse(ctx, nil, withAuth(ctx))
+	response, err := r.client.AnnouncementsV1ListWithResponse(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get announcements: %w", err)
 	}
@@ -54,7 +42,7 @@ func (r *announcementRepository) List(ctx context.Context) ([]domain.Announcemen
 func (r *announcementRepository) Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 	body := external.ToExternalAnnouncementRequest(req)
 
-	response, err := r.client.AnnouncementsV1CreateWithResponse(ctx, body, withAuth(ctx))
+	response, err := r.client.AnnouncementsV1CreateWithResponse(ctx, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create announcement: %w", err)
 	}
@@ -71,7 +59,7 @@ func (r *announcementRepository) Create(ctx context.Context, req *domain.Announc
 func (r *announcementRepository) Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 	body := external.ToExternalAnnouncementRequest(req)
 
-	response, err := r.client.AnnouncementsV1UpdateWithResponse(ctx, id, body, withAuth(ctx))
+	response, err := r.client.AnnouncementsV1UpdateWithResponse(ctx, id, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update announcement: %w", err)
 	}
@@ -86,7 +74,7 @@ func (r *announcementRepository) Update(ctx context.Context, id string, req *dom
 
 // Delete 削除する
 func (r *announcementRepository) Delete(ctx context.Context, id string) error {
-	response, err := r.client.AnnouncementsV1DeleteWithResponse(ctx, id, withAuth(ctx))
+	response, err := r.client.AnnouncementsV1DeleteWithResponse(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete announcement: %w", err)
 	}

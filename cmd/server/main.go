@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	oapimiddleware "github.com/oapi-codegen/gin-middleware"
+	"google.golang.org/api/idtoken"
 )
 
 func main() {
@@ -49,15 +50,23 @@ func main() {
 	if announcementAPIURL == "" {
 		log.Fatal("ANNOUNCEMENT_API_URL is required")
 	}
-
-	// Initialize external API client
-	announcementClient, err := announcement_api.NewClientWithResponses(announcementAPIURL)
+	// 認証付きHTTPクライアントを作成
+	announcementAPIAuthClient, err := idtoken.NewClient(ctx, announcementAPIURL)
 	if err != nil {
-		log.Fatalf("Failed to create announcement API client: %v", err)
+		log.Fatal("Failed to create auth client:", err)
+	}
+
+	// 生成されたクライアントに認証付きHTTPクライアントを注入
+	apiClient, err := announcement_api.NewClientWithResponses(
+		announcementAPIURL,
+		announcement_api.WithHTTPClient(announcementAPIAuthClient),
+	)
+	if err != nil {
+		log.Fatal("Failed to create API client:", err)
 	}
 
 	// Initialize layers
-	announcementRepo := repository.NewAnnouncementRepository(announcementClient)
+	announcementRepo := repository.NewAnnouncementRepository(apiClient)
 	announcementService := service.NewAnnouncementService(announcementRepo)
 
 	// Register handlers
