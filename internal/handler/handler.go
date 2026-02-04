@@ -1,27 +1,27 @@
 package handler
 
 import (
-	"net/http"
-	"time"
+	"context"
 
 	api "github.com/fun-dotto/api-template/generated"
 )
 
-// Handler implements api.ServerInterface
-type Handler struct {
-	announcementAPIURL string
-	httpClient         *http.Client
+type AnnouncementService interface {
+	List(ctx context.Context) ([]api.Announcement, error)
+	Create(ctx context.Context, req *api.AnnouncementRequest) (*api.Announcement, error)
+	Update(ctx context.Context, id string, req *api.AnnouncementRequest) (*api.Announcement, error)
+	Delete(ctx context.Context, id string) error
 }
 
-// NewHandler creates a new Handler instance
-func NewHandler(announcementAPIURL string) *Handler {
+type Handler struct {
+	announcementService AnnouncementService
+}
+
+// NewHandler 新規作成する
+func NewHandler(announcementService AnnouncementService) *Handler {
 	return &Handler{
-		announcementAPIURL: announcementAPIURL,
-		httpClient: &http.Client{
-			Timeout: 30 * time.Second,
-		},
+		announcementService: announcementService,
 	}
 }
 
-// Ensure Handler implements api.ServerInterface
 var _ api.ServerInterface = (*Handler)(nil)
