@@ -7,6 +7,7 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/generated/external/announcement_api"
 	"github.com/fun-dotto/api-template/internal/handler"
 	"github.com/fun-dotto/api-template/internal/middleware"
 	"github.com/fun-dotto/api-template/internal/repository"
@@ -49,8 +50,14 @@ func main() {
 		log.Fatal("ANNOUNCEMENT_API_URL is required")
 	}
 
+	// Initialize external API client
+	announcementClient, err := announcement_api.NewClientWithResponses(announcementAPIURL)
+	if err != nil {
+		log.Fatalf("Failed to create announcement API client: %v", err)
+	}
+
 	// Initialize layers
-	announcementRepo := repository.NewAnnouncementRepository(announcementAPIURL)
+	announcementRepo := repository.NewAnnouncementRepository(announcementClient)
 	announcementService := service.NewAnnouncementService(announcementRepo)
 
 	// Register handlers
