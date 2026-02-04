@@ -17,7 +17,7 @@ func (h *Handler) AnnouncementsV1List(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"announcements": announcements,
+		"announcements": ToAPIAnnouncements(announcements),
 	})
 }
 
@@ -29,14 +29,14 @@ func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 		return
 	}
 
-	announcement, err := h.announcementService.Create(c.Request.Context(), &req)
+	announcement, err := h.announcementService.Create(c.Request.Context(), ToDomainAnnouncementRequest(&req))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"announcement": announcement,
+		"announcement": ToAPIAnnouncement(announcement),
 	})
 }
 
@@ -58,13 +58,13 @@ func (h *Handler) AnnouncementsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	announcement, err := h.announcementService.Update(c.Request.Context(), id, &req)
+	announcement, err := h.announcementService.Update(c.Request.Context(), id, ToDomainAnnouncementRequest(&req))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"announcement": announcement,
+		"announcement": ToAPIAnnouncement(announcement),
 	})
 }
