@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/internal/domain"
 	"github.com/fun-dotto/api-template/internal/service"
 )
 
@@ -28,15 +28,15 @@ func NewAnnouncementRepository(baseURL string) service.AnnouncementRepository {
 }
 
 type listAnnouncementsResponse struct {
-	Announcements []api.Announcement `json:"announcements"`
+	Announcements []domain.Announcement `json:"announcements"`
 }
 
 type announcementResponse struct {
-	Announcement api.Announcement `json:"announcement"`
+	Announcement domain.Announcement `json:"announcement"`
 }
 
 // List 一覧を取得する
-func (r *announcementRepository) List(ctx context.Context) ([]api.Announcement, error) {
+func (r *announcementRepository) List(ctx context.Context) ([]domain.Announcement, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, r.baseURL+"/v1/announcements", nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -62,7 +62,7 @@ func (r *announcementRepository) List(ctx context.Context) ([]api.Announcement, 
 }
 
 // Create 新規作成する
-func (r *announcementRepository) Create(ctx context.Context, req *api.AnnouncementRequest) (*api.Announcement, error) {
+func (r *announcementRepository) Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
@@ -94,7 +94,7 @@ func (r *announcementRepository) Create(ctx context.Context, req *api.Announceme
 }
 
 // Update 更新する
-func (r *announcementRepository) Update(ctx context.Context, id string, req *api.AnnouncementRequest) (*api.Announcement, error) {
+func (r *announcementRepository) Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
