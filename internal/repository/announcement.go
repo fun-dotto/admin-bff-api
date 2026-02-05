@@ -47,11 +47,11 @@ func (r *announcementRepository) Create(ctx context.Context, req *domain.Announc
 		return nil, fmt.Errorf("failed to create announcement: %w", err)
 	}
 
-	if response.JSON200 == nil {
+	if response.JSON201 == nil {
 		return nil, fmt.Errorf("failed to create announcement: status %d", response.StatusCode())
 	}
 
-	result := external.ToDomainAnnouncement(response.JSON200.Announcement)
+	result := external.ToDomainAnnouncement(response.JSON201.Announcement)
 	return &result, nil
 }
 
