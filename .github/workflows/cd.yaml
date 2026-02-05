@@ -124,8 +124,6 @@ jobs:
           image: ${{ env.IMAGE_TAG }}
           region: ${{ vars._DEPLOY_REGION }}
           env_vars: |
-            DB_IAM_USER=${{ vars.DB_IAM_USER }}
-            DB_NAME=${{ vars.DB_NAME }}
-            INSTANCE_CONNECTION_NAME=${{ vars.INSTANCE_CONNECTION_NAME }}
+            ANNOUNCEMENT_API_URL=${{ vars.ANNOUNCEMENT_API_URL }}
           env_vars_update_strategy: overwrite
           secrets_update_strategy: overwrite

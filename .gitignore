@@ -61,3 +61,5 @@ Temporary Items
 
 .env.keys
 .env
+
+bin/
