@@ -9,6 +9,7 @@ import (
 
 type AnnouncementRepository interface {
 	List(ctx context.Context) ([]domain.Announcement, error)
+	Detail(ctx context.Context, id string) (*domain.Announcement, error)
 	Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error)
 	Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error)
 	Delete(ctx context.Context, id string) error
@@ -28,6 +29,11 @@ func NewAnnouncementService(repo AnnouncementRepository) handler.AnnouncementSer
 // List 一覧を取得する
 func (s *announcementService) List(ctx context.Context) ([]domain.Announcement, error) {
 	return s.repo.List(ctx)
+}
+
+// Detail 詳細を取得する
+func (s *announcementService) Detail(ctx context.Context, id string) (*domain.Announcement, error) {
+	return s.repo.Detail(ctx, id)
 }
 
 // Create 新規作成する
