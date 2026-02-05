@@ -50,6 +50,9 @@ type ServerInterface interface {
 	// (DELETE /v1/announcements/{id})
 	AnnouncementsV1Delete(c *gin.Context, id string)
 
+	// (GET /v1/announcements/{id})
+	AnnouncementsV1Detail(c *gin.Context, id string)
+
 	// (PUT /v1/announcements/{id})
 	AnnouncementsV1Update(c *gin.Context, id string)
 }
@@ -113,6 +116,30 @@ func (siw *ServerInterfaceWrapper) AnnouncementsV1Delete(c *gin.Context) {
 	siw.Handler.AnnouncementsV1Delete(c, id)
 }
 
+// AnnouncementsV1Detail operation middleware
+func (siw *ServerInterfaceWrapper) AnnouncementsV1Detail(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.AnnouncementsV1Detail(c, id)
+}
+
 // AnnouncementsV1Update operation middleware
 func (siw *ServerInterfaceWrapper) AnnouncementsV1Update(c *gin.Context) {
 
@@ -167,6 +194,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/v1/announcements", wrapper.AnnouncementsV1List)
 	router.POST(options.BaseURL+"/v1/announcements", wrapper.AnnouncementsV1Create)
 	router.DELETE(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Delete)
+	router.GET(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Detail)
 	router.PUT(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Update)
 }
 
@@ -196,13 +224,13 @@ type AnnouncementsV1CreateResponseObject interface {
 	VisitAnnouncementsV1CreateResponse(w http.ResponseWriter) error
 }
 
-type AnnouncementsV1Create200JSONResponse struct {
+type AnnouncementsV1Create201JSONResponse struct {
 	Announcement Announcement `json:"announcement"`
 }
 
-func (response AnnouncementsV1Create200JSONResponse) VisitAnnouncementsV1CreateResponse(w http.ResponseWriter) error {
+func (response AnnouncementsV1Create201JSONResponse) VisitAnnouncementsV1CreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
+	w.WriteHeader(201)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -221,6 +249,25 @@ type AnnouncementsV1Delete204Response struct {
 func (response AnnouncementsV1Delete204Response) VisitAnnouncementsV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
+}
+
+type AnnouncementsV1DetailRequestObject struct {
+	Id string `json:"id"`
+}
+
+type AnnouncementsV1DetailResponseObject interface {
+	VisitAnnouncementsV1DetailResponse(w http.ResponseWriter) error
+}
+
+type AnnouncementsV1Detail200JSONResponse struct {
+	Announcement Announcement `json:"announcement"`
+}
+
+func (response AnnouncementsV1Detail200JSONResponse) VisitAnnouncementsV1DetailResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type AnnouncementsV1UpdateRequestObject struct {
@@ -254,6 +301,9 @@ type StrictServerInterface interface {
 
 	// (DELETE /v1/announcements/{id})
 	AnnouncementsV1Delete(ctx context.Context, request AnnouncementsV1DeleteRequestObject) (AnnouncementsV1DeleteResponseObject, error)
+
+	// (GET /v1/announcements/{id})
+	AnnouncementsV1Detail(ctx context.Context, request AnnouncementsV1DetailRequestObject) (AnnouncementsV1DetailResponseObject, error)
 
 	// (PUT /v1/announcements/{id})
 	AnnouncementsV1Update(ctx context.Context, request AnnouncementsV1UpdateRequestObject) (AnnouncementsV1UpdateResponseObject, error)
@@ -349,6 +399,33 @@ func (sh *strictHandler) AnnouncementsV1Delete(ctx *gin.Context, id string) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(AnnouncementsV1DeleteResponseObject); ok {
 		if err := validResponse.VisitAnnouncementsV1DeleteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// AnnouncementsV1Detail operation middleware
+func (sh *strictHandler) AnnouncementsV1Detail(ctx *gin.Context, id string) {
+	var request AnnouncementsV1DetailRequestObject
+
+	request.Id = id
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AnnouncementsV1Detail(ctx, request.(AnnouncementsV1DetailRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AnnouncementsV1Detail")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(AnnouncementsV1DetailResponseObject); ok {
+		if err := validResponse.VisitAnnouncementsV1DetailResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
