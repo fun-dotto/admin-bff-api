@@ -30,7 +30,7 @@ paths:
       description: おしらせを作成する
       parameters: []
       responses:
-        '200':
+        '201':
           description: 作成されたおしらせ
           content:
             application/json:
@@ -51,6 +51,30 @@ paths:
               $ref: '#/components/schemas/AnnouncementRequest'
         description: 作成するおしらせの情報
   /v1/announcements/{id}:
+    get:
+      operationId: AnnouncementsV1_detail
+      description: おしらせを詳細取得する
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: おしらせID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: おしらせの詳細
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  announcement:
+                    $ref: '#/components/schemas/Announcement'
+                required:
+                  - announcement
+      tags:
+        - Announcements
     put:
       operationId: AnnouncementsV1_update
       description: おしらせを更新する
@@ -94,7 +118,7 @@ paths:
             type: string
       responses:
         '204':
-          description: 'There is no content to send for this request, but the headers may be useful. '
+          description: There is no content to send for this request, but the headers may be useful.
       tags:
         - Announcements
 components:

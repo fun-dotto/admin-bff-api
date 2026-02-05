@@ -21,6 +21,19 @@ func (h *Handler) AnnouncementsV1List(c *gin.Context) {
 	})
 }
 
+// AnnouncementsV1Detail 詳細を取得する
+func (h *Handler) AnnouncementsV1Detail(c *gin.Context, id string) {
+	announcement, err := h.announcementService.Detail(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"announcement": ToAPIAnnouncement(announcement),
+	})
+}
+
 // AnnouncementsV1Create 新規作成する
 func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 	var req api.AnnouncementRequest

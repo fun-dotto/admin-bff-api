@@ -38,6 +38,21 @@ func (r *announcementRepository) List(ctx context.Context) ([]domain.Announcemen
 	return result, nil
 }
 
+// Detail 詳細を取得する
+func (r *announcementRepository) Detail(ctx context.Context, id string) (*domain.Announcement, error) {
+	response, err := r.client.AnnouncementsV1DetailWithResponse(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get announcement: %w", err)
+	}
+
+	if response.JSON200 == nil {
+		return nil, fmt.Errorf("failed to get announcement: status %d", response.StatusCode())
+	}
+
+	result := external.ToDomainAnnouncement(response.JSON200.Announcement)
+	return &result, nil
+}
+
 // Create 新規作成する
 func (r *announcementRepository) Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 	body := external.ToExternalAnnouncementRequest(req)
@@ -47,11 +62,11 @@ func (r *announcementRepository) Create(ctx context.Context, req *domain.Announc
 		return nil, fmt.Errorf("failed to create announcement: %w", err)
 	}
 
-	if response.JSON200 == nil {
+	if response.JSON201 == nil {
 		return nil, fmt.Errorf("failed to create announcement: status %d", response.StatusCode())
 	}
 
-	result := external.ToDomainAnnouncement(response.JSON200.Announcement)
+	result := external.ToDomainAnnouncement(response.JSON201.Announcement)
 	return &result, nil
 }
 
