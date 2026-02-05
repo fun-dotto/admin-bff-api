@@ -106,3 +106,28 @@ func GetFirebaseTokenFromContext(ctx context.Context) (*auth.Token, bool) {
 	token, ok := val.(*auth.Token)
 	return token, ok
 }
+
+// RequireAnyClaim は指定したカスタムクレームのいずれかが true であることを検証します。
+// いずれのクレームも満たさない場合は 403 レスポンスを返し false を返します。
+func RequireAnyClaim(c *gin.Context, claims ...string) bool {
+	token, ok := GetFirebaseToken(c)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "Authentication required",
+		})
+		return false
+	}
+
+	for _, claim := range claims {
+		if val, exists := token.Claims[claim]; exists {
+			if boolVal, ok := val.(bool); ok && boolVal {
+				return true
+			}
+		}
+	}
+
+	c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+		"error": "Insufficient permissions",
+	})
+	return false
+}
