@@ -78,6 +78,7 @@ func (h *Handler) AnnouncementsV1Delete(c *gin.Context, id string) {
 	}
 
 	c.Status(http.StatusNoContent)
+	c.Writer.WriteHeaderNow()
 }
 
 // AnnouncementsV1Update 更新する
