@@ -120,7 +120,7 @@ func TestAnnouncementsV1List(t *testing.T) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Contains(t, response["error"], "Authentication")
+				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
 	}
@@ -176,7 +176,7 @@ func TestAnnouncementsV1Detail(t *testing.T) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Contains(t, response["error"], "Authentication")
+				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
 	}
@@ -246,7 +246,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Contains(t, response["error"], "Authentication")
+				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
 		{
@@ -346,7 +346,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Contains(t, response["error"], "Authentication")
+				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
 	}
@@ -398,7 +398,7 @@ func TestAnnouncementsV1Delete(t *testing.T) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Contains(t, response["error"], "Authentication")
+				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
 	}
