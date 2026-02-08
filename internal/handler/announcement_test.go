@@ -40,6 +40,17 @@ func setupTestContext(withAdminClaim bool) (*httptest.ResponseRecorder, *gin.Con
 	return w, c
 }
 
+// setupTestContextWithClaims 指定したクレームでFirebaseトークンをモックしたテストコンテキストを作成する（403など権限不足の検証用）
+func setupTestContextWithClaims(claims map[string]interface{}) (*httptest.ResponseRecorder, *gin.Context) {
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest(http.MethodGet, "/", nil)
+	token := &auth.Token{Claims: claims}
+	c.Set(middleware.FirebaseTokenContextKey, token)
+	return w, c
+}
+
 func TestAnnouncementsV1List(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -196,6 +207,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 		name           string
 		request        api.AnnouncementRequest
 		withAdminClaim bool
+		customClaims   map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
 		wantCode       int
 		validate       func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
@@ -237,6 +249,23 @@ func TestAnnouncementsV1Create(t *testing.T) {
 				assert.Contains(t, response["error"], "Authentication")
 			},
 		},
+		{
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			request: api.AnnouncementRequest{
+				Title:          "新しいお知らせ",
+				Url:            "https://example.com/new",
+				AvailableFrom:  now,
+				AvailableUntil: &until,
+			},
+			customClaims: map[string]interface{}{"user": true},
+			wantCode:     http.StatusForbidden,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response map[string]interface{}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Equal(t, "Insufficient permissions", response["error"])
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -244,7 +273,13 @@ func TestAnnouncementsV1Create(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
 			h := handler.NewHandler(announcementService)
-			w, c := setupTestContext(tt.withAdminClaim)
+			var w *httptest.ResponseRecorder
+			var c *gin.Context
+			if tt.customClaims != nil {
+				w, c = setupTestContextWithClaims(tt.customClaims)
+			} else {
+				w, c = setupTestContext(tt.withAdminClaim)
+			}
 
 			// リクエストボディを設定
 			body, _ := json.Marshal(tt.request)
