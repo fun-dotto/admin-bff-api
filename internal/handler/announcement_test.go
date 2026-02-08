@@ -225,12 +225,13 @@ func TestAnnouncementsV1Create(t *testing.T) {
 	until := now.Add(24 * time.Hour)
 
 	tests := []struct {
-		name           string
-		request        api.AnnouncementRequest
-		withAdminClaim bool
-		customClaims   map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name               string
+		request            api.AnnouncementRequest
+		withAdminClaim     bool
+		withDeveloperClaim bool
+		customClaims       map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
+		wantCode           int
+		validate           func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
 			name: "正常にお知らせを作成できる",
@@ -251,6 +252,27 @@ func TestAnnouncementsV1Create(t *testing.T) {
 				assert.Equal(t, "created-id", response.Announcement.Id)
 				assert.Equal(t, "新しいお知らせ", response.Announcement.Title)
 				assert.Equal(t, "https://example.com/new", response.Announcement.Url)
+			},
+		},
+		{
+			name: "developerクレームのみでも作成できる",
+			request: api.AnnouncementRequest{
+				Title:          "developer経由のお知らせ",
+				Url:            "https://example.com/developer",
+				AvailableFrom:  now,
+				AvailableUntil: &until,
+			},
+			withDeveloperClaim: true,
+			wantCode:           http.StatusOK,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response struct {
+					Announcement api.Announcement `json:"announcement"`
+				}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.Equal(t, "created-id", response.Announcement.Id)
+				assert.Equal(t, "developer経由のお知らせ", response.Announcement.Title)
+				assert.Equal(t, "https://example.com/developer", response.Announcement.Url)
 			},
 		},
 		{
@@ -298,6 +320,8 @@ func TestAnnouncementsV1Create(t *testing.T) {
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
+			} else if tt.withDeveloperClaim {
+				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
 				w, c = setupTestContext(tt.withAdminClaim)
 			}
