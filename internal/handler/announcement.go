@@ -77,7 +77,7 @@ func (h *Handler) AnnouncementsV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	c.AbortWithStatus(http.StatusNoContent)
+	c.Status(http.StatusNoContent)
 }
 
 // AnnouncementsV1Update 更新する
