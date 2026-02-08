@@ -61,7 +61,7 @@ func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"announcement": ToAPIAnnouncement(announcement),
 	})
 }

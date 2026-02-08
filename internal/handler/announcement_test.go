@@ -243,7 +243,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 				AvailableUntil: &until,
 			},
 			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			wantCode:       http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Announcement api.Announcement `json:"announcement"`
@@ -264,7 +264,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 				AvailableUntil: &until,
 			},
 			withDeveloperClaim: true,
-			wantCode:           http.StatusOK,
+			wantCode:           http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Announcement api.Announcement `json:"announcement"`
