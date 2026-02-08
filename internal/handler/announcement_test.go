@@ -327,6 +327,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 		id             string
 		request        api.AnnouncementRequest
 		withAdminClaim bool
+		customClaims   map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
 		wantCode       int
 		validate       func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
@@ -370,6 +371,24 @@ func TestAnnouncementsV1Update(t *testing.T) {
 				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
+		{
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:   "1",
+			request: api.AnnouncementRequest{
+				Title:          "更新されたお知らせ",
+				Url:            "https://example.com/updated",
+				AvailableFrom:  now,
+				AvailableUntil: &until,
+			},
+			customClaims: map[string]interface{}{"user": true},
+			wantCode:     http.StatusForbidden,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response map[string]interface{}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Equal(t, "Insufficient permissions", response["error"])
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -377,7 +396,13 @@ func TestAnnouncementsV1Update(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
 			h := handler.NewHandler(announcementService)
-			w, c := setupTestContext(tt.withAdminClaim)
+			var w *httptest.ResponseRecorder
+			var c *gin.Context
+			if tt.customClaims != nil {
+				w, c = setupTestContextWithClaims(tt.customClaims)
+			} else {
+				w, c = setupTestContext(tt.withAdminClaim)
+			}
 
 			// リクエストボディを設定
 			body, _ := json.Marshal(tt.request)
