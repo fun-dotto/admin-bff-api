@@ -16,6 +16,7 @@ import (
 	"github.com/fun-dotto/api-template/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // setupTestContext Firebase認証をモックしたテストコンテキストを作成する
@@ -53,11 +54,11 @@ func setupTestContextWithClaims(claims map[string]interface{}) (*httptest.Respon
 
 func TestAnnouncementsV1List(t *testing.T) {
 	tests := []struct {
-		name             string
-		withAdminClaim   bool
+		name               string
+		withAdminClaim     bool
 		withDeveloperClaim bool
-		wantCode         int
-		validate         func(t *testing.T, w *httptest.ResponseRecorder)
+		wantCode           int
+		validate           func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
 			name:           "正常にお知らせ一覧が取得できる",
@@ -429,7 +430,8 @@ func TestAnnouncementsV1Update(t *testing.T) {
 			}
 
 			// リクエストボディを設定
-			body, _ := json.Marshal(tt.request)
+			body, err := json.Marshal(tt.request)
+			require.NoError(t, err, "リクエストボディのJSONエンコードに失敗しました")
 			c.Request = httptest.NewRequest(http.MethodPut, "/api/v1/announcements/"+tt.id, bytes.NewBuffer(body))
 			c.Request.Header.Set("Content-Type", "application/json")
 
