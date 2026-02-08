@@ -446,18 +446,26 @@ func TestAnnouncementsV1Update(t *testing.T) {
 
 func TestAnnouncementsV1Delete(t *testing.T) {
 	tests := []struct {
-		name           string
-		id             string
-		withAdminClaim bool
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name               string
+		id                 string
+		withAdminClaim     bool
+		withDeveloperClaim bool
+		wantCode           int
+		validate           func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
 			name:           "正常にお知らせを削除できる",
 			id:             "1",
 			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			wantCode:       http.StatusNoContent,
 			validate:       nil,
+		},
+		{
+			name:               "developerクレームのみでも削除できる",
+			id:                 "1",
+			withDeveloperClaim: true,
+			wantCode:           http.StatusNoContent,
+			validate:           nil,
 		},
 		{
 			name:           "認証トークンがない場合は401エラー",
@@ -478,7 +486,13 @@ func TestAnnouncementsV1Delete(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
 			h := handler.NewHandler(announcementService)
-			w, c := setupTestContext(tt.withAdminClaim)
+			var w *httptest.ResponseRecorder
+			var c *gin.Context
+			if tt.withDeveloperClaim {
+				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
+			} else {
+				w, c = setupTestContext(tt.withAdminClaim)
+			}
 
 			h.AnnouncementsV1Delete(c, tt.id)
 
