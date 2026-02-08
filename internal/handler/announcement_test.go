@@ -53,10 +53,11 @@ func setupTestContextWithClaims(claims map[string]interface{}) (*httptest.Respon
 
 func TestAnnouncementsV1List(t *testing.T) {
 	tests := []struct {
-		name           string
-		withAdminClaim bool
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name             string
+		withAdminClaim   bool
+		withDeveloperClaim bool
+		wantCode         int
+		validate         func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
 			name:           "正常にお知らせ一覧が取得できる",
@@ -70,6 +71,20 @@ func TestAnnouncementsV1List(t *testing.T) {
 				announcements, ok := response["announcements"].([]interface{})
 				assert.True(t, ok, "announcementsフィールドが配列ではありません")
 				assert.NotEmpty(t, announcements, "アナウンスメントが空です")
+			},
+		},
+		{
+			name:               "developerクレームのみでも一覧が取得できる",
+			withDeveloperClaim: true,
+			wantCode:           http.StatusOK,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response map[string]interface{}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err, "JSONのパースに失敗しました")
+				announcements, ok := response["announcements"].([]interface{})
+				assert.True(t, ok, "announcementsフィールドが配列ではありません")
+				assert.NotEmpty(t, announcements, "アナウンスメントが空です")
+				assert.Len(t, announcements, 1, "MockRepositoryは1件返すはずです")
 			},
 		},
 		{
@@ -130,7 +145,13 @@ func TestAnnouncementsV1List(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
 			h := handler.NewHandler(announcementService)
-			w, c := setupTestContext(tt.withAdminClaim)
+			var w *httptest.ResponseRecorder
+			var c *gin.Context
+			if tt.withDeveloperClaim {
+				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
+			} else {
+				w, c = setupTestContext(tt.withAdminClaim)
+			}
 
 			h.AnnouncementsV1List(c)
 
