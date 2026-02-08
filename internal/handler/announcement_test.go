@@ -328,7 +328,8 @@ func TestAnnouncementsV1Create(t *testing.T) {
 			}
 
 			// リクエストボディを設定
-			body, _ := json.Marshal(tt.request)
+			body, err := json.Marshal(tt.request)
+			require.NoError(t, err, "リクエストボディのJSONエンコードに失敗しました")
 			c.Request = httptest.NewRequest(http.MethodPost, "/api/v1/announcements", bytes.NewBuffer(body))
 			c.Request.Header.Set("Content-Type", "application/json")
 
