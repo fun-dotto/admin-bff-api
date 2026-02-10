@@ -125,8 +125,8 @@ func TestAnnouncementsV1List(t *testing.T) {
 				assert.Equal(t, "1", response.Announcements[0].Id)
 				assert.Equal(t, "お知らせ1", response.Announcements[0].Title)
 				assert.Equal(t, "https://example.com/1", response.Announcements[0].Url)
-				assert.NotNil(t, response.Announcements[0].AvailableFrom)
-				assert.NotNil(t, response.Announcements[0].AvailableUntil)
+			assert.False(t, response.Announcements[0].AvailableFrom.IsZero(), "AvailableFromが設定されていること")
+			assert.False(t, response.Announcements[0].AvailableUntil.IsZero(), "AvailableUntilが設定されていること")
 			},
 		},
 		{
