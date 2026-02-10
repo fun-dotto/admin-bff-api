@@ -116,7 +116,7 @@ func TestAnnouncementsV1List(t *testing.T) {
 			wantCode:       http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
-					Announcements []api.Announcement `json:"announcements"`
+					Announcements []api.AnnouncementServiceAnnouncement `json:"announcements"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
@@ -180,7 +180,7 @@ func TestAnnouncementsV1Detail(t *testing.T) {
 			wantCode:       http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
-					Announcement api.Announcement `json:"announcement"`
+					Announcement api.AnnouncementServiceAnnouncement `json:"announcement"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err, "JSONのパースに失敗しました")
@@ -227,7 +227,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 
 	tests := []struct {
 		name               string
-		request            api.AnnouncementRequest
+		request            api.AnnouncementServiceAnnouncementRequest
 		withAdminClaim     bool
 		withDeveloperClaim bool
 		customClaims       map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
@@ -236,7 +236,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 	}{
 		{
 			name: "正常にお知らせを作成できる",
-			request: api.AnnouncementRequest{
+			request: api.AnnouncementServiceAnnouncementRequest{
 				Title:          "新しいお知らせ",
 				Url:            "https://example.com/new",
 				AvailableFrom:  now,
@@ -246,7 +246,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 			wantCode:       http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
-					Announcement api.Announcement `json:"announcement"`
+					Announcement api.AnnouncementServiceAnnouncement `json:"announcement"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err, "JSONのパースに失敗しました")
@@ -257,7 +257,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 		},
 		{
 			name: "developerクレームのみでも作成できる",
-			request: api.AnnouncementRequest{
+			request: api.AnnouncementServiceAnnouncementRequest{
 				Title:          "developer経由のお知らせ",
 				Url:            "https://example.com/developer",
 				AvailableFrom:  now,
@@ -267,7 +267,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 			wantCode:           http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
-					Announcement api.Announcement `json:"announcement"`
+					Announcement api.AnnouncementServiceAnnouncement `json:"announcement"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err, "JSONのパースに失敗しました")
@@ -278,7 +278,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 		},
 		{
 			name: "認証トークンがない場合は401エラー",
-			request: api.AnnouncementRequest{
+			request: api.AnnouncementServiceAnnouncementRequest{
 				Title:          "新しいお知らせ",
 				Url:            "https://example.com/new",
 				AvailableFrom:  now,
@@ -295,7 +295,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 		},
 		{
 			name: "admin/developer以外のクレームのみのトークンでは403エラー",
-			request: api.AnnouncementRequest{
+			request: api.AnnouncementServiceAnnouncementRequest{
 				Title:          "新しいお知らせ",
 				Url:            "https://example.com/new",
 				AvailableFrom:  now,
@@ -351,7 +351,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 	tests := []struct {
 		name           string
 		id             string
-		request        api.AnnouncementRequest
+		request        api.AnnouncementServiceAnnouncementRequest
 		withAdminClaim bool
 		customClaims   map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
 		wantCode       int
@@ -360,7 +360,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 		{
 			name: "正常にお知らせを更新できる",
 			id:   "1",
-			request: api.AnnouncementRequest{
+			request: api.AnnouncementServiceAnnouncementRequest{
 				Title:          "更新されたお知らせ",
 				Url:            "https://example.com/updated",
 				AvailableFrom:  now,
@@ -370,7 +370,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 			wantCode:       http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
-					Announcement api.Announcement `json:"announcement"`
+					Announcement api.AnnouncementServiceAnnouncement `json:"announcement"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err, "JSONのパースに失敗しました")
@@ -382,7 +382,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 		{
 			name: "認証トークンがない場合は401エラー",
 			id:   "1",
-			request: api.AnnouncementRequest{
+			request: api.AnnouncementServiceAnnouncementRequest{
 				Title:          "更新されたお知らせ",
 				Url:            "https://example.com/updated",
 				AvailableFrom:  now,
@@ -400,7 +400,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 		{
 			name: "admin/developer以外のクレームのみのトークンでは403エラー",
 			id:   "1",
-			request: api.AnnouncementRequest{
+			request: api.AnnouncementServiceAnnouncementRequest{
 				Title:          "更新されたお知らせ",
 				Url:            "https://example.com/updated",
 				AvailableFrom:  now,
