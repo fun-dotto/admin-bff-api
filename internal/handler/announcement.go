@@ -49,7 +49,7 @@ func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 		return
 	}
 
-	var req api.AnnouncementRequest
+	var req api.AnnouncementServiceAnnouncementRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -86,7 +86,7 @@ func (h *Handler) AnnouncementsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req api.AnnouncementRequest
+	var req api.AnnouncementServiceAnnouncementRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

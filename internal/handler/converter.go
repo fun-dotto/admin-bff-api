@@ -6,8 +6,8 @@ import (
 )
 
 // ToAPIAnnouncement ドメインモデルをAPIモデルに変換する
-func ToAPIAnnouncement(a *domain.Announcement) api.Announcement {
-	return api.Announcement{
+func ToAPIAnnouncement(a *domain.Announcement) api.AnnouncementServiceAnnouncement {
+	return api.AnnouncementServiceAnnouncement{
 		Id:             a.ID,
 		Title:          a.Title,
 		Url:            a.URL,
@@ -17,8 +17,8 @@ func ToAPIAnnouncement(a *domain.Announcement) api.Announcement {
 }
 
 // ToAPIAnnouncements ドメインモデルの配列をAPIモデルの配列に変換する
-func ToAPIAnnouncements(announcements []domain.Announcement) []api.Announcement {
-	result := make([]api.Announcement, len(announcements))
+func ToAPIAnnouncements(announcements []domain.Announcement) []api.AnnouncementServiceAnnouncement {
+	result := make([]api.AnnouncementServiceAnnouncement, len(announcements))
 	for i, a := range announcements {
 		result[i] = ToAPIAnnouncement(&a)
 	}
@@ -26,7 +26,7 @@ func ToAPIAnnouncements(announcements []domain.Announcement) []api.Announcement 
 }
 
 // ToDomainAnnouncementRequest APIモデルをドメインモデルに変換する
-func ToDomainAnnouncementRequest(req *api.AnnouncementRequest) *domain.AnnouncementRequest {
+func ToDomainAnnouncementRequest(req *api.AnnouncementServiceAnnouncementRequest) *domain.AnnouncementRequest {
 	return &domain.AnnouncementRequest{
 		Title:          req.Title,
 		URL:            req.Url,
