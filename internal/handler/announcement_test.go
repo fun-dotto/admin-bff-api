@@ -57,6 +57,7 @@ func TestAnnouncementsV1List(t *testing.T) {
 		name               string
 		withAdminClaim     bool
 		withDeveloperClaim bool
+		customClaims       map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
 		wantCode           int
 		validate           func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
@@ -139,6 +140,17 @@ func TestAnnouncementsV1List(t *testing.T) {
 				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
+		{
+			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
+			customClaims: map[string]interface{}{"user": true},
+			wantCode:     http.StatusForbidden,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response map[string]interface{}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Equal(t, "Insufficient permissions", response["error"])
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -148,7 +160,9 @@ func TestAnnouncementsV1List(t *testing.T) {
 			h := handler.NewHandler(announcementService)
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
-			if tt.withDeveloperClaim {
+			if tt.customClaims != nil {
+				w, c = setupTestContextWithClaims(tt.customClaims)
+			} else if tt.withDeveloperClaim {
 				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
 				w, c = setupTestContext(tt.withAdminClaim)
@@ -170,6 +184,7 @@ func TestAnnouncementsV1Detail(t *testing.T) {
 		name           string
 		id             string
 		withAdminClaim bool
+		customClaims   map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
 		wantCode       int
 		validate       func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
@@ -201,6 +216,18 @@ func TestAnnouncementsV1Detail(t *testing.T) {
 				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
+		{
+			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:           "1",
+			customClaims: map[string]interface{}{"user": true},
+			wantCode:     http.StatusForbidden,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response map[string]interface{}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Equal(t, "Insufficient permissions", response["error"])
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -208,7 +235,13 @@ func TestAnnouncementsV1Detail(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
 			h := handler.NewHandler(announcementService)
-			w, c := setupTestContext(tt.withAdminClaim)
+			var w *httptest.ResponseRecorder
+			var c *gin.Context
+			if tt.customClaims != nil {
+				w, c = setupTestContextWithClaims(tt.customClaims)
+			} else {
+				w, c = setupTestContext(tt.withAdminClaim)
+			}
 
 			h.AnnouncementsV1Detail(c, tt.id)
 
@@ -453,6 +486,7 @@ func TestAnnouncementsV1Delete(t *testing.T) {
 		id                 string
 		withAdminClaim     bool
 		withDeveloperClaim bool
+		customClaims       map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
 		wantCode           int
 		validate           func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
@@ -482,6 +516,18 @@ func TestAnnouncementsV1Delete(t *testing.T) {
 				assert.Equal(t, "Authentication required", response["error"])
 			},
 		},
+		{
+			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:           "1",
+			customClaims: map[string]interface{}{"user": true},
+			wantCode:     http.StatusForbidden,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response map[string]interface{}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Equal(t, "Insufficient permissions", response["error"])
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -491,7 +537,9 @@ func TestAnnouncementsV1Delete(t *testing.T) {
 			h := handler.NewHandler(announcementService)
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
-			if tt.withDeveloperClaim {
+			if tt.customClaims != nil {
+				w, c = setupTestContextWithClaims(tt.customClaims)
+			} else if tt.withDeveloperClaim {
 				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
 				w, c = setupTestContext(tt.withAdminClaim)
