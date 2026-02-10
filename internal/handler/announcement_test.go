@@ -106,7 +106,7 @@ func TestAnnouncementsV1List(t *testing.T) {
 				assert.NoError(t, err)
 
 				announcements, ok := response["announcements"].([]interface{})
-				assert.True(t, ok, "announcementsフィールドが存在しません")
+				assert.True(t, ok, "announcementsフィールドが配列ではありません")
 				assert.Len(t, announcements, 1, "MockRepositoryは1件返すはずです")
 			},
 		},
