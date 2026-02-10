@@ -21,8 +21,8 @@ func (h *Handler) AnnouncementsV1List(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"announcements": ToAPIAnnouncements(announcements),
+	c.JSON(http.StatusOK, api.AnnouncementsV1List200JSONResponse{
+		Announcements: ToAPIAnnouncements(announcements),
 	})
 }
 
@@ -38,8 +38,8 @@ func (h *Handler) AnnouncementsV1Detail(c *gin.Context, id string) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"announcement": ToAPIAnnouncement(announcement),
+	c.JSON(http.StatusOK, api.AnnouncementsV1Detail200JSONResponse{
+		Announcement: ToAPIAnnouncement(announcement),
 	})
 }
 
@@ -49,7 +49,7 @@ func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 		return
 	}
 
-	var req api.AnnouncementRequest
+	var req api.AnnouncementServiceAnnouncementRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -61,8 +61,8 @@ func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"announcement": ToAPIAnnouncement(announcement),
+	c.JSON(http.StatusCreated, api.AnnouncementsV1Create201JSONResponse{
+		Announcement: ToAPIAnnouncement(announcement),
 	})
 }
 
@@ -87,7 +87,7 @@ func (h *Handler) AnnouncementsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req api.AnnouncementRequest
+	var req api.AnnouncementServiceAnnouncementRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -99,7 +99,7 @@ func (h *Handler) AnnouncementsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"announcement": ToAPIAnnouncement(announcement),
+	c.JSON(http.StatusOK, api.AnnouncementsV1Update200JSONResponse{
+		Announcement: ToAPIAnnouncement(announcement),
 	})
 }
