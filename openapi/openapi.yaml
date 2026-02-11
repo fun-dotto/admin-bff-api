@@ -15,7 +15,7 @@ paths:
       operationId: AnnouncementsV1_list
       parameters: []
       responses:
-        '200':
+        "200":
           description: おしらせのリスト
           content:
             application/json:
@@ -25,7 +25,7 @@ paths:
                   announcements:
                     type: array
                     items:
-                      $ref: '#/components/schemas/AnnouncementService.Announcement'
+                      $ref: "#/components/schemas/AnnouncementService.Announcement"
                 required:
                   - announcements
       tags:
@@ -35,7 +35,7 @@ paths:
       description: おしらせを作成する
       parameters: []
       responses:
-        '201':
+        "201":
           description: 作成されたおしらせ
           content:
             application/json:
@@ -43,7 +43,7 @@ paths:
                 type: object
                 properties:
                   announcement:
-                    $ref: '#/components/schemas/AnnouncementService.Announcement'
+                    $ref: "#/components/schemas/AnnouncementService.Announcement"
                 required:
                   - announcement
       tags:
@@ -53,7 +53,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnnouncementService.AnnouncementRequest'
+              $ref: "#/components/schemas/AnnouncementService.AnnouncementRequest"
         description: 作成するおしらせの情報
   /v1/announcements/{id}:
     get:
@@ -67,7 +67,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: おしらせの詳細
           content:
             application/json:
@@ -75,7 +75,7 @@ paths:
                 type: object
                 properties:
                   announcement:
-                    $ref: '#/components/schemas/AnnouncementService.Announcement'
+                    $ref: "#/components/schemas/AnnouncementService.Announcement"
                 required:
                   - announcement
       tags:
@@ -91,7 +91,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 更新されたおしらせ
           content:
             application/json:
@@ -99,7 +99,7 @@ paths:
                 type: object
                 properties:
                   announcement:
-                    $ref: '#/components/schemas/AnnouncementService.Announcement'
+                    $ref: "#/components/schemas/AnnouncementService.Announcement"
                 required:
                   - announcement
       tags:
@@ -109,7 +109,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AnnouncementService.AnnouncementRequest'
+              $ref: "#/components/schemas/AnnouncementService.AnnouncementRequest"
         description: 更新するおしらせの情報
     delete:
       operationId: AnnouncementsV1_delete
@@ -122,7 +122,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: There is no content to send for this request, but the headers may be useful.
       tags:
         - Announcements
@@ -132,7 +132,7 @@ paths:
       description: コース一覧を取得する
       parameters: []
       responses:
-        '200':
+        "200":
           description: コースのリスト
           content:
             application/json:
@@ -142,7 +142,7 @@ paths:
                   courses:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SubjectService.Course'
+                      $ref: "#/components/schemas/SubjectService.Course"
                 required:
                   - courses
       tags:
@@ -152,7 +152,7 @@ paths:
       description: コースを作成する
       parameters: []
       responses:
-        '201':
+        "201":
           description: 作成されたコース
           content:
             application/json:
@@ -160,7 +160,7 @@ paths:
                 type: object
                 properties:
                   course:
-                    $ref: '#/components/schemas/SubjectService.Course'
+                    $ref: "#/components/schemas/SubjectService.Course"
                 required:
                   - course
       tags:
@@ -170,7 +170,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.CourseRequest'
+              $ref: "#/components/schemas/SubjectService.CourseRequest"
         description: 作成するコースの情報
   /v1/courses/{id}:
     get:
@@ -184,7 +184,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: コースの詳細
           content:
             application/json:
@@ -192,7 +192,7 @@ paths:
                 type: object
                 properties:
                   course:
-                    $ref: '#/components/schemas/SubjectService.Course'
+                    $ref: "#/components/schemas/SubjectService.Course"
                 required:
                   - course
       tags:
@@ -208,7 +208,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 更新されたコース
           content:
             application/json:
@@ -216,7 +216,7 @@ paths:
                 type: object
                 properties:
                   course:
-                    $ref: '#/components/schemas/SubjectService.Course'
+                    $ref: "#/components/schemas/SubjectService.Course"
                 required:
                   - course
       tags:
@@ -226,7 +226,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.CourseRequest'
+              $ref: "#/components/schemas/SubjectService.CourseRequest"
         description: 更新するコースの情報
     delete:
       operationId: CoursesV1_delete
@@ -239,7 +239,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: There is no content to send for this request, but the headers may be useful.
       tags:
         - Courses
@@ -249,7 +249,7 @@ paths:
       description: 曜日・時限一覧を取得する
       parameters: []
       responses:
-        '200':
+        "200":
           description: 曜日・時限のリスト
           content:
             application/json:
@@ -259,7 +259,7 @@ paths:
                   dayOfWeekTimetableSlots:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SubjectService.DayOfWeekTimetableSlot'
+                      $ref: "#/components/schemas/SubjectService.DayOfWeekTimetableSlot"
                 required:
                   - dayOfWeekTimetableSlots
       tags:
@@ -269,7 +269,7 @@ paths:
       description: 曜日・時限を作成する
       parameters: []
       responses:
-        '201':
+        "201":
           description: 作成された曜日・時限
           content:
             application/json:
@@ -277,7 +277,7 @@ paths:
                 type: object
                 properties:
                   dayOfWeekTimetableSlot:
-                    $ref: '#/components/schemas/SubjectService.DayOfWeekTimetableSlot'
+                    $ref: "#/components/schemas/SubjectService.DayOfWeekTimetableSlot"
                 required:
                   - dayOfWeekTimetableSlot
       tags:
@@ -287,7 +287,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.DayOfWeekTimetableSlotRequest'
+              $ref: "#/components/schemas/SubjectService.DayOfWeekTimetableSlotRequest"
         description: 作成する曜日・時限の情報
   /v1/day-of-week-timetable-slots/{id}:
     get:
@@ -301,7 +301,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 曜日・時限の詳細
           content:
             application/json:
@@ -309,7 +309,7 @@ paths:
                 type: object
                 properties:
                   dayOfWeekTimetableSlot:
-                    $ref: '#/components/schemas/SubjectService.DayOfWeekTimetableSlot'
+                    $ref: "#/components/schemas/SubjectService.DayOfWeekTimetableSlot"
                 required:
                   - dayOfWeekTimetableSlot
       tags:
@@ -325,7 +325,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 更新された曜日・時限
           content:
             application/json:
@@ -333,7 +333,7 @@ paths:
                 type: object
                 properties:
                   dayOfWeekTimetableSlot:
-                    $ref: '#/components/schemas/SubjectService.DayOfWeekTimetableSlot'
+                    $ref: "#/components/schemas/SubjectService.DayOfWeekTimetableSlot"
                 required:
                   - dayOfWeekTimetableSlot
       tags:
@@ -343,7 +343,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.DayOfWeekTimetableSlotRequest'
+              $ref: "#/components/schemas/SubjectService.DayOfWeekTimetableSlotRequest"
         description: 更新する曜日・時限の情報
     delete:
       operationId: DayOfWeekTimetableSlotsV1_delete
@@ -356,7 +356,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: There is no content to send for this request, but the headers may be useful.
       tags:
         - DayOfWeekTimetableSlots
@@ -366,7 +366,7 @@ paths:
       description: 教員一覧を取得する
       parameters: []
       responses:
-        '200':
+        "200":
           description: 教員のリスト
           content:
             application/json:
@@ -376,7 +376,7 @@ paths:
                   faculties:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SubjectService.Faculty'
+                      $ref: "#/components/schemas/SubjectService.Faculty"
                 required:
                   - faculties
       tags:
@@ -386,7 +386,7 @@ paths:
       description: 教員を作成する
       parameters: []
       responses:
-        '201':
+        "201":
           description: 作成された教員
           content:
             application/json:
@@ -394,7 +394,7 @@ paths:
                 type: object
                 properties:
                   faculty:
-                    $ref: '#/components/schemas/SubjectService.Faculty'
+                    $ref: "#/components/schemas/SubjectService.Faculty"
                 required:
                   - faculty
       tags:
@@ -404,7 +404,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.FacultyRequest'
+              $ref: "#/components/schemas/SubjectService.FacultyRequest"
         description: 作成する教員の情報
   /v1/faculties/{id}:
     get:
@@ -418,7 +418,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 教員の詳細
           content:
             application/json:
@@ -426,7 +426,7 @@ paths:
                 type: object
                 properties:
                   faculty:
-                    $ref: '#/components/schemas/SubjectService.Faculty'
+                    $ref: "#/components/schemas/SubjectService.Faculty"
                 required:
                   - faculty
       tags:
@@ -442,7 +442,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 更新された教員
           content:
             application/json:
@@ -450,7 +450,7 @@ paths:
                 type: object
                 properties:
                   faculty:
-                    $ref: '#/components/schemas/SubjectService.Faculty'
+                    $ref: "#/components/schemas/SubjectService.Faculty"
                 required:
                   - faculty
       tags:
@@ -460,7 +460,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.FacultyRequest'
+              $ref: "#/components/schemas/SubjectService.FacultyRequest"
         description: 更新する教員の情報
     delete:
       operationId: FacultiesV1_delete
@@ -473,7 +473,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: There is no content to send for this request, but the headers may be useful.
       tags:
         - Faculties
@@ -483,7 +483,7 @@ paths:
       description: 科目群・科目区分一覧を取得する
       parameters: []
       responses:
-        '200':
+        "200":
           description: 科目群・科目区分のリスト
           content:
             application/json:
@@ -493,7 +493,7 @@ paths:
                   subjectCategories:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SubjectService.SubjectCategory'
+                      $ref: "#/components/schemas/SubjectService.SubjectCategory"
                 required:
                   - subjectCategories
       tags:
@@ -503,7 +503,7 @@ paths:
       description: 科目群・科目区分を作成する
       parameters: []
       responses:
-        '201':
+        "201":
           description: 作成された科目群・科目区分
           content:
             application/json:
@@ -511,7 +511,7 @@ paths:
                 type: object
                 properties:
                   subjectCategory:
-                    $ref: '#/components/schemas/SubjectService.SubjectCategory'
+                    $ref: "#/components/schemas/SubjectService.SubjectCategory"
                 required:
                   - subjectCategory
       tags:
@@ -521,7 +521,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.SubjectCategoryRequest'
+              $ref: "#/components/schemas/SubjectService.SubjectCategoryRequest"
         description: 作成する科目群・科目区分の情報
   /v1/subject-categories/{id}:
     get:
@@ -535,7 +535,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 科目群・科目区分の詳細
           content:
             application/json:
@@ -543,7 +543,7 @@ paths:
                 type: object
                 properties:
                   subjectCategory:
-                    $ref: '#/components/schemas/SubjectService.SubjectCategory'
+                    $ref: "#/components/schemas/SubjectService.SubjectCategory"
                 required:
                   - subjectCategory
       tags:
@@ -559,7 +559,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 更新された科目群・科目区分
           content:
             application/json:
@@ -567,7 +567,7 @@ paths:
                 type: object
                 properties:
                   subjectCategory:
-                    $ref: '#/components/schemas/SubjectService.SubjectCategory'
+                    $ref: "#/components/schemas/SubjectService.SubjectCategory"
                 required:
                   - subjectCategory
       tags:
@@ -577,7 +577,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.SubjectCategoryRequest'
+              $ref: "#/components/schemas/SubjectService.SubjectCategoryRequest"
         description: 更新する科目群・科目区分の情報
     delete:
       operationId: SubjectCategoriesV1_delete
@@ -590,7 +590,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: There is no content to send for this request, but the headers may be useful.
       tags:
         - SubjectCategories
@@ -600,7 +600,7 @@ paths:
       description: 科目一覧を取得する
       parameters: []
       responses:
-        '200':
+        "200":
           description: 科目のリスト
           content:
             application/json:
@@ -610,7 +610,7 @@ paths:
                   subjects:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SubjectService.Subject'
+                      $ref: "#/components/schemas/SubjectService.Subject"
                 required:
                   - subjects
       tags:
@@ -620,7 +620,7 @@ paths:
       description: 科目を作成する
       parameters: []
       responses:
-        '201':
+        "201":
           description: 作成された科目
           content:
             application/json:
@@ -628,7 +628,7 @@ paths:
                 type: object
                 properties:
                   subject:
-                    $ref: '#/components/schemas/SubjectService.Subject'
+                    $ref: "#/components/schemas/SubjectService.Subject"
                 required:
                   - subject
       tags:
@@ -638,7 +638,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.SubjectRequest'
+              $ref: "#/components/schemas/SubjectService.SubjectRequest"
         description: 作成する科目の情報
   /v1/subjects/{id}:
     get:
@@ -652,7 +652,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 科目の詳細
           content:
             application/json:
@@ -660,7 +660,7 @@ paths:
                 type: object
                 properties:
                   subject:
-                    $ref: '#/components/schemas/SubjectService.Subject'
+                    $ref: "#/components/schemas/SubjectService.Subject"
                 required:
                   - subject
       tags:
@@ -676,7 +676,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: 更新された科目
           content:
             application/json:
@@ -684,7 +684,7 @@ paths:
                 type: object
                 properties:
                   subject:
-                    $ref: '#/components/schemas/SubjectService.Subject'
+                    $ref: "#/components/schemas/SubjectService.Subject"
                 required:
                   - subject
       tags:
@@ -694,7 +694,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubjectService.SubjectRequest'
+              $ref: "#/components/schemas/SubjectService.SubjectRequest"
         description: 更新する科目の情報
     delete:
       operationId: SubjectsV1_delete
@@ -707,7 +707,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        "204":
           description: There is no content to send for this request, but the headers may be useful.
       tags:
         - Subjects
@@ -849,9 +849,9 @@ components:
         id:
           type: string
         dayOfWeek:
-          $ref: '#/components/schemas/DottoFoundationV1.DayOfWeek'
+          $ref: "#/components/schemas/DottoFoundationV1.DayOfWeek"
         timetableSlot:
-          $ref: '#/components/schemas/DottoFoundationV1.TimetableSlot'
+          $ref: "#/components/schemas/DottoFoundationV1.TimetableSlot"
       description: 曜日・時限
     SubjectService.DayOfWeekTimetableSlotRequest:
       type: object
@@ -860,9 +860,9 @@ components:
         - timetableSlot
       properties:
         dayOfWeek:
-          $ref: '#/components/schemas/DottoFoundationV1.DayOfWeek'
+          $ref: "#/components/schemas/DottoFoundationV1.DayOfWeek"
         timetableSlot:
-          $ref: '#/components/schemas/DottoFoundationV1.TimetableSlot'
+          $ref: "#/components/schemas/DottoFoundationV1.TimetableSlot"
     SubjectService.Faculty:
       type: object
       required:
@@ -905,27 +905,27 @@ components:
         name:
           type: string
         faculty:
-          $ref: '#/components/schemas/SubjectService.Faculty'
+          $ref: "#/components/schemas/SubjectService.Faculty"
         semester:
-          $ref: '#/components/schemas/DottoFoundationV1.CourseSemester'
+          $ref: "#/components/schemas/DottoFoundationV1.CourseSemester"
         dayOfWeekTimetableSlots:
           type: array
           items:
-            $ref: '#/components/schemas/SubjectService.DayOfWeekTimetableSlot'
+            $ref: "#/components/schemas/SubjectService.DayOfWeekTimetableSlot"
         eligibleAttributes:
           type: array
           items:
-            $ref: '#/components/schemas/SubjectService.SubjectTargetClass'
+            $ref: "#/components/schemas/SubjectService.SubjectTargetClass"
           description: 授業名末尾の`学年-クラス`をもとに決定
         requirements:
           type: array
           items:
-            $ref: '#/components/schemas/SubjectService.SubjectRequirement'
+            $ref: "#/components/schemas/SubjectService.SubjectRequirement"
           description: 科目群・科目区分をもとに決定
         categories:
           type: array
           items:
-            $ref: '#/components/schemas/SubjectService.SubjectCategory'
+            $ref: "#/components/schemas/SubjectService.SubjectCategory"
           description: 科目群・科目区分のリスト
         syllabusId:
           type: string
@@ -965,7 +965,7 @@ components:
         facultyId:
           type: string
         semester:
-          $ref: '#/components/schemas/DottoFoundationV1.CourseSemester'
+          $ref: "#/components/schemas/DottoFoundationV1.CourseSemester"
         dayOfWeekTimetableSlotIds:
           type: array
           items:
@@ -973,11 +973,11 @@ components:
         eligibleAttributes:
           type: array
           items:
-            $ref: '#/components/schemas/SubjectService.SubjectTargetClass'
+            $ref: "#/components/schemas/SubjectService.SubjectTargetClass"
         requirements:
           type: array
           items:
-            $ref: '#/components/schemas/SubjectService.SubjectRequirementRequest'
+            $ref: "#/components/schemas/SubjectService.SubjectRequirementRequest"
         categoryIds:
           type: array
           items:
@@ -991,9 +991,9 @@ components:
         - requirementType
       properties:
         course:
-          $ref: '#/components/schemas/SubjectService.Course'
+          $ref: "#/components/schemas/SubjectService.Course"
         requirementType:
-          $ref: '#/components/schemas/DottoFoundationV1.SubjectRequirementType'
+          $ref: "#/components/schemas/DottoFoundationV1.SubjectRequirementType"
     SubjectService.SubjectRequirementRequest:
       type: object
       required:
@@ -1003,17 +1003,17 @@ components:
         courseId:
           type: string
         requirementType:
-          $ref: '#/components/schemas/DottoFoundationV1.SubjectRequirementType'
+          $ref: "#/components/schemas/DottoFoundationV1.SubjectRequirementType"
     SubjectService.SubjectTargetClass:
       type: object
       required:
         - grade
       properties:
         grade:
-          $ref: '#/components/schemas/DottoFoundationV1.Grade'
+          $ref: "#/components/schemas/DottoFoundationV1.Grade"
         class:
           allOf:
-            - $ref: '#/components/schemas/DottoFoundationV1.Class'
+            - $ref: "#/components/schemas/DottoFoundationV1.Class"
           description: 修士課程・博士課程対象の場合はnull
       description: 対象学年・クラス
 servers:
