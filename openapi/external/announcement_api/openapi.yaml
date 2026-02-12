@@ -17,7 +17,7 @@ paths:
 
             昇順ソートの場合は`asc`を指定、降順ソートの場合は`desc`を指定
           schema:
-            $ref: "#/components/schemas/FoundationV1.SortDirection"
+            $ref: '#/components/schemas/FoundationV1.SortDirection'
             default: asc
           explode: false
         - name: filterIsActive
@@ -32,7 +32,7 @@ paths:
             default: false
           explode: false
       responses:
-        "200":
+        '200':
           description: おしらせのリスト
           content:
             application/json:
@@ -42,7 +42,7 @@ paths:
                   announcements:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Announcement"
+                      $ref: '#/components/schemas/Announcement'
                 required:
                   - announcements
       tags:
@@ -52,7 +52,7 @@ paths:
       description: おしらせを作成する
       parameters: []
       responses:
-        "201":
+        '201':
           description: 作成されたおしらせ
           content:
             application/json:
@@ -60,7 +60,7 @@ paths:
                 type: object
                 properties:
                   announcement:
-                    $ref: "#/components/schemas/Announcement"
+                    $ref: '#/components/schemas/Announcement'
                 required:
                   - announcement
       tags:
@@ -70,7 +70,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AnnouncementRequest"
+              $ref: '#/components/schemas/AnnouncementRequest'
         description: 作成するおしらせの情報
   /v1/announcements/{id}:
     get:
@@ -84,7 +84,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: おしらせの詳細
           content:
             application/json:
@@ -92,7 +92,7 @@ paths:
                 type: object
                 properties:
                   announcement:
-                    $ref: "#/components/schemas/Announcement"
+                    $ref: '#/components/schemas/Announcement'
                 required:
                   - announcement
       tags:
@@ -108,7 +108,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: 更新されたおしらせ
           content:
             application/json:
@@ -116,7 +116,7 @@ paths:
                 type: object
                 properties:
                   announcement:
-                    $ref: "#/components/schemas/Announcement"
+                    $ref: '#/components/schemas/Announcement'
                 required:
                   - announcement
       tags:
@@ -126,7 +126,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AnnouncementRequest"
+              $ref: '#/components/schemas/AnnouncementRequest'
         description: 更新するおしらせの情報
     delete:
       operationId: AnnouncementsV1_delete
@@ -139,7 +139,7 @@ paths:
           schema:
             type: string
       responses:
-        "204":
+        '204':
           description: There is no content to send for this request, but the headers may be useful.
       tags:
         - Announcements
