@@ -157,7 +157,7 @@ func TestAnnouncementsV1List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
-			h := handler.NewHandler(announcementService)
+			h := handler.NewHandler().WithAnnouncementService(announcementService)
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
@@ -234,7 +234,7 @@ func TestAnnouncementsV1Detail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
-			h := handler.NewHandler(announcementService)
+			h := handler.NewHandler().WithAnnouncementService(announcementService)
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
@@ -349,7 +349,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
-			h := handler.NewHandler(announcementService)
+			h := handler.NewHandler().WithAnnouncementService(announcementService)
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
@@ -454,7 +454,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
-			h := handler.NewHandler(announcementService)
+			h := handler.NewHandler().WithAnnouncementService(announcementService)
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
@@ -534,7 +534,7 @@ func TestAnnouncementsV1Delete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := repository.NewMockAnnouncementRepository()
 			announcementService := service.NewAnnouncementService(mockRepo)
-			h := handler.NewHandler(announcementService)
+			h := handler.NewHandler().WithAnnouncementService(announcementService)
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
