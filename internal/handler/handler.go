@@ -23,9 +23,18 @@ type FacultyService interface {
 	Delete(ctx context.Context, id string) error
 }
 
+type CourseService interface {
+	List(ctx context.Context) ([]domain.Course, error)
+	Detail(ctx context.Context, id string) (*domain.Course, error)
+	Create(ctx context.Context, req *domain.CourseRequest) (*domain.Course, error)
+	Update(ctx context.Context, id string, req *domain.CourseRequest) (*domain.Course, error)
+	Delete(ctx context.Context, id string) error
+}
+
 type Handler struct {
 	announcementService AnnouncementService
 	facultyService      FacultyService
+	courseService       CourseService
 }
 
 func NewHandler() *Handler {
@@ -39,6 +48,11 @@ func (h *Handler) WithAnnouncementService(s AnnouncementService) *Handler {
 
 func (h *Handler) WithFacultyService(s FacultyService) *Handler {
 	h.facultyService = s
+	return h
+}
+
+func (h *Handler) WithCourseService(s CourseService) *Handler {
+	h.courseService = s
 	return h
 }
 
