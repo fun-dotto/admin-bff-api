@@ -54,8 +54,13 @@ func main() {
 	announcementRepo := repository.NewAnnouncementRepository(clients.Announcement)
 	announcementService := service.NewAnnouncementService(announcementRepo)
 
+	facultyRepo := repository.NewFacultyRepository(clients.Subject)
+	facultyService := service.NewFacultyService(facultyRepo)
+
 	// Register handlers
-	h := handler.NewHandler(announcementService)
+	h := handler.NewHandler().
+		WithAnnouncementService(announcementService).
+		WithFacultyService(facultyService)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"
