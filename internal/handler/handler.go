@@ -15,14 +15,31 @@ type AnnouncementService interface {
 	Delete(ctx context.Context, id string) error
 }
 
-type Handler struct {
-	announcementService AnnouncementService
+type FacultyService interface {
+	List(ctx context.Context) ([]domain.Faculty, error)
+	Detail(ctx context.Context, id string) (*domain.Faculty, error)
+	Create(ctx context.Context, req *domain.FacultyRequest) (*domain.Faculty, error)
+	Update(ctx context.Context, id string, req *domain.FacultyRequest) (*domain.Faculty, error)
+	Delete(ctx context.Context, id string) error
 }
 
-func NewHandler(announcementService AnnouncementService) *Handler {
-	return &Handler{
-		announcementService: announcementService,
-	}
+type Handler struct {
+	announcementService AnnouncementService
+	facultyService      FacultyService
+}
+
+func NewHandler() *Handler {
+	return &Handler{}
+}
+
+func (h *Handler) WithAnnouncementService(s AnnouncementService) *Handler {
+	h.announcementService = s
+	return h
+}
+
+func (h *Handler) WithFacultyService(s FacultyService) *Handler {
+	h.facultyService = s
+	return h
 }
 
 var _ api.ServerInterface = (*Handler)(nil)
