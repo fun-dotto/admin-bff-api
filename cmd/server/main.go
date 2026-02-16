@@ -57,10 +57,14 @@ func main() {
 	facultyRepo := repository.NewFacultyRepository(clients.Subject)
 	facultyService := service.NewFacultyService(facultyRepo)
 
+	courseRepo := repository.NewCourseRepository(clients.Subject)
+	courseService := service.NewCourseService(courseRepo)
+
 	// Register handlers
 	h := handler.NewHandler().
 		WithAnnouncementService(announcementService).
-		WithFacultyService(facultyService)
+		WithFacultyService(facultyService).
+		WithCourseService(courseService)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"
