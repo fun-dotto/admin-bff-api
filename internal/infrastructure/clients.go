@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/fun-dotto/api-template/generated/external/announcement_api"
 	"github.com/fun-dotto/api-template/generated/external/subject_api"
 	"google.golang.org/api/idtoken"
 )
+
+const httpClientTimeout = 30 * time.Second
 
 // ExternalClients 外部APIクライアントをまとめて管理
 type ExternalClients struct {
@@ -75,5 +78,6 @@ func newAuthHTTPClient(ctx context.Context, targetURL string) (*http.Client, err
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auth client: %w", err)
 	}
+	client.Timeout = httpClientTimeout
 	return client, nil
 }
