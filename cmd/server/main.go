@@ -60,11 +60,15 @@ func main() {
 	courseRepo := repository.NewCourseRepository(clients.Subject)
 	courseService := service.NewCourseService(courseRepo)
 
+	dayOfWeekTimetableSlotRepo := repository.NewDayOfWeekTimetableSlotRepository(clients.Subject)
+	dayOfWeekTimetableSlotService := service.NewDayOfWeekTimetableSlotService(dayOfWeekTimetableSlotRepo)
+
 	// Register handlers
 	h := handler.NewHandler().
 		WithAnnouncementService(announcementService).
 		WithFacultyService(facultyService).
-		WithCourseService(courseService)
+		WithCourseService(courseService).
+		WithDayOfWeekTimetableSlotService(dayOfWeekTimetableSlotService)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"
