@@ -66,13 +66,17 @@ func main() {
 	subjectCategoryRepo := repository.NewSubjectCategoryRepository(clients.Subject)
 	subjectCategoryService := service.NewSubjectCategoryService(subjectCategoryRepo)
 
+	subjectRepo := repository.NewSubjectRepository(clients.Subject)
+	subjectService := service.NewSubjectService(subjectRepo)
+
 	// Register handlers
 	h := handler.NewHandler().
 		WithAnnouncementService(announcementService).
 		WithFacultyService(facultyService).
 		WithCourseService(courseService).
 		WithDayOfWeekTimetableSlotService(dayOfWeekTimetableSlotService).
-		WithSubjectCategoryService(subjectCategoryService)
+		WithSubjectCategoryService(subjectCategoryService).
+		WithSubjectService(subjectService)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"
