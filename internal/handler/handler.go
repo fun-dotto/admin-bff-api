@@ -47,12 +47,21 @@ type SubjectCategoryService interface {
 	Delete(ctx context.Context, id string) error
 }
 
+type SubjectService interface {
+	List(ctx context.Context) ([]domain.Subject, error)
+	Detail(ctx context.Context, id string) (*domain.Subject, error)
+	Create(ctx context.Context, req *domain.SubjectRequest) (*domain.Subject, error)
+	Update(ctx context.Context, id string, req *domain.SubjectRequest) (*domain.Subject, error)
+	Delete(ctx context.Context, id string) error
+}
+
 type Handler struct {
 	announcementService           AnnouncementService
 	facultyService                FacultyService
 	courseService                 CourseService
 	dayOfWeekTimetableSlotService DayOfWeekTimetableSlotService
 	subjectCategoryService        SubjectCategoryService
+	subjectService                SubjectService
 }
 
 func NewHandler() *Handler {
@@ -81,6 +90,11 @@ func (h *Handler) WithDayOfWeekTimetableSlotService(s DayOfWeekTimetableSlotServ
 
 func (h *Handler) WithSubjectCategoryService(s SubjectCategoryService) *Handler {
 	h.subjectCategoryService = s
+	return h
+}
+
+func (h *Handler) WithSubjectService(s SubjectService) *Handler {
+	h.subjectService = s
 	return h
 }
 
