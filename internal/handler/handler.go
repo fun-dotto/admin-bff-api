@@ -31,10 +31,19 @@ type CourseService interface {
 	Delete(ctx context.Context, id string) error
 }
 
+type DayOfWeekTimetableSlotService interface {
+	List(ctx context.Context) ([]domain.DayOfWeekTimetableSlot, error)
+	Detail(ctx context.Context, id string) (*domain.DayOfWeekTimetableSlot, error)
+	Create(ctx context.Context, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error)
+	Update(ctx context.Context, id string, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error)
+	Delete(ctx context.Context, id string) error
+}
+
 type Handler struct {
-	announcementService AnnouncementService
-	facultyService      FacultyService
-	courseService       CourseService
+	announcementService            AnnouncementService
+	facultyService                 FacultyService
+	courseService                  CourseService
+	dayOfWeekTimetableSlotService  DayOfWeekTimetableSlotService
 }
 
 func NewHandler() *Handler {
@@ -53,6 +62,11 @@ func (h *Handler) WithFacultyService(s FacultyService) *Handler {
 
 func (h *Handler) WithCourseService(s CourseService) *Handler {
 	h.courseService = s
+	return h
+}
+
+func (h *Handler) WithDayOfWeekTimetableSlotService(s DayOfWeekTimetableSlotService) *Handler {
+	h.dayOfWeekTimetableSlotService = s
 	return h
 }
 
