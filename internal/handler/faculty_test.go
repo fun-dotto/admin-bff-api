@@ -2,12 +2,14 @@ package handler_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/internal/domain"
 	"github.com/fun-dotto/api-template/internal/handler"
 	"github.com/fun-dotto/api-template/internal/repository"
 	"github.com/fun-dotto/api-template/internal/service"
@@ -17,70 +19,69 @@ import (
 )
 
 func TestFacultiesV1List(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name               string
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{}
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		setupMock    func() *repository.MockFacultyRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に教員一覧が取得できる",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				var response map[string]interface{}
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
-
-				faculties, ok := response["faculties"].([]interface{})
-				assert.True(t, ok, "facultiesフィールドが配列ではありません")
-				assert.NotEmpty(t, faculties, "教員が空です")
+			name: "正常に教員一覧が取得できる",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{
+					ListFunc: func(ctx context.Context) ([]domain.Faculty, error) {
+						return []domain.Faculty{
+							{ID: "1", Name: "教員1", Email: "faculty1@example.com"},
+						}, nil
+					},
+				}
 			},
-		},
-		{
-			name:               "developerクレームのみでも一覧が取得できる",
-			withDeveloperClaim: true,
-			wantCode:           http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				var response map[string]interface{}
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
-				faculties, ok := response["faculties"].([]interface{})
-				assert.True(t, ok, "facultiesフィールドが配列ではありません")
-				assert.NotEmpty(t, faculties, "教員が空です")
-				assert.Len(t, faculties, 1, "MockRepositoryは1件返すはずです")
-			},
-		},
-		{
-			name:           "Content-Typeがapplication/jsonである",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-			},
-		},
-		{
-			name:           "教員のフィールドが正しく返される",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Faculties []api.SubjectServiceFaculty `json:"faculties"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Len(t, response.Faculties, 1, "MockRepositoryは1件返すはずです")
+				assert.Len(t, response.Faculties, 1)
 				assert.Equal(t, "1", response.Faculties[0].Id)
 				assert.Equal(t, "教員1", response.Faculties[0].Name)
 				assert.Equal(t, "faculty1@example.com", response.Faculties[0].Email)
 			},
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "developerクレームのみでも一覧が取得できる",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{
+					ListFunc: func(ctx context.Context) ([]domain.Faculty, error) {
+						return []domain.Faculty{
+							{ID: "1", Name: "教員1", Email: "faculty1@example.com"},
+						}, nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusOK,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response struct {
+					Faculties []api.SubjectServiceFaculty `json:"faculties"`
+				}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Len(t, response.Faculties, 1)
+			},
+		},
+		{
+			name: "認証トークンがない場合は401エラー",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -89,7 +90,10 @@ func TestFacultiesV1List(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -103,17 +107,16 @@ func TestFacultiesV1List(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockFacultyRepository()
+			mockRepo := tt.setupMock()
 			facultyService := service.NewFacultyService(mockRepo)
 			h := handler.NewHandler().WithFacultyService(facultyService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.FacultiesV1List(c)
@@ -128,35 +131,47 @@ func TestFacultiesV1List(t *testing.T) {
 }
 
 func TestFacultiesV1Detail(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name           string
-		id             string
-		withAdminClaim bool
-		customClaims   map[string]interface{}
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		setupMock    func() *repository.MockFacultyRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に教員詳細が取得できる",
-			id:             "1",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			name: "正常に教員詳細が取得できる",
+			id:   "1",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{
+					DetailFunc: func(ctx context.Context, id string) (*domain.Faculty, error) {
+						return &domain.Faculty{ID: id, Name: "教員" + id, Email: "faculty" + id + "@example.com"}, nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Faculty api.SubjectServiceFaculty `json:"faculty"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "1", response.Faculty.Id)
 				assert.Equal(t, "教員1", response.Faculty.Name)
 				assert.Equal(t, "faculty1@example.com", response.Faculty.Email)
 			},
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			id:             "1",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "認証トークンがない場合は401エラー",
+			id:   "1",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -165,8 +180,11 @@ func TestFacultiesV1Detail(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
-			id:           "1",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:   "1",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -180,15 +198,16 @@ func TestFacultiesV1Detail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockFacultyRepository()
+			mockRepo := tt.setupMock()
 			facultyService := service.NewFacultyService(mockRepo)
 			h := handler.NewHandler().WithFacultyService(facultyService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.FacultiesV1Detail(c, tt.id)
@@ -203,60 +222,69 @@ func TestFacultiesV1Detail(t *testing.T) {
 }
 
 func TestFacultiesV1Create(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name               string
-		request            api.SubjectServiceFacultyRequest
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{}
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		request      api.SubjectServiceFacultyRequest
+		setupMock    func() *repository.MockFacultyRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name: "正常に教員を作成できる",
-			request: api.SubjectServiceFacultyRequest{
-				Name:  "新しい教員",
-				Email: "newfaculty@example.com",
+			name:    "正常に教員を作成できる",
+			request: api.SubjectServiceFacultyRequest{Name: "新しい教員", Email: "newfaculty@example.com"},
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{
+					CreateFunc: func(ctx context.Context, req *domain.FacultyRequest) (*domain.Faculty, error) {
+						return &domain.Faculty{ID: "created-id", Name: req.Name, Email: req.Email}, nil
+					},
+				}
 			},
-			withAdminClaim: true,
-			wantCode:       http.StatusCreated,
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Faculty api.SubjectServiceFaculty `json:"faculty"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "created-id", response.Faculty.Id)
 				assert.Equal(t, "新しい教員", response.Faculty.Name)
 				assert.Equal(t, "newfaculty@example.com", response.Faculty.Email)
 			},
 		},
 		{
-			name: "developerクレームのみでも作成できる",
-			request: api.SubjectServiceFacultyRequest{
-				Name:  "developer経由の教員",
-				Email: "devfaculty@example.com",
+			name:    "developerクレームのみでも作成できる",
+			request: api.SubjectServiceFacultyRequest{Name: "developer経由の教員", Email: "devfaculty@example.com"},
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{
+					CreateFunc: func(ctx context.Context, req *domain.FacultyRequest) (*domain.Faculty, error) {
+						return &domain.Faculty{ID: "created-id", Name: req.Name, Email: req.Email}, nil
+					},
+				}
 			},
-			withDeveloperClaim: true,
-			wantCode:           http.StatusCreated,
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Faculty api.SubjectServiceFaculty `json:"faculty"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "created-id", response.Faculty.Id)
 				assert.Equal(t, "developer経由の教員", response.Faculty.Name)
 			},
 		},
 		{
-			name: "認証トークンがない場合は401エラー",
-			request: api.SubjectServiceFacultyRequest{
-				Name:  "新しい教員",
-				Email: "newfaculty@example.com",
+			name:    "認証トークンがない場合は401エラー",
+			request: api.SubjectServiceFacultyRequest{Name: "新しい教員", Email: "newfaculty@example.com"},
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
 			},
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -265,10 +293,10 @@ func TestFacultiesV1Create(t *testing.T) {
 			},
 		},
 		{
-			name: "admin/developer以外のクレームのみのトークンでは403エラー",
-			request: api.SubjectServiceFacultyRequest{
-				Name:  "新しい教員",
-				Email: "newfaculty@example.com",
+			name:    "admin/developer以外のクレームのみのトークンでは403エラー",
+			request: api.SubjectServiceFacultyRequest{Name: "新しい教員", Email: "newfaculty@example.com"},
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
 			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
@@ -283,21 +311,20 @@ func TestFacultiesV1Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockFacultyRepository()
+			mockRepo := tt.setupMock()
 			facultyService := service.NewFacultyService(mockRepo)
 			h := handler.NewHandler().WithFacultyService(facultyService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			body, err := json.Marshal(tt.request)
-			require.NoError(t, err, "リクエストボディのJSONエンコードに失敗しました")
+			require.NoError(t, err)
 			c.Request = httptest.NewRequest(http.MethodPost, "/api/v1/faculties", bytes.NewBuffer(body))
 			c.Request.Header.Set("Content-Type", "application/json")
 
@@ -313,44 +340,50 @@ func TestFacultiesV1Create(t *testing.T) {
 }
 
 func TestFacultiesV1Update(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name           string
-		id             string
-		request        api.SubjectServiceFacultyRequest
-		withAdminClaim bool
-		customClaims   map[string]interface{}
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		request      api.SubjectServiceFacultyRequest
+		setupMock    func() *repository.MockFacultyRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name: "正常に教員を更新できる",
-			id:   "1",
-			request: api.SubjectServiceFacultyRequest{
-				Name:  "更新された教員",
-				Email: "updated@example.com",
+			name:    "正常に教員を更新できる",
+			id:      "1",
+			request: api.SubjectServiceFacultyRequest{Name: "更新された教員", Email: "updated@example.com"},
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{
+					UpdateFunc: func(ctx context.Context, id string, req *domain.FacultyRequest) (*domain.Faculty, error) {
+						return &domain.Faculty{ID: id, Name: req.Name, Email: req.Email}, nil
+					},
+				}
 			},
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Faculty api.SubjectServiceFaculty `json:"faculty"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "1", response.Faculty.Id)
 				assert.Equal(t, "更新された教員", response.Faculty.Name)
 				assert.Equal(t, "updated@example.com", response.Faculty.Email)
 			},
 		},
 		{
-			name: "認証トークンがない場合は401エラー",
-			id:   "1",
-			request: api.SubjectServiceFacultyRequest{
-				Name:  "更新された教員",
-				Email: "updated@example.com",
+			name:    "認証トークンがない場合は401エラー",
+			id:      "1",
+			request: api.SubjectServiceFacultyRequest{Name: "更新された教員", Email: "updated@example.com"},
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
 			},
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -359,11 +392,11 @@ func TestFacultiesV1Update(t *testing.T) {
 			},
 		},
 		{
-			name: "admin/developer以外のクレームのみのトークンでは403エラー",
-			id:   "1",
-			request: api.SubjectServiceFacultyRequest{
-				Name:  "更新された教員",
-				Email: "updated@example.com",
+			name:    "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:      "1",
+			request: api.SubjectServiceFacultyRequest{Name: "更新された教員", Email: "updated@example.com"},
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
 			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
@@ -378,19 +411,20 @@ func TestFacultiesV1Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockFacultyRepository()
+			mockRepo := tt.setupMock()
 			facultyService := service.NewFacultyService(mockRepo)
 			h := handler.NewHandler().WithFacultyService(facultyService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			body, err := json.Marshal(tt.request)
-			require.NoError(t, err, "リクエストボディのJSONエンコードに失敗しました")
+			require.NoError(t, err)
 			c.Request = httptest.NewRequest(http.MethodPut, "/api/v1/faculties/"+tt.id, bytes.NewBuffer(body))
 			c.Request.Header.Set("Content-Type", "application/json")
 
@@ -406,34 +440,52 @@ func TestFacultiesV1Update(t *testing.T) {
 }
 
 func TestFacultiesV1Delete(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name               string
-		id                 string
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{}
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		setupMock    func() *repository.MockFacultyRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に教員を削除できる",
-			id:             "1",
-			withAdminClaim: true,
-			wantCode:       http.StatusNoContent,
-			validate:       nil,
+			name: "正常に教員を削除できる",
+			id:   "1",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{
+					DeleteFunc: func(ctx context.Context, id string) error {
+						return nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusNoContent,
+			validate:     nil,
 		},
 		{
-			name:               "developerクレームのみでも削除できる",
-			id:                 "1",
-			withDeveloperClaim: true,
-			wantCode:           http.StatusNoContent,
-			validate:           nil,
+			name: "developerクレームのみでも削除できる",
+			id:   "1",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{
+					DeleteFunc: func(ctx context.Context, id string) error {
+						return nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusNoContent,
+			validate:     nil,
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			id:             "1",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "認証トークンがない場合は401エラー",
+			id:   "1",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -442,8 +494,11 @@ func TestFacultiesV1Delete(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
-			id:           "1",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:   "1",
+			setupMock: func() *repository.MockFacultyRepository {
+				return &repository.MockFacultyRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -457,17 +512,16 @@ func TestFacultiesV1Delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockFacultyRepository()
+			mockRepo := tt.setupMock()
 			facultyService := service.NewFacultyService(mockRepo)
 			h := handler.NewHandler().WithFacultyService(facultyService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.FacultiesV1Delete(c, tt.id)

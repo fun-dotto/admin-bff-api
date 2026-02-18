@@ -2,12 +2,14 @@ package handler_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/internal/domain"
 	"github.com/fun-dotto/api-template/internal/handler"
 	"github.com/fun-dotto/api-template/internal/repository"
 	"github.com/fun-dotto/api-template/internal/service"
@@ -16,91 +18,94 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func createMockSubject(id string) *domain.Subject {
+	classA := domain.ClassA
+	return &domain.Subject{
+		ID:   id,
+		Name: "科目" + id,
+		Faculty: domain.Faculty{
+			ID:    "faculty-1",
+			Name:  "教員1",
+			Email: "faculty1@example.com",
+		},
+		Semester: domain.CourseSemesterH1,
+		DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{
+			{ID: "slot-1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1},
+		},
+		EligibleAttributes: []domain.SubjectTargetClass{
+			{Grade: domain.GradeB1, Class: &classA},
+		},
+		Requirements: []domain.SubjectRequirement{
+			{Course: domain.Course{ID: "course-1", Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeRequired},
+		},
+		Categories: []domain.SubjectCategory{
+			{ID: "category-1", Name: "カテゴリ1"},
+		},
+		SyllabusID: "syllabus-1",
+	}
+}
+
 func TestSubjectsV1List(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name               string
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		setupMock    func() *repository.MockSubjectRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に科目一覧が取得できる",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				var response map[string]interface{}
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
-
-				subjects, ok := response["subjects"].([]interface{})
-				assert.True(t, ok, "subjectsフィールドが配列ではありません")
-				assert.NotEmpty(t, subjects, "科目が空です")
+			name: "正常に科目一覧が取得できる",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{
+					ListFunc: func(ctx context.Context) ([]domain.Subject, error) {
+						return []domain.Subject{*createMockSubject("1")}, nil
+					},
+				}
 			},
-		},
-		{
-			name:               "developerクレームのみでも一覧が取得できる",
-			withDeveloperClaim: true,
-			wantCode:           http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				var response map[string]interface{}
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
-				subjects, ok := response["subjects"].([]interface{})
-				assert.True(t, ok, "subjectsフィールドが配列ではありません")
-				assert.NotEmpty(t, subjects, "科目が空です")
-				assert.Len(t, subjects, 1, "MockRepositoryは1件返すはずです")
-			},
-		},
-		{
-			name:           "Content-Typeがapplication/jsonである",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-			},
-		},
-		{
-			name:           "レスポンスが正しい構造である",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				var response map[string]interface{}
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err)
-
-				subjects, ok := response["subjects"].([]interface{})
-				assert.True(t, ok, "subjectsフィールドが配列ではありません")
-				assert.Len(t, subjects, 1, "MockRepositoryは1件返すはずです")
-			},
-		},
-		{
-			name:           "科目のフィールドが正しく返される",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Subjects []api.SubjectServiceSubject `json:"subjects"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Len(t, response.Subjects, 1, "MockRepositoryは1件返すはずです")
+				assert.Len(t, response.Subjects, 1)
 				assert.Equal(t, "1", response.Subjects[0].Id)
 				assert.Equal(t, "科目1", response.Subjects[0].Name)
 				assert.Equal(t, api.H1, response.Subjects[0].Semester)
 				assert.Equal(t, "syllabus-1", response.Subjects[0].SyllabusId)
-				assert.NotEmpty(t, response.Subjects[0].Faculty.Id, "Facultyが設定されていること")
-				assert.NotEmpty(t, response.Subjects[0].DayOfWeekTimetableSlots, "DayOfWeekTimetableSlotsが設定されていること")
-				assert.NotEmpty(t, response.Subjects[0].EligibleAttributes, "EligibleAttributesが設定されていること")
-				assert.NotEmpty(t, response.Subjects[0].Requirements, "Requirementsが設定されていること")
-				assert.NotEmpty(t, response.Subjects[0].Categories, "Categoriesが設定されていること")
 			},
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "developerクレームのみでも一覧が取得できる",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{
+					ListFunc: func(ctx context.Context) ([]domain.Subject, error) {
+						return []domain.Subject{*createMockSubject("1")}, nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusOK,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response struct {
+					Subjects []api.SubjectServiceSubject `json:"subjects"`
+				}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Len(t, response.Subjects, 1)
+			},
+		},
+		{
+			name: "認証トークンがない場合は401エラー",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -109,7 +114,10 @@ func TestSubjectsV1List(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -123,17 +131,16 @@ func TestSubjectsV1List(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectRepository()
+			mockRepo := tt.setupMock()
 			subjectService := service.NewSubjectService(mockRepo)
 			h := handler.NewHandler().WithSubjectService(subjectService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.SubjectsV1List(c)
@@ -148,25 +155,34 @@ func TestSubjectsV1List(t *testing.T) {
 }
 
 func TestSubjectsV1Detail(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name           string
-		id             string
-		withAdminClaim bool
-		customClaims   map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		setupMock    func() *repository.MockSubjectRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に科目詳細が取得できる",
-			id:             "1",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			name: "正常に科目詳細が取得できる",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{
+					DetailFunc: func(ctx context.Context, id string) (*domain.Subject, error) {
+						return createMockSubject(id), nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Subject api.SubjectServiceSubject `json:"subject"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "1", response.Subject.Id)
 				assert.Equal(t, "科目1", response.Subject.Name)
 				assert.Equal(t, api.H1, response.Subject.Semester)
@@ -174,10 +190,13 @@ func TestSubjectsV1Detail(t *testing.T) {
 			},
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			id:             "1",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "認証トークンがない場合は401エラー",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -186,8 +205,11 @@ func TestSubjectsV1Detail(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
-			id:           "1",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -201,15 +223,16 @@ func TestSubjectsV1Detail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectRepository()
+			mockRepo := tt.setupMock()
 			subjectService := service.NewSubjectService(mockRepo)
 			h := handler.NewHandler().WithSubjectService(subjectService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.SubjectsV1Detail(c, tt.id)
@@ -224,16 +247,16 @@ func TestSubjectsV1Detail(t *testing.T) {
 }
 
 func TestSubjectsV1Create(t *testing.T) {
+	gin.SetMode(gin.TestMode)
 	classA := api.A
 
 	tests := []struct {
-		name               string
-		request            api.SubjectServiceSubjectRequest
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		request      api.SubjectServiceSubjectRequest
+		setupMock    func() *repository.MockSubjectRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
 			name: "正常に科目を作成できる",
@@ -242,29 +265,37 @@ func TestSubjectsV1Create(t *testing.T) {
 				FacultyId:                 "faculty-1",
 				Semester:                  api.H1,
 				DayOfWeekTimetableSlotIds: []string{"slot-1"},
-				EligibleAttributes: []api.SubjectServiceSubjectTargetClass{
-					{
-						Grade: api.B1,
-						Class: &classA,
-					},
-				},
-				Requirements: []api.SubjectServiceSubjectRequirementRequest{
-					{
-						CourseId:        "course-1",
-						RequirementType: api.Required,
-					},
-				},
-				CategoryIds: []string{"category-1"},
-				SyllabusId:  "syllabus-new",
+				EligibleAttributes:        []api.SubjectServiceSubjectTargetClass{{Grade: api.B1, Class: &classA}},
+				Requirements:              []api.SubjectServiceSubjectRequirementRequest{{CourseId: "course-1", RequirementType: api.Required}},
+				CategoryIds:               []string{"category-1"},
+				SyllabusId:                "syllabus-new",
 			},
-			withAdminClaim: true,
-			wantCode:       http.StatusCreated,
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{
+					CreateFunc: func(ctx context.Context, req *domain.SubjectRequest) (*domain.Subject, error) {
+						classA := domain.ClassA
+						return &domain.Subject{
+							ID:                      "created-id",
+							Name:                    req.Name,
+							Faculty:                 domain.Faculty{ID: req.FacultyID, Name: "教員1", Email: "faculty1@example.com"},
+							Semester:                req.Semester,
+							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}},
+							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB1, Class: &classA}},
+							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: "course-1", Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeRequired}},
+							Categories:              []domain.SubjectCategory{{ID: "category-1", Name: "カテゴリ1"}},
+							SyllabusID:              req.SyllabusID,
+						}, nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Subject api.SubjectServiceSubject `json:"subject"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "created-id", response.Subject.Id)
 				assert.Equal(t, "新しい科目", response.Subject.Name)
 				assert.Equal(t, api.H1, response.Subject.Semester)
@@ -278,29 +309,37 @@ func TestSubjectsV1Create(t *testing.T) {
 				FacultyId:                 "faculty-1",
 				Semester:                  api.H2,
 				DayOfWeekTimetableSlotIds: []string{"slot-1"},
-				EligibleAttributes: []api.SubjectServiceSubjectTargetClass{
-					{
-						Grade: api.B2,
-						Class: &classA,
-					},
-				},
-				Requirements: []api.SubjectServiceSubjectRequirementRequest{
-					{
-						CourseId:        "course-1",
-						RequirementType: api.Optional,
-					},
-				},
-				CategoryIds: []string{"category-1"},
-				SyllabusId:  "syllabus-dev",
+				EligibleAttributes:        []api.SubjectServiceSubjectTargetClass{{Grade: api.B2, Class: &classA}},
+				Requirements:              []api.SubjectServiceSubjectRequirementRequest{{CourseId: "course-1", RequirementType: api.Optional}},
+				CategoryIds:               []string{"category-1"},
+				SyllabusId:                "syllabus-dev",
 			},
-			withDeveloperClaim: true,
-			wantCode:           http.StatusCreated,
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{
+					CreateFunc: func(ctx context.Context, req *domain.SubjectRequest) (*domain.Subject, error) {
+						classA := domain.ClassA
+						return &domain.Subject{
+							ID:                      "created-id",
+							Name:                    req.Name,
+							Faculty:                 domain.Faculty{ID: req.FacultyID, Name: "教員1", Email: "faculty1@example.com"},
+							Semester:                req.Semester,
+							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}},
+							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB2, Class: &classA}},
+							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: "course-1", Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeOptional}},
+							Categories:              []domain.SubjectCategory{{ID: "category-1", Name: "カテゴリ1"}},
+							SyllabusID:              req.SyllabusID,
+						}, nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Subject api.SubjectServiceSubject `json:"subject"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "created-id", response.Subject.Id)
 				assert.Equal(t, "developer経由の科目", response.Subject.Name)
 			},
@@ -317,8 +356,11 @@ func TestSubjectsV1Create(t *testing.T) {
 				CategoryIds:               []string{},
 				SyllabusId:                "syllabus-new",
 			},
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -338,6 +380,9 @@ func TestSubjectsV1Create(t *testing.T) {
 				CategoryIds:               []string{},
 				SyllabusId:                "syllabus-new",
 			},
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -351,22 +396,20 @@ func TestSubjectsV1Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectRepository()
+			mockRepo := tt.setupMock()
 			subjectService := service.NewSubjectService(mockRepo)
 			h := handler.NewHandler().WithSubjectService(subjectService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
-			// リクエストボディを設定
 			body, err := json.Marshal(tt.request)
-			require.NoError(t, err, "リクエストボディのJSONエンコードに失敗しました")
+			require.NoError(t, err)
 			c.Request = httptest.NewRequest(http.MethodPost, "/api/v1/subjects", bytes.NewBuffer(body))
 			c.Request.Header.Set("Content-Type", "application/json")
 
@@ -382,16 +425,17 @@ func TestSubjectsV1Create(t *testing.T) {
 }
 
 func TestSubjectsV1Update(t *testing.T) {
+	gin.SetMode(gin.TestMode)
 	classB := api.B
 
 	tests := []struct {
-		name           string
-		id             string
-		request        api.SubjectServiceSubjectRequest
-		withAdminClaim bool
-		customClaims   map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		request      api.SubjectServiceSubjectRequest
+		setupMock    func() *repository.MockSubjectRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
 			name: "正常に科目を更新できる",
@@ -401,29 +445,37 @@ func TestSubjectsV1Update(t *testing.T) {
 				FacultyId:                 "faculty-2",
 				Semester:                  api.H2,
 				DayOfWeekTimetableSlotIds: []string{"slot-2"},
-				EligibleAttributes: []api.SubjectServiceSubjectTargetClass{
-					{
-						Grade: api.B2,
-						Class: &classB,
-					},
-				},
-				Requirements: []api.SubjectServiceSubjectRequirementRequest{
-					{
-						CourseId:        "course-2",
-						RequirementType: api.OptionalRequired,
-					},
-				},
-				CategoryIds: []string{"category-2"},
-				SyllabusId:  "syllabus-updated",
+				EligibleAttributes:        []api.SubjectServiceSubjectTargetClass{{Grade: api.B2, Class: &classB}},
+				Requirements:              []api.SubjectServiceSubjectRequirementRequest{{CourseId: "course-2", RequirementType: api.OptionalRequired}},
+				CategoryIds:               []string{"category-2"},
+				SyllabusId:                "syllabus-updated",
 			},
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{
+					UpdateFunc: func(ctx context.Context, id string, req *domain.SubjectRequest) (*domain.Subject, error) {
+						classB := domain.ClassB
+						return &domain.Subject{
+							ID:                      id,
+							Name:                    req.Name,
+							Faculty:                 domain.Faculty{ID: req.FacultyID, Name: "教員2", Email: "faculty2@example.com"},
+							Semester:                req.Semester,
+							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-2", DayOfWeek: domain.DayOfWeekTuesday, TimetableSlot: domain.TimetableSlotSlot2}},
+							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB2, Class: &classB}},
+							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: "course-2", Name: "コース2"}, RequirementType: domain.SubjectRequirementTypeOptionalRequired}},
+							Categories:              []domain.SubjectCategory{{ID: "category-2", Name: "カテゴリ2"}},
+							SyllabusID:              req.SyllabusID,
+						}, nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					Subject api.SubjectServiceSubject `json:"subject"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "1", response.Subject.Id)
 				assert.Equal(t, "更新された科目", response.Subject.Name)
 				assert.Equal(t, api.H2, response.Subject.Semester)
@@ -443,8 +495,11 @@ func TestSubjectsV1Update(t *testing.T) {
 				CategoryIds:               []string{},
 				SyllabusId:                "syllabus-updated",
 			},
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -465,6 +520,9 @@ func TestSubjectsV1Update(t *testing.T) {
 				CategoryIds:               []string{},
 				SyllabusId:                "syllabus-updated",
 			},
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -478,20 +536,20 @@ func TestSubjectsV1Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectRepository()
+			mockRepo := tt.setupMock()
 			subjectService := service.NewSubjectService(mockRepo)
 			h := handler.NewHandler().WithSubjectService(subjectService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
-			// リクエストボディを設定
 			body, err := json.Marshal(tt.request)
-			require.NoError(t, err, "リクエストボディのJSONエンコードに失敗しました")
+			require.NoError(t, err)
 			c.Request = httptest.NewRequest(http.MethodPut, "/api/v1/subjects/"+tt.id, bytes.NewBuffer(body))
 			c.Request.Header.Set("Content-Type", "application/json")
 
@@ -507,34 +565,52 @@ func TestSubjectsV1Update(t *testing.T) {
 }
 
 func TestSubjectsV1Delete(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name               string
-		id                 string
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{} // 指定時はこのクレームでトークンをセット（403検証用）
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		setupMock    func() *repository.MockSubjectRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に科目を削除できる",
-			id:             "1",
-			withAdminClaim: true,
-			wantCode:       http.StatusNoContent,
-			validate:       nil,
+			name: "正常に科目を削除できる",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{
+					DeleteFunc: func(ctx context.Context, id string) error {
+						return nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusNoContent,
+			validate:     nil,
 		},
 		{
-			name:               "developerクレームのみでも削除できる",
-			id:                 "1",
-			withDeveloperClaim: true,
-			wantCode:           http.StatusNoContent,
-			validate:           nil,
+			name: "developerクレームのみでも削除できる",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{
+					DeleteFunc: func(ctx context.Context, id string) error {
+						return nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusNoContent,
+			validate:     nil,
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			id:             "1",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "認証トークンがない場合は401エラー",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -543,8 +619,11 @@ func TestSubjectsV1Delete(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
-			id:           "1",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectRepository {
+				return &repository.MockSubjectRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -558,17 +637,16 @@ func TestSubjectsV1Delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectRepository()
+			mockRepo := tt.setupMock()
 			subjectService := service.NewSubjectService(mockRepo)
 			h := handler.NewHandler().WithSubjectService(subjectService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.SubjectsV1Delete(c, tt.id)

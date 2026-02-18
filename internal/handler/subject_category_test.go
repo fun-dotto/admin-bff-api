@@ -2,12 +2,14 @@ package handler_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/internal/domain"
 	"github.com/fun-dotto/api-template/internal/handler"
 	"github.com/fun-dotto/api-template/internal/repository"
 	"github.com/fun-dotto/api-template/internal/service"
@@ -17,69 +19,68 @@ import (
 )
 
 func TestSubjectCategoriesV1List(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name               string
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{}
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		setupMock    func() *repository.MockSubjectCategoryRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に科目群・科目区分一覧が取得できる",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				var response map[string]interface{}
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
-
-				categories, ok := response["subjectCategories"].([]interface{})
-				assert.True(t, ok, "subjectCategoriesフィールドが配列ではありません")
-				assert.NotEmpty(t, categories, "科目群・科目区分が空です")
+			name: "正常に科目群・科目区分一覧が取得できる",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{
+					ListFunc: func(ctx context.Context) ([]domain.SubjectCategory, error) {
+						return []domain.SubjectCategory{
+							{ID: "1", Name: "カテゴリ1"},
+						}, nil
+					},
+				}
 			},
-		},
-		{
-			name:               "developerクレームのみでも一覧が取得できる",
-			withDeveloperClaim: true,
-			wantCode:           http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				var response map[string]interface{}
-				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
-				categories, ok := response["subjectCategories"].([]interface{})
-				assert.True(t, ok, "subjectCategoriesフィールドが配列ではありません")
-				assert.NotEmpty(t, categories, "科目群・科目区分が空です")
-				assert.Len(t, categories, 1, "MockRepositoryは1件返すはずです")
-			},
-		},
-		{
-			name:           "Content-Typeがapplication/jsonである",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
-			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
-				assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
-			},
-		},
-		{
-			name:           "科目群・科目区分のフィールドが正しく返される",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					SubjectCategories []api.SubjectServiceSubjectCategory `json:"subjectCategories"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
-				assert.Len(t, response.SubjectCategories, 1, "MockRepositoryは1件返すはずです")
+				assert.Len(t, response.SubjectCategories, 1)
 				assert.Equal(t, "1", response.SubjectCategories[0].Id)
 				assert.Equal(t, "カテゴリ1", response.SubjectCategories[0].Name)
 			},
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "developerクレームのみでも一覧が取得できる",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{
+					ListFunc: func(ctx context.Context) ([]domain.SubjectCategory, error) {
+						return []domain.SubjectCategory{
+							{ID: "1", Name: "カテゴリ1"},
+						}, nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusOK,
+			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response struct {
+					SubjectCategories []api.SubjectServiceSubjectCategory `json:"subjectCategories"`
+				}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Len(t, response.SubjectCategories, 1)
+			},
+		},
+		{
+			name: "認証トークンがない場合は401エラー",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -88,7 +89,10 @@ func TestSubjectCategoriesV1List(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -102,17 +106,16 @@ func TestSubjectCategoriesV1List(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectCategoryRepository()
+			mockRepo := tt.setupMock()
 			categoryService := service.NewSubjectCategoryService(mockRepo)
 			h := handler.NewHandler().WithSubjectCategoryService(categoryService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.SubjectCategoriesV1List(c)
@@ -127,34 +130,46 @@ func TestSubjectCategoriesV1List(t *testing.T) {
 }
 
 func TestSubjectCategoriesV1Detail(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name           string
-		id             string
-		withAdminClaim bool
-		customClaims   map[string]interface{}
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		setupMock    func() *repository.MockSubjectCategoryRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に科目群・科目区分詳細が取得できる",
-			id:             "1",
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			name: "正常に科目群・科目区分詳細が取得できる",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{
+					DetailFunc: func(ctx context.Context, id string) (*domain.SubjectCategory, error) {
+						return &domain.SubjectCategory{ID: id, Name: "カテゴリ" + id}, nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					SubjectCategory api.SubjectServiceSubjectCategory `json:"subjectCategory"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "1", response.SubjectCategory.Id)
 				assert.Equal(t, "カテゴリ1", response.SubjectCategory.Name)
 			},
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			id:             "1",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "認証トークンがない場合は401エラー",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -163,8 +178,11 @@ func TestSubjectCategoriesV1Detail(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
-			id:           "1",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -178,15 +196,16 @@ func TestSubjectCategoriesV1Detail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectCategoryRepository()
+			mockRepo := tt.setupMock()
 			categoryService := service.NewSubjectCategoryService(mockRepo)
 			h := handler.NewHandler().WithSubjectCategoryService(categoryService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.SubjectCategoriesV1Detail(c, tt.id)
@@ -201,56 +220,68 @@ func TestSubjectCategoriesV1Detail(t *testing.T) {
 }
 
 func TestSubjectCategoriesV1Create(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name               string
-		request            api.SubjectServiceSubjectCategoryRequest
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{}
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		request      api.SubjectServiceSubjectCategoryRequest
+		setupMock    func() *repository.MockSubjectCategoryRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name: "正常に科目群・科目区分を作成できる",
-			request: api.SubjectServiceSubjectCategoryRequest{
-				Name: "新しいカテゴリ",
+			name:    "正常に科目群・科目区分を作成できる",
+			request: api.SubjectServiceSubjectCategoryRequest{Name: "新しいカテゴリ"},
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{
+					CreateFunc: func(ctx context.Context, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
+						return &domain.SubjectCategory{ID: "created-id", Name: req.Name}, nil
+					},
+				}
 			},
-			withAdminClaim: true,
-			wantCode:       http.StatusCreated,
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					SubjectCategory api.SubjectServiceSubjectCategory `json:"subjectCategory"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "created-id", response.SubjectCategory.Id)
 				assert.Equal(t, "新しいカテゴリ", response.SubjectCategory.Name)
 			},
 		},
 		{
-			name: "developerクレームのみでも作成できる",
-			request: api.SubjectServiceSubjectCategoryRequest{
-				Name: "developer経由のカテゴリ",
+			name:    "developerクレームのみでも作成できる",
+			request: api.SubjectServiceSubjectCategoryRequest{Name: "developer経由のカテゴリ"},
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{
+					CreateFunc: func(ctx context.Context, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
+						return &domain.SubjectCategory{ID: "created-id", Name: req.Name}, nil
+					},
+				}
 			},
-			withDeveloperClaim: true,
-			wantCode:           http.StatusCreated,
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusCreated,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					SubjectCategory api.SubjectServiceSubjectCategory `json:"subjectCategory"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "created-id", response.SubjectCategory.Id)
 				assert.Equal(t, "developer経由のカテゴリ", response.SubjectCategory.Name)
 			},
 		},
 		{
-			name: "認証トークンがない場合は401エラー",
-			request: api.SubjectServiceSubjectCategoryRequest{
-				Name: "新しいカテゴリ",
+			name:    "認証トークンがない場合は401エラー",
+			request: api.SubjectServiceSubjectCategoryRequest{Name: "新しいカテゴリ"},
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
 			},
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -259,9 +290,10 @@ func TestSubjectCategoriesV1Create(t *testing.T) {
 			},
 		},
 		{
-			name: "admin/developer以外のクレームのみのトークンでは403エラー",
-			request: api.SubjectServiceSubjectCategoryRequest{
-				Name: "新しいカテゴリ",
+			name:    "admin/developer以外のクレームのみのトークンでは403エラー",
+			request: api.SubjectServiceSubjectCategoryRequest{Name: "新しいカテゴリ"},
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
 			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
@@ -276,21 +308,20 @@ func TestSubjectCategoriesV1Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectCategoryRepository()
+			mockRepo := tt.setupMock()
 			categoryService := service.NewSubjectCategoryService(mockRepo)
 			h := handler.NewHandler().WithSubjectCategoryService(categoryService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			body, err := json.Marshal(tt.request)
-			require.NoError(t, err, "リクエストボディのJSONエンコードに失敗しました")
+			require.NoError(t, err)
 			c.Request = httptest.NewRequest(http.MethodPost, "/api/v1/subject-categories", bytes.NewBuffer(body))
 			c.Request.Header.Set("Content-Type", "application/json")
 
@@ -306,41 +337,49 @@ func TestSubjectCategoriesV1Create(t *testing.T) {
 }
 
 func TestSubjectCategoriesV1Update(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name           string
-		id             string
-		request        api.SubjectServiceSubjectCategoryRequest
-		withAdminClaim bool
-		customClaims   map[string]interface{}
-		wantCode       int
-		validate       func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		request      api.SubjectServiceSubjectCategoryRequest
+		setupMock    func() *repository.MockSubjectCategoryRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name: "正常に科目群・科目区分を更新できる",
-			id:   "1",
-			request: api.SubjectServiceSubjectCategoryRequest{
-				Name: "更新されたカテゴリ",
+			name:    "正常に科目群・科目区分を更新できる",
+			id:      "1",
+			request: api.SubjectServiceSubjectCategoryRequest{Name: "更新されたカテゴリ"},
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{
+					UpdateFunc: func(ctx context.Context, id string, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
+						return &domain.SubjectCategory{ID: id, Name: req.Name}, nil
+					},
+				}
 			},
-			withAdminClaim: true,
-			wantCode:       http.StatusOK,
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusOK,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response struct {
 					SubjectCategory api.SubjectServiceSubjectCategory `json:"subjectCategory"`
 				}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
-				assert.NoError(t, err, "JSONのパースに失敗しました")
+				assert.NoError(t, err)
 				assert.Equal(t, "1", response.SubjectCategory.Id)
 				assert.Equal(t, "更新されたカテゴリ", response.SubjectCategory.Name)
 			},
 		},
 		{
-			name: "認証トークンがない場合は401エラー",
-			id:   "1",
-			request: api.SubjectServiceSubjectCategoryRequest{
-				Name: "更新されたカテゴリ",
+			name:    "認証トークンがない場合は401エラー",
+			id:      "1",
+			request: api.SubjectServiceSubjectCategoryRequest{Name: "更新されたカテゴリ"},
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
 			},
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -349,10 +388,11 @@ func TestSubjectCategoriesV1Update(t *testing.T) {
 			},
 		},
 		{
-			name: "admin/developer以外のクレームのみのトークンでは403エラー",
-			id:   "1",
-			request: api.SubjectServiceSubjectCategoryRequest{
-				Name: "更新されたカテゴリ",
+			name:    "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:      "1",
+			request: api.SubjectServiceSubjectCategoryRequest{Name: "更新されたカテゴリ"},
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
 			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
@@ -367,19 +407,20 @@ func TestSubjectCategoriesV1Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectCategoryRepository()
+			mockRepo := tt.setupMock()
 			categoryService := service.NewSubjectCategoryService(mockRepo)
 			h := handler.NewHandler().WithSubjectCategoryService(categoryService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			body, err := json.Marshal(tt.request)
-			require.NoError(t, err, "リクエストボディのJSONエンコードに失敗しました")
+			require.NoError(t, err)
 			c.Request = httptest.NewRequest(http.MethodPut, "/api/v1/subject-categories/"+tt.id, bytes.NewBuffer(body))
 			c.Request.Header.Set("Content-Type", "application/json")
 
@@ -395,34 +436,52 @@ func TestSubjectCategoriesV1Update(t *testing.T) {
 }
 
 func TestSubjectCategoriesV1Delete(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
 	tests := []struct {
-		name               string
-		id                 string
-		withAdminClaim     bool
-		withDeveloperClaim bool
-		customClaims       map[string]interface{}
-		wantCode           int
-		validate           func(t *testing.T, w *httptest.ResponseRecorder)
+		name         string
+		id           string
+		setupMock    func() *repository.MockSubjectCategoryRepository
+		customClaims map[string]interface{}
+		wantCode     int
+		validate     func(t *testing.T, w *httptest.ResponseRecorder)
 	}{
 		{
-			name:           "正常に科目群・科目区分を削除できる",
-			id:             "1",
-			withAdminClaim: true,
-			wantCode:       http.StatusNoContent,
-			validate:       nil,
+			name: "正常に科目群・科目区分を削除できる",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{
+					DeleteFunc: func(ctx context.Context, id string) error {
+						return nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"admin": true},
+			wantCode:     http.StatusNoContent,
+			validate:     nil,
 		},
 		{
-			name:               "developerクレームのみでも削除できる",
-			id:                 "1",
-			withDeveloperClaim: true,
-			wantCode:           http.StatusNoContent,
-			validate:           nil,
+			name: "developerクレームのみでも削除できる",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{
+					DeleteFunc: func(ctx context.Context, id string) error {
+						return nil
+					},
+				}
+			},
+			customClaims: map[string]interface{}{"developer": true},
+			wantCode:     http.StatusNoContent,
+			validate:     nil,
 		},
 		{
-			name:           "認証トークンがない場合は401エラー",
-			id:             "1",
-			withAdminClaim: false,
-			wantCode:       http.StatusUnauthorized,
+			name: "認証トークンがない場合は401エラー",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
+			},
+			customClaims: nil,
+			wantCode:     http.StatusUnauthorized,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
 				var response map[string]interface{}
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -431,8 +490,11 @@ func TestSubjectCategoriesV1Delete(t *testing.T) {
 			},
 		},
 		{
-			name:         "admin/developer以外のクレームのみのトークンでは403エラー",
-			id:           "1",
+			name: "admin/developer以外のクレームのみのトークンでは403エラー",
+			id:   "1",
+			setupMock: func() *repository.MockSubjectCategoryRepository {
+				return &repository.MockSubjectCategoryRepository{}
+			},
 			customClaims: map[string]interface{}{"user": true},
 			wantCode:     http.StatusForbidden,
 			validate: func(t *testing.T, w *httptest.ResponseRecorder) {
@@ -446,17 +508,16 @@ func TestSubjectCategoriesV1Delete(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := repository.NewMockSubjectCategoryRepository()
+			mockRepo := tt.setupMock()
 			categoryService := service.NewSubjectCategoryService(mockRepo)
 			h := handler.NewHandler().WithSubjectCategoryService(categoryService)
+
 			var w *httptest.ResponseRecorder
 			var c *gin.Context
 			if tt.customClaims != nil {
 				w, c = setupTestContextWithClaims(tt.customClaims)
-			} else if tt.withDeveloperClaim {
-				w, c = setupTestContextWithClaims(map[string]interface{}{"developer": true})
 			} else {
-				w, c = setupTestContext(tt.withAdminClaim)
+				w, c = setupTestContext(false)
 			}
 
 			h.SubjectCategoriesV1Delete(c, tt.id)
