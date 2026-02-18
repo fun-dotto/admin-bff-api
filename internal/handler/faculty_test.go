@@ -147,7 +147,7 @@ func TestFacultiesV1Detail(t *testing.T) {
 			setupMock: func() *repository.MockFacultyRepository {
 				return &repository.MockFacultyRepository{
 					DetailFunc: func(ctx context.Context, id string) (*domain.Faculty, error) {
-						return &domain.Faculty{ID: id, Name: "教員" + id, Email: "faculty" + id + "@example.com"}, nil
+						return &domain.Faculty{ID: domain.FacultyID(id), Name: "教員" + id, Email: "faculty" + id + "@example.com"}, nil
 					},
 				}
 			},
@@ -358,7 +358,7 @@ func TestFacultiesV1Update(t *testing.T) {
 			setupMock: func() *repository.MockFacultyRepository {
 				return &repository.MockFacultyRepository{
 					UpdateFunc: func(ctx context.Context, id string, req *domain.FacultyRequest) (*domain.Faculty, error) {
-						return &domain.Faculty{ID: id, Name: req.Name, Email: req.Email}, nil
+						return &domain.Faculty{ID: domain.FacultyID(id), Name: req.Name, Email: req.Email}, nil
 					},
 				}
 			},

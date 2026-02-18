@@ -8,7 +8,7 @@ import (
 // ToAPIFaculty ドメインモデルをAPIモデルに変換する
 func ToAPIFaculty(f *domain.Faculty) api.SubjectServiceFaculty {
 	return api.SubjectServiceFaculty{
-		Id:    f.ID,
+		Id:    f.ID.String(),
 		Name:  f.Name,
 		Email: f.Email,
 	}

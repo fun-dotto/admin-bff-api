@@ -1,8 +1,15 @@
 package domain
 
+// FacultyID 教員IDの型
+type FacultyID string
+
+func (f FacultyID) String() string {
+	return string(f)
+}
+
 // Faculty 教員のドメインモデル
 type Faculty struct {
-	ID    string
+	ID    FacultyID
 	Name  string
 	Email string
 }

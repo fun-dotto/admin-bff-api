@@ -277,7 +277,7 @@ func TestSubjectsV1Create(t *testing.T) {
 						return &domain.Subject{
 							ID:                      "created-id",
 							Name:                    req.Name,
-							Faculty:                 domain.Faculty{ID: req.FacultyID, Name: "教員1", Email: "faculty1@example.com"},
+							Faculty:                 domain.Faculty{ID: domain.FacultyID(req.FacultyID), Name: "教員1", Email: "faculty1@example.com"},
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB1, Class: &classA}},
@@ -321,7 +321,7 @@ func TestSubjectsV1Create(t *testing.T) {
 						return &domain.Subject{
 							ID:                      "created-id",
 							Name:                    req.Name,
-							Faculty:                 domain.Faculty{ID: req.FacultyID, Name: "教員1", Email: "faculty1@example.com"},
+							Faculty:                 domain.Faculty{ID: domain.FacultyID(req.FacultyID), Name: "教員1", Email: "faculty1@example.com"},
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB2, Class: &classA}},
@@ -457,7 +457,7 @@ func TestSubjectsV1Update(t *testing.T) {
 						return &domain.Subject{
 							ID:                      id,
 							Name:                    req.Name,
-							Faculty:                 domain.Faculty{ID: req.FacultyID, Name: "教員2", Email: "faculty2@example.com"},
+							Faculty:                 domain.Faculty{ID: domain.FacultyID(req.FacultyID), Name: "教員2", Email: "faculty2@example.com"},
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-2", DayOfWeek: domain.DayOfWeekTuesday, TimetableSlot: domain.TimetableSlotSlot2}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB2, Class: &classB}},

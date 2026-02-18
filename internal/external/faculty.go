@@ -8,7 +8,7 @@ import (
 // ToDomainFaculty 外部API形式からドメイン形式に変換する
 func ToDomainFaculty(f subject_api.Faculty) domain.Faculty {
 	return domain.Faculty{
-		ID:    f.Id,
+		ID:    domain.FacultyID(f.Id),
 		Name:  f.Name,
 		Email: f.Email,
 	}
