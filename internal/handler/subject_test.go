@@ -36,7 +36,7 @@ func createMockSubject(id string) *domain.Subject {
 			{Grade: domain.GradeB1, Class: &classA},
 		},
 		Requirements: []domain.SubjectRequirement{
-			{Course: domain.Course{ID: "course-1", Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeRequired},
+			{Course: domain.Course{ID: domain.CourseID("course-1"), Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeRequired},
 		},
 		Categories: []domain.SubjectCategory{
 			{ID: "category-1", Name: "カテゴリ1"},
@@ -281,7 +281,7 @@ func TestSubjectsV1Create(t *testing.T) {
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB1, Class: &classA}},
-							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: "course-1", Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeRequired}},
+							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: domain.CourseID("course-1"), Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeRequired}},
 							Categories:              []domain.SubjectCategory{{ID: "category-1", Name: "カテゴリ1"}},
 							SyllabusID:              req.SyllabusID,
 						}, nil
@@ -325,7 +325,7 @@ func TestSubjectsV1Create(t *testing.T) {
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB2, Class: &classA}},
-							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: "course-1", Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeOptional}},
+							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: domain.CourseID("course-1"), Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeOptional}},
 							Categories:              []domain.SubjectCategory{{ID: "category-1", Name: "カテゴリ1"}},
 							SyllabusID:              req.SyllabusID,
 						}, nil
@@ -461,7 +461,7 @@ func TestSubjectsV1Update(t *testing.T) {
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: "slot-2", DayOfWeek: domain.DayOfWeekTuesday, TimetableSlot: domain.TimetableSlotSlot2}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB2, Class: &classB}},
-							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: "course-2", Name: "コース2"}, RequirementType: domain.SubjectRequirementTypeOptionalRequired}},
+							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: domain.CourseID("course-2"), Name: "コース2"}, RequirementType: domain.SubjectRequirementTypeOptionalRequired}},
 							Categories:              []domain.SubjectCategory{{ID: "category-2", Name: "カテゴリ2"}},
 							SyllabusID:              req.SyllabusID,
 						}, nil

@@ -34,7 +34,7 @@ func TestCoursesV1List(t *testing.T) {
 				return &repository.MockCourseRepository{
 					ListFunc: func(ctx context.Context) ([]domain.Course, error) {
 						return []domain.Course{
-							{ID: "1", Name: "コース1"},
+							{ID: domain.CourseID("1"), Name: "コース1"},
 						}, nil
 					},
 				}
@@ -58,7 +58,7 @@ func TestCoursesV1List(t *testing.T) {
 				return &repository.MockCourseRepository{
 					ListFunc: func(ctx context.Context) ([]domain.Course, error) {
 						return []domain.Course{
-							{ID: "1", Name: "コース1"},
+							{ID: domain.CourseID("1"), Name: "コース1"},
 						}, nil
 					},
 				}
@@ -146,7 +146,7 @@ func TestCoursesV1Detail(t *testing.T) {
 			setupMock: func() *repository.MockCourseRepository {
 				return &repository.MockCourseRepository{
 					DetailFunc: func(ctx context.Context, id string) (*domain.Course, error) {
-						return &domain.Course{ID: id, Name: "コース" + id}, nil
+						return &domain.Course{ID: domain.CourseID(id), Name: "コース" + id}, nil
 					},
 				}
 			},
@@ -236,7 +236,7 @@ func TestCoursesV1Create(t *testing.T) {
 			setupMock: func() *repository.MockCourseRepository {
 				return &repository.MockCourseRepository{
 					CreateFunc: func(ctx context.Context, req *domain.CourseRequest) (*domain.Course, error) {
-						return &domain.Course{ID: "created-id", Name: req.Name}, nil
+						return &domain.Course{ID: domain.CourseID("created-id"), Name: req.Name}, nil
 					},
 				}
 			},
@@ -258,7 +258,7 @@ func TestCoursesV1Create(t *testing.T) {
 			setupMock: func() *repository.MockCourseRepository {
 				return &repository.MockCourseRepository{
 					CreateFunc: func(ctx context.Context, req *domain.CourseRequest) (*domain.Course, error) {
-						return &domain.Course{ID: "created-id", Name: req.Name}, nil
+						return &domain.Course{ID: domain.CourseID("created-id"), Name: req.Name}, nil
 					},
 				}
 			},
@@ -355,7 +355,7 @@ func TestCoursesV1Update(t *testing.T) {
 			setupMock: func() *repository.MockCourseRepository {
 				return &repository.MockCourseRepository{
 					UpdateFunc: func(ctx context.Context, id string, req *domain.CourseRequest) (*domain.Course, error) {
-						return &domain.Course{ID: id, Name: req.Name}, nil
+						return &domain.Course{ID: domain.CourseID(id), Name: req.Name}, nil
 					},
 				}
 			},

@@ -8,7 +8,7 @@ import (
 // ToDomainCourse 外部API形式からドメイン形式に変換する
 func ToDomainCourse(c subject_api.Course) domain.Course {
 	return domain.Course{
-		ID:   c.Id,
+		ID:   domain.CourseID(c.Id),
 		Name: c.Name,
 	}
 }
