@@ -7,48 +7,49 @@ import (
 	"github.com/fun-dotto/api-template/internal/service"
 )
 
-type mockSubjectCategoryRepository struct{}
+type MockSubjectCategoryRepository struct {
+	ListFunc   func(ctx context.Context) ([]domain.SubjectCategory, error)
+	DetailFunc func(ctx context.Context, id string) (*domain.SubjectCategory, error)
+	CreateFunc func(ctx context.Context, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error)
+	UpdateFunc func(ctx context.Context, id string, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error)
+	DeleteFunc func(ctx context.Context, id string) error
+}
 
-// NewMockSubjectCategoryRepository モックリポジトリを作成する
 func NewMockSubjectCategoryRepository() service.SubjectCategoryRepository {
-	return &mockSubjectCategoryRepository{}
+	return &MockSubjectCategoryRepository{}
 }
 
-// List 一覧を取得する（モック）
-func (r *mockSubjectCategoryRepository) List(ctx context.Context) ([]domain.SubjectCategory, error) {
-	return []domain.SubjectCategory{
-		{
-			ID:   "1",
-			Name: "カテゴリ1",
-		},
-	}, nil
+func (r *MockSubjectCategoryRepository) List(ctx context.Context) ([]domain.SubjectCategory, error) {
+	if r.ListFunc != nil {
+		return r.ListFunc(ctx)
+	}
+	return []domain.SubjectCategory{}, nil
 }
 
-// Detail 詳細を取得する（モック）
-func (r *mockSubjectCategoryRepository) Detail(ctx context.Context, id string) (*domain.SubjectCategory, error) {
-	return &domain.SubjectCategory{
-		ID:   id,
-		Name: "カテゴリ" + id,
-	}, nil
+func (r *MockSubjectCategoryRepository) Detail(ctx context.Context, id string) (*domain.SubjectCategory, error) {
+	if r.DetailFunc != nil {
+		return r.DetailFunc(ctx, id)
+	}
+	return nil, nil
 }
 
-// Create 新規作成する（モック）
-func (r *mockSubjectCategoryRepository) Create(ctx context.Context, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
-	return &domain.SubjectCategory{
-		ID:   "created-id",
-		Name: req.Name,
-	}, nil
+func (r *MockSubjectCategoryRepository) Create(ctx context.Context, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
+	if r.CreateFunc != nil {
+		return r.CreateFunc(ctx, req)
+	}
+	return nil, nil
 }
 
-// Update 更新する（モック）
-func (r *mockSubjectCategoryRepository) Update(ctx context.Context, id string, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
-	return &domain.SubjectCategory{
-		ID:   id,
-		Name: req.Name,
-	}, nil
+func (r *MockSubjectCategoryRepository) Update(ctx context.Context, id string, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
+	if r.UpdateFunc != nil {
+		return r.UpdateFunc(ctx, id, req)
+	}
+	return nil, nil
 }
 
-// Delete 削除する（モック）
-func (r *mockSubjectCategoryRepository) Delete(ctx context.Context, id string) error {
+func (r *MockSubjectCategoryRepository) Delete(ctx context.Context, id string) error {
+	if r.DeleteFunc != nil {
+		return r.DeleteFunc(ctx, id)
+	}
 	return nil
 }

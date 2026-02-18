@@ -2,70 +2,54 @@ package repository
 
 import (
 	"context"
-	"time"
 
 	"github.com/fun-dotto/api-template/internal/domain"
 	"github.com/fun-dotto/api-template/internal/service"
 )
 
-type mockAnnouncementRepository struct{}
+type MockAnnouncementRepository struct {
+	ListFunc   func(ctx context.Context) ([]domain.Announcement, error)
+	DetailFunc func(ctx context.Context, id string) (*domain.Announcement, error)
+	CreateFunc func(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error)
+	UpdateFunc func(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error)
+	DeleteFunc func(ctx context.Context, id string) error
+}
 
-// NewMockAnnouncementRepository モックリポジトリを作成する
 func NewMockAnnouncementRepository() service.AnnouncementRepository {
-	return &mockAnnouncementRepository{}
+	return &MockAnnouncementRepository{}
 }
 
-// List 一覧を取得する（モック）
-func (r *mockAnnouncementRepository) List(ctx context.Context) ([]domain.Announcement, error) {
-	now := time.Now()
-	until := now.Add(24 * time.Hour)
-	return []domain.Announcement{
-		{
-			ID:             "1",
-			Title:          "お知らせ1",
-			URL:            "https://example.com/1",
-			AvailableFrom:  now,
-			AvailableUntil: &until,
-		},
-	}, nil
+func (r *MockAnnouncementRepository) List(ctx context.Context) ([]domain.Announcement, error) {
+	if r.ListFunc != nil {
+		return r.ListFunc(ctx)
+	}
+	return []domain.Announcement{}, nil
 }
 
-// Detail 詳細を取得する（モック）
-func (r *mockAnnouncementRepository) Detail(ctx context.Context, id string) (*domain.Announcement, error) {
-	now := time.Now()
-	until := now.Add(24 * time.Hour)
-	return &domain.Announcement{
-		ID:             id,
-		Title:          "お知らせ" + id,
-		URL:            "https://example.com/" + id,
-		AvailableFrom:  now,
-		AvailableUntil: &until,
-	}, nil
+func (r *MockAnnouncementRepository) Detail(ctx context.Context, id string) (*domain.Announcement, error) {
+	if r.DetailFunc != nil {
+		return r.DetailFunc(ctx, id)
+	}
+	return nil, nil
 }
 
-// Create 新規作成する（モック）
-func (r *mockAnnouncementRepository) Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
-	return &domain.Announcement{
-		ID:             "created-id",
-		Title:          req.Title,
-		URL:            req.URL,
-		AvailableFrom:  req.AvailableFrom,
-		AvailableUntil: req.AvailableUntil,
-	}, nil
+func (r *MockAnnouncementRepository) Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
+	if r.CreateFunc != nil {
+		return r.CreateFunc(ctx, req)
+	}
+	return nil, nil
 }
 
-// Update 更新する（モック）
-func (r *mockAnnouncementRepository) Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
-	return &domain.Announcement{
-		ID:             id,
-		Title:          req.Title,
-		URL:            req.URL,
-		AvailableFrom:  req.AvailableFrom,
-		AvailableUntil: req.AvailableUntil,
-	}, nil
+func (r *MockAnnouncementRepository) Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
+	if r.UpdateFunc != nil {
+		return r.UpdateFunc(ctx, id, req)
+	}
+	return nil, nil
 }
 
-// Delete 削除する（モック）
-func (r *mockAnnouncementRepository) Delete(ctx context.Context, id string) error {
+func (r *MockAnnouncementRepository) Delete(ctx context.Context, id string) error {
+	if r.DeleteFunc != nil {
+		return r.DeleteFunc(ctx, id)
+	}
 	return nil
 }

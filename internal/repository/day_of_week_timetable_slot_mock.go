@@ -7,52 +7,49 @@ import (
 	"github.com/fun-dotto/api-template/internal/service"
 )
 
-type mockDayOfWeekTimetableSlotRepository struct{}
+type MockDayOfWeekTimetableSlotRepository struct {
+	ListFunc   func(ctx context.Context) ([]domain.DayOfWeekTimetableSlot, error)
+	DetailFunc func(ctx context.Context, id string) (*domain.DayOfWeekTimetableSlot, error)
+	CreateFunc func(ctx context.Context, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error)
+	UpdateFunc func(ctx context.Context, id string, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error)
+	DeleteFunc func(ctx context.Context, id string) error
+}
 
-// NewMockDayOfWeekTimetableSlotRepository モックリポジトリを作成する
 func NewMockDayOfWeekTimetableSlotRepository() service.DayOfWeekTimetableSlotRepository {
-	return &mockDayOfWeekTimetableSlotRepository{}
+	return &MockDayOfWeekTimetableSlotRepository{}
 }
 
-// List 一覧を取得する（モック）
-func (r *mockDayOfWeekTimetableSlotRepository) List(ctx context.Context) ([]domain.DayOfWeekTimetableSlot, error) {
-	return []domain.DayOfWeekTimetableSlot{
-		{
-			ID:            "1",
-			DayOfWeek:     domain.DayOfWeekMonday,
-			TimetableSlot: domain.TimetableSlotSlot1,
-		},
-	}, nil
+func (r *MockDayOfWeekTimetableSlotRepository) List(ctx context.Context) ([]domain.DayOfWeekTimetableSlot, error) {
+	if r.ListFunc != nil {
+		return r.ListFunc(ctx)
+	}
+	return []domain.DayOfWeekTimetableSlot{}, nil
 }
 
-// Detail 詳細を取得する（モック）
-func (r *mockDayOfWeekTimetableSlotRepository) Detail(ctx context.Context, id string) (*domain.DayOfWeekTimetableSlot, error) {
-	return &domain.DayOfWeekTimetableSlot{
-		ID:            id,
-		DayOfWeek:     domain.DayOfWeekMonday,
-		TimetableSlot: domain.TimetableSlotSlot1,
-	}, nil
+func (r *MockDayOfWeekTimetableSlotRepository) Detail(ctx context.Context, id string) (*domain.DayOfWeekTimetableSlot, error) {
+	if r.DetailFunc != nil {
+		return r.DetailFunc(ctx, id)
+	}
+	return nil, nil
 }
 
-// Create 新規作成する（モック）
-func (r *mockDayOfWeekTimetableSlotRepository) Create(ctx context.Context, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error) {
-	return &domain.DayOfWeekTimetableSlot{
-		ID:            "created-id",
-		DayOfWeek:     req.DayOfWeek,
-		TimetableSlot: req.TimetableSlot,
-	}, nil
+func (r *MockDayOfWeekTimetableSlotRepository) Create(ctx context.Context, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error) {
+	if r.CreateFunc != nil {
+		return r.CreateFunc(ctx, req)
+	}
+	return nil, nil
 }
 
-// Update 更新する（モック）
-func (r *mockDayOfWeekTimetableSlotRepository) Update(ctx context.Context, id string, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error) {
-	return &domain.DayOfWeekTimetableSlot{
-		ID:            id,
-		DayOfWeek:     req.DayOfWeek,
-		TimetableSlot: req.TimetableSlot,
-	}, nil
+func (r *MockDayOfWeekTimetableSlotRepository) Update(ctx context.Context, id string, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error) {
+	if r.UpdateFunc != nil {
+		return r.UpdateFunc(ctx, id, req)
+	}
+	return nil, nil
 }
 
-// Delete 削除する（モック）
-func (r *mockDayOfWeekTimetableSlotRepository) Delete(ctx context.Context, id string) error {
+func (r *MockDayOfWeekTimetableSlotRepository) Delete(ctx context.Context, id string) error {
+	if r.DeleteFunc != nil {
+		return r.DeleteFunc(ctx, id)
+	}
 	return nil
 }
