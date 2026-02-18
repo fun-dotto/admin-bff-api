@@ -18,9 +18,16 @@ type SubjectRequirementRequest struct {
 	RequirementType SubjectRequirementType
 }
 
+// SubjectID 科目IDの型
+type SubjectID string
+
+func (s SubjectID) String() string {
+	return string(s)
+}
+
 // Subject 科目のドメインモデル
 type Subject struct {
-	ID                      string
+	ID                      SubjectID
 	Name                    string
 	Faculty                 Faculty
 	Semester                CourseSemester

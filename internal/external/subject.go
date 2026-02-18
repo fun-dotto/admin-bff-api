@@ -32,7 +32,7 @@ func ToDomainSubject(s subject_api.Subject) domain.Subject {
 	}
 
 	return domain.Subject{
-		ID:                      s.Id,
+		ID:                      domain.SubjectID(s.Id),
 		Name:                    s.Name,
 		Faculty:                 ToDomainFaculty(s.Faculty),
 		Semester:                domain.CourseSemester(s.Semester),

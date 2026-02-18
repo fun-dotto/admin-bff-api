@@ -68,7 +68,7 @@ func TestAnnouncementsV1List(t *testing.T) {
 					ListFunc: func(ctx context.Context) ([]domain.Announcement, error) {
 						return []domain.Announcement{
 							{
-								ID:             "1",
+								ID:             domain.AnnouncementID("1"),
 								Title:          "お知らせ1",
 								URL:            "https://example.com/1",
 								AvailableFrom:  now,
@@ -99,7 +99,7 @@ func TestAnnouncementsV1List(t *testing.T) {
 					ListFunc: func(ctx context.Context) ([]domain.Announcement, error) {
 						return []domain.Announcement{
 							{
-								ID:             "1",
+								ID:             domain.AnnouncementID("1"),
 								Title:          "お知らせ1",
 								URL:            "https://example.com/1",
 								AvailableFrom:  now,
@@ -195,7 +195,7 @@ func TestAnnouncementsV1Detail(t *testing.T) {
 				return &repository.MockAnnouncementRepository{
 					DetailFunc: func(ctx context.Context, id string) (*domain.Announcement, error) {
 						return &domain.Announcement{
-							ID:             id,
+							ID:             domain.AnnouncementID(id),
 							Title:          "お知らせ" + id,
 							URL:            "https://example.com/" + id,
 							AvailableFrom:  now,
@@ -299,7 +299,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 				return &repository.MockAnnouncementRepository{
 					CreateFunc: func(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 						return &domain.Announcement{
-							ID:             "created-id",
+							ID:             domain.AnnouncementID("created-id"),
 							Title:          req.Title,
 							URL:            req.URL,
 							AvailableFrom:  req.AvailableFrom,
@@ -333,7 +333,7 @@ func TestAnnouncementsV1Create(t *testing.T) {
 				return &repository.MockAnnouncementRepository{
 					CreateFunc: func(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 						return &domain.Announcement{
-							ID:             "created-id",
+							ID:             domain.AnnouncementID("created-id"),
 							Title:          req.Title,
 							URL:            req.URL,
 							AvailableFrom:  req.AvailableFrom,
@@ -453,7 +453,7 @@ func TestAnnouncementsV1Update(t *testing.T) {
 				return &repository.MockAnnouncementRepository{
 					UpdateFunc: func(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error) {
 						return &domain.Announcement{
-							ID:             id,
+							ID:             domain.AnnouncementID(id),
 							Title:          req.Title,
 							URL:            req.URL,
 							AvailableFrom:  req.AvailableFrom,

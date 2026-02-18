@@ -8,7 +8,7 @@ import (
 // ToDomainSubjectCategory 外部API形式からドメイン形式に変換する
 func ToDomainSubjectCategory(c subject_api.SubjectCategory) domain.SubjectCategory {
 	return domain.SubjectCategory{
-		ID:   c.Id,
+		ID:   domain.SubjectCategoryID(c.Id),
 		Name: c.Name,
 	}
 }

@@ -8,7 +8,7 @@ import (
 // ToAPISubjectCategory ドメインモデルをAPIモデルに変換する
 func ToAPISubjectCategory(c *domain.SubjectCategory) api.SubjectServiceSubjectCategory {
 	return api.SubjectServiceSubjectCategory{
-		Id:   c.ID,
+		Id:   c.ID.String(),
 		Name: c.Name,
 	}
 }

@@ -32,7 +32,7 @@ func ToAPISubject(s *domain.Subject) api.SubjectServiceSubject {
 	}
 
 	return api.SubjectServiceSubject{
-		Id:                      s.ID,
+		Id:                      s.ID.String(),
 		Name:                    s.Name,
 		Faculty:                 ToAPIFaculty(&s.Faculty),
 		Semester:                api.DottoFoundationV1CourseSemester(s.Semester),

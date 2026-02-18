@@ -34,7 +34,7 @@ func TestSubjectCategoriesV1List(t *testing.T) {
 				return &repository.MockSubjectCategoryRepository{
 					ListFunc: func(ctx context.Context) ([]domain.SubjectCategory, error) {
 						return []domain.SubjectCategory{
-							{ID: "1", Name: "カテゴリ1"},
+							{ID: domain.SubjectCategoryID("1"), Name: "カテゴリ1"},
 						}, nil
 					},
 				}
@@ -58,7 +58,7 @@ func TestSubjectCategoriesV1List(t *testing.T) {
 				return &repository.MockSubjectCategoryRepository{
 					ListFunc: func(ctx context.Context) ([]domain.SubjectCategory, error) {
 						return []domain.SubjectCategory{
-							{ID: "1", Name: "カテゴリ1"},
+							{ID: domain.SubjectCategoryID("1"), Name: "カテゴリ1"},
 						}, nil
 					},
 				}
@@ -146,7 +146,7 @@ func TestSubjectCategoriesV1Detail(t *testing.T) {
 			setupMock: func() *repository.MockSubjectCategoryRepository {
 				return &repository.MockSubjectCategoryRepository{
 					DetailFunc: func(ctx context.Context, id string) (*domain.SubjectCategory, error) {
-						return &domain.SubjectCategory{ID: id, Name: "カテゴリ" + id}, nil
+						return &domain.SubjectCategory{ID: domain.SubjectCategoryID(id), Name: "カテゴリ" + id}, nil
 					},
 				}
 			},
@@ -236,7 +236,7 @@ func TestSubjectCategoriesV1Create(t *testing.T) {
 			setupMock: func() *repository.MockSubjectCategoryRepository {
 				return &repository.MockSubjectCategoryRepository{
 					CreateFunc: func(ctx context.Context, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
-						return &domain.SubjectCategory{ID: "created-id", Name: req.Name}, nil
+						return &domain.SubjectCategory{ID: domain.SubjectCategoryID("created-id"), Name: req.Name}, nil
 					},
 				}
 			},
@@ -258,7 +258,7 @@ func TestSubjectCategoriesV1Create(t *testing.T) {
 			setupMock: func() *repository.MockSubjectCategoryRepository {
 				return &repository.MockSubjectCategoryRepository{
 					CreateFunc: func(ctx context.Context, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
-						return &domain.SubjectCategory{ID: "created-id", Name: req.Name}, nil
+						return &domain.SubjectCategory{ID: domain.SubjectCategoryID("created-id"), Name: req.Name}, nil
 					},
 				}
 			},
@@ -355,7 +355,7 @@ func TestSubjectCategoriesV1Update(t *testing.T) {
 			setupMock: func() *repository.MockSubjectCategoryRepository {
 				return &repository.MockSubjectCategoryRepository{
 					UpdateFunc: func(ctx context.Context, id string, req *domain.SubjectCategoryRequest) (*domain.SubjectCategory, error) {
-						return &domain.SubjectCategory{ID: id, Name: req.Name}, nil
+						return &domain.SubjectCategory{ID: domain.SubjectCategoryID(id), Name: req.Name}, nil
 					},
 				}
 			},

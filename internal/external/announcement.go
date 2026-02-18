@@ -8,7 +8,7 @@ import (
 // ToDomainAnnouncement 外部API形式からドメイン形式に変換する
 func ToDomainAnnouncement(a announcement_api.Announcement) domain.Announcement {
 	return domain.Announcement{
-		ID:             a.Id,
+		ID:             domain.AnnouncementID(a.Id),
 		Title:          a.Title,
 		URL:            a.Url,
 		AvailableFrom:  a.AvailableFrom,

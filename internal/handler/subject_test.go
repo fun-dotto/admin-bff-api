@@ -21,10 +21,10 @@ import (
 func createMockSubject(id string) *domain.Subject {
 	classA := domain.ClassA
 	return &domain.Subject{
-		ID:   id,
+		ID:   domain.SubjectID(id),
 		Name: "科目" + id,
 		Faculty: domain.Faculty{
-			ID:    "faculty-1",
+			ID:    domain.FacultyID("faculty-1"),
 			Name:  "教員1",
 			Email: "faculty1@example.com",
 		},
@@ -275,14 +275,14 @@ func TestSubjectsV1Create(t *testing.T) {
 					CreateFunc: func(ctx context.Context, req *domain.SubjectRequest) (*domain.Subject, error) {
 						classA := domain.ClassA
 						return &domain.Subject{
-							ID:                      "created-id",
+							ID:                      domain.SubjectID("created-id"),
 							Name:                    req.Name,
 							Faculty:                 domain.Faculty{ID: domain.FacultyID(req.FacultyID), Name: "教員1", Email: "faculty1@example.com"},
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: domain.DayOfWeekTimetableSlotID("slot-1"), DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB1, Class: &classA}},
 							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: domain.CourseID("course-1"), Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeRequired}},
-							Categories:              []domain.SubjectCategory{{ID: "category-1", Name: "カテゴリ1"}},
+							Categories:              []domain.SubjectCategory{{ID: domain.SubjectCategoryID("category-1"), Name: "カテゴリ1"}},
 							SyllabusID:              req.SyllabusID,
 						}, nil
 					},
@@ -319,14 +319,14 @@ func TestSubjectsV1Create(t *testing.T) {
 					CreateFunc: func(ctx context.Context, req *domain.SubjectRequest) (*domain.Subject, error) {
 						classA := domain.ClassA
 						return &domain.Subject{
-							ID:                      "created-id",
+							ID:                      domain.SubjectID("created-id"),
 							Name:                    req.Name,
 							Faculty:                 domain.Faculty{ID: domain.FacultyID(req.FacultyID), Name: "教員1", Email: "faculty1@example.com"},
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: domain.DayOfWeekTimetableSlotID("slot-1"), DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB2, Class: &classA}},
 							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: domain.CourseID("course-1"), Name: "コース1"}, RequirementType: domain.SubjectRequirementTypeOptional}},
-							Categories:              []domain.SubjectCategory{{ID: "category-1", Name: "カテゴリ1"}},
+							Categories:              []domain.SubjectCategory{{ID: domain.SubjectCategoryID("category-1"), Name: "カテゴリ1"}},
 							SyllabusID:              req.SyllabusID,
 						}, nil
 					},
@@ -455,14 +455,14 @@ func TestSubjectsV1Update(t *testing.T) {
 					UpdateFunc: func(ctx context.Context, id string, req *domain.SubjectRequest) (*domain.Subject, error) {
 						classB := domain.ClassB
 						return &domain.Subject{
-							ID:                      id,
+							ID:                      domain.SubjectID(id),
 							Name:                    req.Name,
 							Faculty:                 domain.Faculty{ID: domain.FacultyID(req.FacultyID), Name: "教員2", Email: "faculty2@example.com"},
 							Semester:                req.Semester,
 							DayOfWeekTimetableSlots: []domain.DayOfWeekTimetableSlot{{ID: domain.DayOfWeekTimetableSlotID("slot-2"), DayOfWeek: domain.DayOfWeekTuesday, TimetableSlot: domain.TimetableSlotSlot2}},
 							EligibleAttributes:      []domain.SubjectTargetClass{{Grade: domain.GradeB2, Class: &classB}},
 							Requirements:            []domain.SubjectRequirement{{Course: domain.Course{ID: domain.CourseID("course-2"), Name: "コース2"}, RequirementType: domain.SubjectRequirementTypeOptionalRequired}},
-							Categories:              []domain.SubjectCategory{{ID: "category-2", Name: "カテゴリ2"}},
+							Categories:              []domain.SubjectCategory{{ID: domain.SubjectCategoryID("category-2"), Name: "カテゴリ2"}},
 							SyllabusID:              req.SyllabusID,
 						}, nil
 					},

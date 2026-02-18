@@ -8,7 +8,7 @@ import (
 // ToAPIAnnouncement ドメインモデルをAPIモデルに変換する
 func ToAPIAnnouncement(a *domain.Announcement) api.AnnouncementServiceAnnouncement {
 	return api.AnnouncementServiceAnnouncement{
-		Id:             a.ID,
+		Id:             a.ID.String(),
 		Title:          a.Title,
 		Url:            a.URL,
 		AvailableFrom:  a.AvailableFrom,
