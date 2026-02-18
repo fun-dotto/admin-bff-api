@@ -34,7 +34,7 @@ func TestDayOfWeekTimetableSlotsV1List(t *testing.T) {
 				return &repository.MockDayOfWeekTimetableSlotRepository{
 					ListFunc: func(ctx context.Context) ([]domain.DayOfWeekTimetableSlot, error) {
 						return []domain.DayOfWeekTimetableSlot{
-							{ID: "1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1},
+							{ID: domain.DayOfWeekTimetableSlotID("1"), DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1},
 						}, nil
 					},
 				}
@@ -59,7 +59,7 @@ func TestDayOfWeekTimetableSlotsV1List(t *testing.T) {
 				return &repository.MockDayOfWeekTimetableSlotRepository{
 					ListFunc: func(ctx context.Context) ([]domain.DayOfWeekTimetableSlot, error) {
 						return []domain.DayOfWeekTimetableSlot{
-							{ID: "1", DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1},
+							{ID: domain.DayOfWeekTimetableSlotID("1"), DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1},
 						}, nil
 					},
 				}
@@ -147,7 +147,7 @@ func TestDayOfWeekTimetableSlotsV1Detail(t *testing.T) {
 			setupMock: func() *repository.MockDayOfWeekTimetableSlotRepository {
 				return &repository.MockDayOfWeekTimetableSlotRepository{
 					DetailFunc: func(ctx context.Context, id string) (*domain.DayOfWeekTimetableSlot, error) {
-						return &domain.DayOfWeekTimetableSlot{ID: id, DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}, nil
+						return &domain.DayOfWeekTimetableSlot{ID: domain.DayOfWeekTimetableSlotID(id), DayOfWeek: domain.DayOfWeekMonday, TimetableSlot: domain.TimetableSlotSlot1}, nil
 					},
 				}
 			},
@@ -238,7 +238,7 @@ func TestDayOfWeekTimetableSlotsV1Create(t *testing.T) {
 			setupMock: func() *repository.MockDayOfWeekTimetableSlotRepository {
 				return &repository.MockDayOfWeekTimetableSlotRepository{
 					CreateFunc: func(ctx context.Context, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error) {
-						return &domain.DayOfWeekTimetableSlot{ID: "created-id", DayOfWeek: req.DayOfWeek, TimetableSlot: req.TimetableSlot}, nil
+						return &domain.DayOfWeekTimetableSlot{ID: domain.DayOfWeekTimetableSlotID("created-id"), DayOfWeek: req.DayOfWeek, TimetableSlot: req.TimetableSlot}, nil
 					},
 				}
 			},
@@ -261,7 +261,7 @@ func TestDayOfWeekTimetableSlotsV1Create(t *testing.T) {
 			setupMock: func() *repository.MockDayOfWeekTimetableSlotRepository {
 				return &repository.MockDayOfWeekTimetableSlotRepository{
 					CreateFunc: func(ctx context.Context, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error) {
-						return &domain.DayOfWeekTimetableSlot{ID: "created-id", DayOfWeek: req.DayOfWeek, TimetableSlot: req.TimetableSlot}, nil
+						return &domain.DayOfWeekTimetableSlot{ID: domain.DayOfWeekTimetableSlotID("created-id"), DayOfWeek: req.DayOfWeek, TimetableSlot: req.TimetableSlot}, nil
 					},
 				}
 			},
@@ -359,7 +359,7 @@ func TestDayOfWeekTimetableSlotsV1Update(t *testing.T) {
 			setupMock: func() *repository.MockDayOfWeekTimetableSlotRepository {
 				return &repository.MockDayOfWeekTimetableSlotRepository{
 					UpdateFunc: func(ctx context.Context, id string, req *domain.DayOfWeekTimetableSlotRequest) (*domain.DayOfWeekTimetableSlot, error) {
-						return &domain.DayOfWeekTimetableSlot{ID: id, DayOfWeek: req.DayOfWeek, TimetableSlot: req.TimetableSlot}, nil
+						return &domain.DayOfWeekTimetableSlot{ID: domain.DayOfWeekTimetableSlotID(id), DayOfWeek: req.DayOfWeek, TimetableSlot: req.TimetableSlot}, nil
 					},
 				}
 			},

@@ -8,7 +8,7 @@ import (
 // ToDomainDayOfWeekTimetableSlot 外部API形式からドメイン形式に変換する
 func ToDomainDayOfWeekTimetableSlot(d subject_api.DayOfWeekTimetableSlot) domain.DayOfWeekTimetableSlot {
 	return domain.DayOfWeekTimetableSlot{
-		ID:            d.Id,
+		ID:            domain.DayOfWeekTimetableSlotID(d.Id),
 		DayOfWeek:     domain.DayOfWeek(d.DayOfWeek),
 		TimetableSlot: domain.TimetableSlot(d.TimetableSlot),
 	}

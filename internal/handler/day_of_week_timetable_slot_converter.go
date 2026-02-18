@@ -8,7 +8,7 @@ import (
 // ToAPIDayOfWeekTimetableSlot ドメインモデルをAPIモデルに変換する
 func ToAPIDayOfWeekTimetableSlot(d *domain.DayOfWeekTimetableSlot) api.SubjectServiceDayOfWeekTimetableSlot {
 	return api.SubjectServiceDayOfWeekTimetableSlot{
-		Id:            d.ID,
+		Id:            d.ID.String(),
 		DayOfWeek:     api.DottoFoundationV1DayOfWeek(d.DayOfWeek),
 		TimetableSlot: api.DottoFoundationV1TimetableSlot(d.TimetableSlot),
 	}
