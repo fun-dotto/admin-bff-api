@@ -51,9 +51,6 @@ func main() {
 	}
 
 	// Initialize layers
-	announcementRepo := repository.NewAnnouncementRepository(clients.Announcement)
-	announcementService := service.NewAnnouncementService(announcementRepo)
-
 	facultyRepo := repository.NewFacultyRepository(clients.Subject)
 	facultyService := service.NewFacultyService(facultyRepo)
 
@@ -71,7 +68,7 @@ func main() {
 
 	// Register handlers
 	h := handler.NewHandler().
-		WithAnnouncementService(announcementService).
+		WithAnnouncementClient(clients.Announcement).
 		WithFacultyService(facultyService).
 		WithCourseService(courseService).
 		WithDayOfWeekTimetableSlotService(dayOfWeekTimetableSlotService).
