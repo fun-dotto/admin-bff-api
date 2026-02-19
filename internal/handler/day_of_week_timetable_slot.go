@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/generated/external/subject_api"
 	"github.com/fun-dotto/api-template/internal/middleware"
 )
 
@@ -15,15 +15,18 @@ func (h *Handler) DayOfWeekTimetableSlotsV1List(c *gin.Context) {
 		return
 	}
 
-	slots, err := h.dayOfWeekTimetableSlotService.List(c.Request.Context())
+	response, err := h.subjectClient.DayOfWeekTimetableSlotsV1ListWithResponse(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.DayOfWeekTimetableSlotsV1List200JSONResponse{
-		DayOfWeekTimetableSlots: ToAPIDayOfWeekTimetableSlots(slots),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // DayOfWeekTimetableSlotsV1Detail 曜日・時限を詳細取得する
@@ -32,15 +35,18 @@ func (h *Handler) DayOfWeekTimetableSlotsV1Detail(c *gin.Context, id string) {
 		return
 	}
 
-	slot, err := h.dayOfWeekTimetableSlotService.Detail(c.Request.Context(), id)
+	response, err := h.subjectClient.DayOfWeekTimetableSlotsV1DetailWithResponse(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.DayOfWeekTimetableSlotsV1Detail200JSONResponse{
-		DayOfWeekTimetableSlot: ToAPIDayOfWeekTimetableSlot(slot),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // DayOfWeekTimetableSlotsV1Create 曜日・時限を作成する
@@ -49,21 +55,24 @@ func (h *Handler) DayOfWeekTimetableSlotsV1Create(c *gin.Context) {
 		return
 	}
 
-	var req api.SubjectServiceDayOfWeekTimetableSlotRequest
+	var req subject_api.DayOfWeekTimetableSlotRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	slot, err := h.dayOfWeekTimetableSlotService.Create(c.Request.Context(), ToDomainDayOfWeekTimetableSlotRequest(&req))
+	response, err := h.subjectClient.DayOfWeekTimetableSlotsV1CreateWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, api.DayOfWeekTimetableSlotsV1Create201JSONResponse{
-		DayOfWeekTimetableSlot: ToAPIDayOfWeekTimetableSlot(slot),
-	})
+	if response.JSON201 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.JSON201)
 }
 
 // DayOfWeekTimetableSlotsV1Update 曜日・時限を更新する
@@ -72,21 +81,24 @@ func (h *Handler) DayOfWeekTimetableSlotsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req api.SubjectServiceDayOfWeekTimetableSlotRequest
+	var req subject_api.DayOfWeekTimetableSlotRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	slot, err := h.dayOfWeekTimetableSlotService.Update(c.Request.Context(), id, ToDomainDayOfWeekTimetableSlotRequest(&req))
+	response, err := h.subjectClient.DayOfWeekTimetableSlotsV1UpdateWithResponse(c.Request.Context(), id, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.DayOfWeekTimetableSlotsV1Update200JSONResponse{
-		DayOfWeekTimetableSlot: ToAPIDayOfWeekTimetableSlot(slot),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // DayOfWeekTimetableSlotsV1Delete 曜日・時限を削除する
@@ -95,11 +107,12 @@ func (h *Handler) DayOfWeekTimetableSlotsV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	if err := h.dayOfWeekTimetableSlotService.Delete(c.Request.Context(), id); err != nil {
+	response, err := h.subjectClient.DayOfWeekTimetableSlotsV1DeleteWithResponse(c.Request.Context(), id)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(response.StatusCode())
 	c.Writer.WriteHeaderNow()
 }

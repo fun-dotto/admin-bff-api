@@ -9,8 +9,6 @@ import (
 	"github.com/fun-dotto/api-template/internal/handler"
 	"github.com/fun-dotto/api-template/internal/infrastructure"
 	"github.com/fun-dotto/api-template/internal/middleware"
-	"github.com/fun-dotto/api-template/internal/repository"
-	"github.com/fun-dotto/api-template/internal/service"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -44,36 +42,14 @@ func main() {
 	router.Use(oapimiddleware.OapiRequestValidator(spec))
 	router.Use(middleware.FirebaseAuth(authClient))
 
-	// 外部APIクライアントを一括初期化
 	clients, err := infrastructure.NewExternalClients(ctx)
 	if err != nil {
 		log.Fatalf("Failed to initialize external clients: %v", err)
 	}
 
-	// Initialize layers
-	facultyRepo := repository.NewFacultyRepository(clients.Subject)
-	facultyService := service.NewFacultyService(facultyRepo)
-
-	courseRepo := repository.NewCourseRepository(clients.Subject)
-	courseService := service.NewCourseService(courseRepo)
-
-	dayOfWeekTimetableSlotRepo := repository.NewDayOfWeekTimetableSlotRepository(clients.Subject)
-	dayOfWeekTimetableSlotService := service.NewDayOfWeekTimetableSlotService(dayOfWeekTimetableSlotRepo)
-
-	subjectCategoryRepo := repository.NewSubjectCategoryRepository(clients.Subject)
-	subjectCategoryService := service.NewSubjectCategoryService(subjectCategoryRepo)
-
-	subjectRepo := repository.NewSubjectRepository(clients.Subject)
-	subjectService := service.NewSubjectService(subjectRepo)
-
-	// Register handlers
 	h := handler.NewHandler().
 		WithAnnouncementClient(clients.Announcement).
-		WithFacultyService(facultyService).
-		WithCourseService(courseService).
-		WithDayOfWeekTimetableSlotService(dayOfWeekTimetableSlotService).
-		WithSubjectCategoryService(subjectCategoryService).
-		WithSubjectService(subjectService)
+		WithSubjectClient(clients.Subject)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"

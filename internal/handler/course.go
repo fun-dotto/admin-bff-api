@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/generated/external/subject_api"
 	"github.com/fun-dotto/api-template/internal/middleware"
 )
 
@@ -15,15 +15,18 @@ func (h *Handler) CoursesV1List(c *gin.Context) {
 		return
 	}
 
-	courses, err := h.courseService.List(c.Request.Context())
+	response, err := h.subjectClient.CoursesV1ListWithResponse(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.CoursesV1List200JSONResponse{
-		Courses: ToAPICourses(courses),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // CoursesV1Detail コースを詳細取得する
@@ -32,15 +35,18 @@ func (h *Handler) CoursesV1Detail(c *gin.Context, id string) {
 		return
 	}
 
-	course, err := h.courseService.Detail(c.Request.Context(), id)
+	response, err := h.subjectClient.CoursesV1DetailWithResponse(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.CoursesV1Detail200JSONResponse{
-		Course: ToAPICourse(course),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // CoursesV1Create コースを作成する
@@ -49,21 +55,24 @@ func (h *Handler) CoursesV1Create(c *gin.Context) {
 		return
 	}
 
-	var req api.SubjectServiceCourseRequest
+	var req subject_api.CourseRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	course, err := h.courseService.Create(c.Request.Context(), ToDomainCourseRequest(&req))
+	response, err := h.subjectClient.CoursesV1CreateWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, api.CoursesV1Create201JSONResponse{
-		Course: ToAPICourse(course),
-	})
+	if response.JSON201 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.JSON201)
 }
 
 // CoursesV1Update コースを更新する
@@ -72,21 +81,24 @@ func (h *Handler) CoursesV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req api.SubjectServiceCourseRequest
+	var req subject_api.CourseRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	course, err := h.courseService.Update(c.Request.Context(), id, ToDomainCourseRequest(&req))
+	response, err := h.subjectClient.CoursesV1UpdateWithResponse(c.Request.Context(), id, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.CoursesV1Update200JSONResponse{
-		Course: ToAPICourse(course),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // CoursesV1Delete コースを削除する
@@ -95,11 +107,12 @@ func (h *Handler) CoursesV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	if err := h.courseService.Delete(c.Request.Context(), id); err != nil {
+	response, err := h.subjectClient.CoursesV1DeleteWithResponse(c.Request.Context(), id)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(response.StatusCode())
 	c.Writer.WriteHeaderNow()
 }

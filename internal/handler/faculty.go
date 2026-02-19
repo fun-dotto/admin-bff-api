@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/generated/external/subject_api"
 	"github.com/fun-dotto/api-template/internal/middleware"
 )
 
@@ -15,15 +15,18 @@ func (h *Handler) FacultiesV1List(c *gin.Context) {
 		return
 	}
 
-	faculties, err := h.facultyService.List(c.Request.Context())
+	response, err := h.subjectClient.FacultiesV1ListWithResponse(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.FacultiesV1List200JSONResponse{
-		Faculties: ToAPIFaculties(faculties),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // FacultiesV1Detail 教員を詳細取得する
@@ -32,15 +35,18 @@ func (h *Handler) FacultiesV1Detail(c *gin.Context, id string) {
 		return
 	}
 
-	faculty, err := h.facultyService.Detail(c.Request.Context(), id)
+	response, err := h.subjectClient.FacultiesV1DetailWithResponse(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.FacultiesV1Detail200JSONResponse{
-		Faculty: ToAPIFaculty(faculty),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // FacultiesV1Create 教員を作成する
@@ -49,21 +55,24 @@ func (h *Handler) FacultiesV1Create(c *gin.Context) {
 		return
 	}
 
-	var req api.SubjectServiceFacultyRequest
+	var req subject_api.FacultyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	faculty, err := h.facultyService.Create(c.Request.Context(), ToDomainFacultyRequest(&req))
+	response, err := h.subjectClient.FacultiesV1CreateWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, api.FacultiesV1Create201JSONResponse{
-		Faculty: ToAPIFaculty(faculty),
-	})
+	if response.JSON201 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.JSON201)
 }
 
 // FacultiesV1Update 教員を更新する
@@ -72,21 +81,24 @@ func (h *Handler) FacultiesV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req api.SubjectServiceFacultyRequest
+	var req subject_api.FacultyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	faculty, err := h.facultyService.Update(c.Request.Context(), id, ToDomainFacultyRequest(&req))
+	response, err := h.subjectClient.FacultiesV1UpdateWithResponse(c.Request.Context(), id, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.FacultiesV1Update200JSONResponse{
-		Faculty: ToAPIFaculty(faculty),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // FacultiesV1Delete 教員を削除する
@@ -95,11 +107,12 @@ func (h *Handler) FacultiesV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	if err := h.facultyService.Delete(c.Request.Context(), id); err != nil {
+	response, err := h.subjectClient.FacultiesV1DeleteWithResponse(c.Request.Context(), id)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(response.StatusCode())
 	c.Writer.WriteHeaderNow()
 }
