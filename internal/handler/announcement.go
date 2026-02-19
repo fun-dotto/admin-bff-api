@@ -21,7 +21,12 @@ func (h *Handler) AnnouncementsV1List(c *gin.Context) {
 		return
 	}
 
-	c.Data(response.StatusCode(), "application/json", response.Body)
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // AnnouncementsV1Detail 詳細を取得する
@@ -36,7 +41,12 @@ func (h *Handler) AnnouncementsV1Detail(c *gin.Context, id string) {
 		return
 	}
 
-	c.Data(response.StatusCode(), "application/json", response.Body)
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // AnnouncementsV1Create 新規作成する
@@ -57,7 +67,12 @@ func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 		return
 	}
 
-	c.Data(response.StatusCode(), "application/json", response.Body)
+	if response.JSON201 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.JSON201)
 }
 
 // AnnouncementsV1Delete 削除する
@@ -94,5 +109,10 @@ func (h *Handler) AnnouncementsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	c.Data(response.StatusCode(), "application/json", response.Body)
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
