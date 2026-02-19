@@ -4,16 +4,10 @@ import (
 	"context"
 
 	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/generated/external/announcement_api"
 	"github.com/fun-dotto/api-template/internal/domain"
 )
 
-type AnnouncementService interface {
-	List(ctx context.Context) ([]domain.Announcement, error)
-	Detail(ctx context.Context, id string) (*domain.Announcement, error)
-	Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error)
-	Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error)
-	Delete(ctx context.Context, id string) error
-}
 
 type FacultyService interface {
 	List(ctx context.Context) ([]domain.Faculty, error)
@@ -56,7 +50,7 @@ type SubjectService interface {
 }
 
 type Handler struct {
-	announcementService           AnnouncementService
+	announcementClient            *announcement_api.ClientWithResponses
 	facultyService                FacultyService
 	courseService                 CourseService
 	dayOfWeekTimetableSlotService DayOfWeekTimetableSlotService
@@ -68,8 +62,8 @@ func NewHandler() *Handler {
 	return &Handler{}
 }
 
-func (h *Handler) WithAnnouncementService(s AnnouncementService) *Handler {
-	h.announcementService = s
+func (h *Handler) WithAnnouncementClient(c *announcement_api.ClientWithResponses) *Handler {
+	h.announcementClient = c
 	return h
 }
 

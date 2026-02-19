@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	api "github.com/fun-dotto/api-template/generated"
+	"github.com/fun-dotto/api-template/generated/external/announcement_api"
 	"github.com/fun-dotto/api-template/internal/middleware"
 )
 
@@ -15,15 +15,18 @@ func (h *Handler) AnnouncementsV1List(c *gin.Context) {
 		return
 	}
 
-	announcements, err := h.announcementService.List(c.Request.Context())
+	response, err := h.announcementClient.AnnouncementsV1ListWithResponse(c.Request.Context(), nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.AnnouncementsV1List200JSONResponse{
-		Announcements: ToAPIAnnouncements(announcements),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // AnnouncementsV1Detail 詳細を取得する
@@ -32,15 +35,18 @@ func (h *Handler) AnnouncementsV1Detail(c *gin.Context, id string) {
 		return
 	}
 
-	announcement, err := h.announcementService.Detail(c.Request.Context(), id)
+	response, err := h.announcementClient.AnnouncementsV1DetailWithResponse(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.AnnouncementsV1Detail200JSONResponse{
-		Announcement: ToAPIAnnouncement(announcement),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // AnnouncementsV1Create 新規作成する
@@ -49,21 +55,24 @@ func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 		return
 	}
 
-	var req api.AnnouncementServiceAnnouncementRequest
+	var req announcement_api.AnnouncementRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	announcement, err := h.announcementService.Create(c.Request.Context(), ToDomainAnnouncementRequest(&req))
+	response, err := h.announcementClient.AnnouncementsV1CreateWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, api.AnnouncementsV1Create201JSONResponse{
-		Announcement: ToAPIAnnouncement(announcement),
-	})
+	if response.JSON201 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.JSON201)
 }
 
 // AnnouncementsV1Delete 削除する
@@ -72,12 +81,13 @@ func (h *Handler) AnnouncementsV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	if err := h.announcementService.Delete(c.Request.Context(), id); err != nil {
+	response, err := h.announcementClient.AnnouncementsV1DeleteWithResponse(c.Request.Context(), id)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(response.StatusCode())
 	c.Writer.WriteHeaderNow()
 }
 
@@ -87,19 +97,22 @@ func (h *Handler) AnnouncementsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req api.AnnouncementServiceAnnouncementRequest
+	var req announcement_api.AnnouncementRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	announcement, err := h.announcementService.Update(c.Request.Context(), id, ToDomainAnnouncementRequest(&req))
+	response, err := h.announcementClient.AnnouncementsV1UpdateWithResponse(c.Request.Context(), id, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, api.AnnouncementsV1Update200JSONResponse{
-		Announcement: ToAPIAnnouncement(announcement),
-	})
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
 }
