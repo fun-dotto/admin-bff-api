@@ -1,27 +1,29 @@
 package handler
 
 import (
-	"context"
-
 	api "github.com/fun-dotto/api-template/generated"
-	"github.com/fun-dotto/api-template/internal/domain"
+	"github.com/fun-dotto/api-template/generated/external/announcement_api"
+	"github.com/fun-dotto/api-template/generated/external/subject_api"
 )
 
-type AnnouncementService interface {
-	List(ctx context.Context) ([]domain.Announcement, error)
-	Detail(ctx context.Context, id string) (*domain.Announcement, error)
-	Create(ctx context.Context, req *domain.AnnouncementRequest) (*domain.Announcement, error)
-	Update(ctx context.Context, id string, req *domain.AnnouncementRequest) (*domain.Announcement, error)
-	Delete(ctx context.Context, id string) error
-}
-
 type Handler struct {
-	announcementService AnnouncementService
+	announcementClient *announcement_api.ClientWithResponses
+	subjectClient      *subject_api.ClientWithResponses
 }
 
-func NewHandler(announcementService AnnouncementService) *Handler {
+func NewHandler(
+	announcementClient *announcement_api.ClientWithResponses,
+	subjectClient *subject_api.ClientWithResponses,
+) *Handler {
+	if announcementClient == nil {
+		panic("announcementClient is required")
+	}
+	if subjectClient == nil {
+		panic("subjectClient is required")
+	}
 	return &Handler{
-		announcementService: announcementService,
+		announcementClient: announcementClient,
+		subjectClient:      subjectClient,
 	}
 }
 
