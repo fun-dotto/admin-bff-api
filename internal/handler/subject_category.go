@@ -113,6 +113,11 @@ func (h *Handler) SubjectCategoriesV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	c.Status(response.StatusCode())
-	c.Writer.WriteHeaderNow()
+	status := response.StatusCode()
+	if status != http.StatusNoContent {
+		c.JSON(status, gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
