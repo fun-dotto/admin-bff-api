@@ -113,10 +113,10 @@ func (h *Handler) SubjectsV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	if response.StatusCode() == http.StatusNoContent {
-		c.Status(http.StatusNoContent)
+	if response.StatusCode() != http.StatusNoContent {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "unexpected response from upstream"})
 		return
 	}
 
-	c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+	c.Status(http.StatusNoContent)
 }
