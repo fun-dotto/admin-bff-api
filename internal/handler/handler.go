@@ -11,18 +11,20 @@ type Handler struct {
 	subjectClient      *subject_api.ClientWithResponses
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
-}
-
-func (h *Handler) WithAnnouncementClient(c *announcement_api.ClientWithResponses) *Handler {
-	h.announcementClient = c
-	return h
-}
-
-func (h *Handler) WithSubjectClient(c *subject_api.ClientWithResponses) *Handler {
-	h.subjectClient = c
-	return h
+func NewHandler(
+	announcementClient *announcement_api.ClientWithResponses,
+	subjectClient *subject_api.ClientWithResponses,
+) *Handler {
+	if announcementClient == nil {
+		panic("announcementClient is required")
+	}
+	if subjectClient == nil {
+		panic("subjectClient is required")
+	}
+	return &Handler{
+		announcementClient: announcementClient,
+		subjectClient:      subjectClient,
+	}
 }
 
 var _ api.ServerInterface = (*Handler)(nil)
