@@ -113,6 +113,10 @@ func (h *Handler) FacultiesV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	c.Status(response.StatusCode())
-	c.Writer.WriteHeaderNow()
+	if response.StatusCode() != http.StatusNoContent {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
