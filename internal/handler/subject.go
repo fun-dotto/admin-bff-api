@@ -83,7 +83,7 @@ func (h *Handler) SubjectsV1Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.JSON200)
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // SubjectsV1Update 科目を更新する
