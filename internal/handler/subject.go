@@ -15,18 +15,7 @@ func (h *Handler) SubjectsV1List(c *gin.Context) {
 		return
 	}
 
-	params := &subject_api.SubjectsV1ListParams{
-		Q:                       "",
-		Grade:                   []subject_api.DottoFoundationV1Grade{},
-		Courses:                 []subject_api.DottoFoundationV1Course{},
-		Class:                   []subject_api.DottoFoundationV1Class{},
-		Classification:          []subject_api.DottoFoundationV1SubjectClassification{},
-		Semester:                []subject_api.DottoFoundationV1CourseSemester{},
-		RequirementType:         []subject_api.DottoFoundationV1SubjectRequirementType{},
-		CalturalSubjectCategory: []subject_api.DottoFoundationV1CulturalSubjectCategory{},
-	}
-
-	response, err := h.subjectClient.SubjectsV1ListWithResponse(c.Request.Context(), params)
+	response, err := h.subjectClient.SubjectsV1ListWithResponse(c.Request.Context(), nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
