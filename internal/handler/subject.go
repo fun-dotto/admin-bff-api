@@ -15,7 +15,18 @@ func (h *Handler) SubjectsV1List(c *gin.Context) {
 		return
 	}
 
-	response, err := h.subjectClient.SubjectsV1ListWithResponse(c.Request.Context())
+	params := &subject_api.SubjectsV1ListParams{
+		Q:                       "",
+		Grade:                   []subject_api.DottoFoundationV1Grade{},
+		Courses:                 []subject_api.DottoFoundationV1Course{},
+		Class:                   []subject_api.DottoFoundationV1Class{},
+		Classification:          []subject_api.DottoFoundationV1SubjectClassification{},
+		Semester:                []subject_api.DottoFoundationV1CourseSemester{},
+		RequirementType:         []subject_api.DottoFoundationV1SubjectRequirementType{},
+		CalturalSubjectCategory: []subject_api.DottoFoundationV1CulturalSubjectCategory{},
+	}
+
+	response, err := h.subjectClient.SubjectsV1ListWithResponse(c.Request.Context(), params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -61,18 +72,18 @@ func (h *Handler) SubjectsV1Create(c *gin.Context) {
 		return
 	}
 
-	response, err := h.subjectClient.SubjectsV1CreateWithResponse(c.Request.Context(), req)
+	response, err := h.subjectClient.SubjectsV1UpsertWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	if response.JSON201 == nil {
+	if response.JSON200 == nil {
 		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.JSON201)
+	c.JSON(http.StatusCreated, response.JSON200)
 }
 
 // SubjectsV1Update 科目を更新する
@@ -87,7 +98,7 @@ func (h *Handler) SubjectsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	response, err := h.subjectClient.SubjectsV1UpdateWithResponse(c.Request.Context(), id, req)
+	response, err := h.subjectClient.SubjectsV1UpsertWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
