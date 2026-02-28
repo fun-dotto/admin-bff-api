@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/fun-dotto/api-template/generated/external/subject_api"
-	"github.com/fun-dotto/api-template/internal/middleware"
+	"github.com/fun-dotto/admin-bff-api/generated/external/subject_api"
+	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 )
 
 // SubjectsV1List 科目一覧を取得する
@@ -15,7 +15,7 @@ func (h *Handler) SubjectsV1List(c *gin.Context) {
 		return
 	}
 
-	response, err := h.subjectClient.SubjectsV1ListWithResponse(c.Request.Context())
+	response, err := h.subjectClient.SubjectsV1ListWithResponse(c.Request.Context(), nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -61,18 +61,18 @@ func (h *Handler) SubjectsV1Create(c *gin.Context) {
 		return
 	}
 
-	response, err := h.subjectClient.SubjectsV1CreateWithResponse(c.Request.Context(), req)
+	response, err := h.subjectClient.SubjectsV1UpsertWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	if response.JSON201 == nil {
+	if response.JSON200 == nil {
 		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.JSON201)
+	c.JSON(http.StatusOK, response.JSON200)
 }
 
 // SubjectsV1Update 科目を更新する
@@ -87,7 +87,7 @@ func (h *Handler) SubjectsV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	response, err := h.subjectClient.SubjectsV1UpdateWithResponse(c.Request.Context(), id, req)
+	response, err := h.subjectClient.SubjectsV1UpsertWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/fun-dotto/api-template/generated/external/announcement_api"
-	"github.com/fun-dotto/api-template/internal/middleware"
+	"github.com/fun-dotto/admin-bff-api/generated/external/announcement_api"
+	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 )
 
 // AnnouncementsV1List 一覧を取得する

@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/fun-dotto/api-template/generated/external/subject_api"
-	"github.com/fun-dotto/api-template/internal/middleware"
+	"github.com/fun-dotto/admin-bff-api/generated/external/subject_api"
+	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 )
 
 // FacultiesV1List 教員一覧を取得する
@@ -55,7 +55,7 @@ func (h *Handler) FacultiesV1Create(c *gin.Context) {
 		return
 	}
 
-	var req subject_api.FacultyRequest
+	var req subject_api.DottoFoundationV1FacultyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -81,7 +81,7 @@ func (h *Handler) FacultiesV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req subject_api.FacultyRequest
+	var req subject_api.DottoFoundationV1FacultyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/fun-dotto/api-template/generated/external/announcement_api"
-	"github.com/fun-dotto/api-template/generated/external/subject_api"
+	"github.com/fun-dotto/admin-bff-api/generated/external/announcement_api"
+	"github.com/fun-dotto/admin-bff-api/generated/external/subject_api"
 	"google.golang.org/api/idtoken"
 )
 

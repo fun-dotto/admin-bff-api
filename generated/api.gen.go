@@ -157,6 +157,13 @@ type SubjectServiceSubjectRequirement struct {
 	RequirementType DottoFoundationV1SubjectRequirementType `json:"requirementType"`
 }
 
+// SubjectServiceSubjectSummary defines model for SubjectService.SubjectSummary.
+type SubjectServiceSubjectSummary struct {
+	Faculties []SubjectServiceSubjectFaculty `json:"faculties"`
+	Id        string                         `json:"id"`
+	Name      string                         `json:"name"`
+}
+
 // SubjectServiceSubjectTargetClass 対象学年・クラス
 type SubjectServiceSubjectTargetClass struct {
 	// Class 修士課程・博士課程対象の場合はnull
@@ -775,7 +782,7 @@ type SubjectsV1ListResponseObject interface {
 }
 
 type SubjectsV1List200JSONResponse struct {
-	Subjects []SubjectServiceSubject `json:"subjects"`
+	Subjects []SubjectServiceSubjectSummary `json:"subjects"`
 }
 
 func (response SubjectsV1List200JSONResponse) VisitSubjectsV1ListResponse(w http.ResponseWriter) error {
