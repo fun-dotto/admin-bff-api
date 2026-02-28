@@ -1,9 +1,9 @@
 package handler
 
 import (
-	api "github.com/fun-dotto/api-template/generated"
-	"github.com/fun-dotto/api-template/generated/external/announcement_api"
-	"github.com/fun-dotto/api-template/generated/external/subject_api"
+	api "github.com/fun-dotto/admin-bff-api/generated"
+	"github.com/fun-dotto/admin-bff-api/generated/external/announcement_api"
+	"github.com/fun-dotto/admin-bff-api/generated/external/subject_api"
 )
 
 type Handler struct {

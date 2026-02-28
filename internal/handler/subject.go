@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/fun-dotto/api-template/generated/external/subject_api"
-	"github.com/fun-dotto/api-template/internal/middleware"
+	"github.com/fun-dotto/admin-bff-api/generated/external/subject_api"
+	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 )
 
 // SubjectsV1List 科目一覧を取得する
