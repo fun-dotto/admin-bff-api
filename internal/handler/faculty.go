@@ -55,7 +55,7 @@ func (h *Handler) FacultiesV1Create(c *gin.Context) {
 		return
 	}
 
-	var req subject_api.FacultyRequest
+	var req subject_api.DottoFoundationV1FacultyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -81,7 +81,7 @@ func (h *Handler) FacultiesV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req subject_api.FacultyRequest
+	var req subject_api.DottoFoundationV1FacultyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
