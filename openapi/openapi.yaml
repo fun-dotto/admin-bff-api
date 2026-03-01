@@ -256,7 +256,7 @@ paths:
                   subjects:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SubjectService.Subject'
+                      $ref: '#/components/schemas/SubjectService.SubjectSummary'
                 required:
                   - subjects
       tags:
@@ -541,6 +541,21 @@ components:
           $ref: '#/components/schemas/DottoFoundationV1.Course'
         requirementType:
           $ref: '#/components/schemas/DottoFoundationV1.SubjectRequirementType'
+    SubjectService.SubjectSummary:
+      type: object
+      required:
+        - id
+        - name
+        - faculties
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        faculties:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubjectService.SubjectFaculty'
     SubjectService.SubjectTargetClass:
       type: object
       required:
