@@ -139,7 +139,7 @@ paths:
                   faculties:
                     type: array
                     items:
-                      $ref: '#/components/schemas/DottoFoundationV1.Faculty'
+                      $ref: '#/components/schemas/FacultyService.Faculty'
                 required:
                   - faculties
       tags:
@@ -157,7 +157,7 @@ paths:
                 type: object
                 properties:
                   faculty:
-                    $ref: '#/components/schemas/DottoFoundationV1.Faculty'
+                    $ref: '#/components/schemas/FacultyService.Faculty'
                 required:
                   - faculty
       tags:
@@ -167,7 +167,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DottoFoundationV1.FacultyRequest'
+              $ref: '#/components/schemas/FacultyService.FacultyRequest'
         description: 作成する教員の情報
   /v1/faculties/{id}:
     get:
@@ -189,7 +189,7 @@ paths:
                 type: object
                 properties:
                   faculty:
-                    $ref: '#/components/schemas/DottoFoundationV1.Faculty'
+                    $ref: '#/components/schemas/FacultyService.Faculty'
                 required:
                   - faculty
       tags:
@@ -213,7 +213,7 @@ paths:
                 type: object
                 properties:
                   faculty:
-                    $ref: '#/components/schemas/DottoFoundationV1.Faculty'
+                    $ref: '#/components/schemas/FacultyService.Faculty'
                 required:
                   - faculty
       tags:
@@ -223,7 +223,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DottoFoundationV1.FacultyRequest'
+              $ref: '#/components/schemas/FacultyService.FacultyRequest'
         description: 更新する教員の情報
     delete:
       operationId: FacultiesV1_delete
@@ -436,30 +436,6 @@ components:
         - SummerIntensive
         - WinterIntensive
       description: 開講時期
-    DottoFoundationV1.Faculty:
-      type: object
-      required:
-        - id
-        - name
-        - email
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        email:
-          type: string
-      description: 教員
-    DottoFoundationV1.FacultyRequest:
-      type: object
-      required:
-        - name
-        - email
-      properties:
-        name:
-          type: string
-        email:
-          type: string
     DottoFoundationV1.Grade:
       type: string
       enum:
@@ -480,6 +456,30 @@ components:
         - Optional
         - OptionalRequired
       description: 必修・選択
+    FacultyService.Faculty:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+      description: 教員
+    FacultyService.FacultyRequest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+        email:
+          type: string
     SubjectService.Subject:
       type: object
       required:
@@ -521,7 +521,7 @@ components:
         - isPrimary
       properties:
         faculty:
-          $ref: '#/components/schemas/DottoFoundationV1.Faculty'
+          $ref: '#/components/schemas/FacultyService.Faculty'
         isPrimary:
           type: boolean
     SubjectService.SubjectRequest:
