@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/fun-dotto/api-template/generated/external/subject_api"
+	"github.com/fun-dotto/api-template/generated/external/faculty_api"
 	"github.com/fun-dotto/api-template/internal/middleware"
 )
 
@@ -15,7 +15,7 @@ func (h *Handler) FacultiesV1List(c *gin.Context) {
 		return
 	}
 
-	response, err := h.subjectClient.FacultiesV1ListWithResponse(c.Request.Context())
+	response, err := h.facultyClient.FacultiesV1ListWithResponse(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -35,7 +35,7 @@ func (h *Handler) FacultiesV1Detail(c *gin.Context, id string) {
 		return
 	}
 
-	response, err := h.subjectClient.FacultiesV1DetailWithResponse(c.Request.Context(), id)
+	response, err := h.facultyClient.FacultiesV1DetailWithResponse(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -55,13 +55,13 @@ func (h *Handler) FacultiesV1Create(c *gin.Context) {
 		return
 	}
 
-	var req subject_api.FacultyRequest
+	var req faculty_api.FacultyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	response, err := h.subjectClient.FacultiesV1CreateWithResponse(c.Request.Context(), req)
+	response, err := h.facultyClient.FacultiesV1CreateWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -81,13 +81,13 @@ func (h *Handler) FacultiesV1Update(c *gin.Context, id string) {
 		return
 	}
 
-	var req subject_api.FacultyRequest
+	var req faculty_api.FacultyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	response, err := h.subjectClient.FacultiesV1UpdateWithResponse(c.Request.Context(), id, req)
+	response, err := h.facultyClient.FacultiesV1UpdateWithResponse(c.Request.Context(), id, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -107,7 +107,7 @@ func (h *Handler) FacultiesV1Delete(c *gin.Context, id string) {
 		return
 	}
 
-	response, err := h.subjectClient.FacultiesV1DeleteWithResponse(c.Request.Context(), id)
+	response, err := h.facultyClient.FacultiesV1DeleteWithResponse(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
