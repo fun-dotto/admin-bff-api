@@ -31,6 +31,15 @@ const (
 	L DottoFoundationV1Class = "L"
 )
 
+// Defines values for DottoFoundationV1Course.
+const (
+	AdvancedICT       DottoFoundationV1Course = "AdvancedICT"
+	ComplexSystem     DottoFoundationV1Course = "ComplexSystem"
+	InformationDesign DottoFoundationV1Course = "InformationDesign"
+	InformationSystem DottoFoundationV1Course = "InformationSystem"
+	IntelligentSystem DottoFoundationV1Course = "IntelligentSystem"
+)
+
 // Defines values for DottoFoundationV1CourseSemester.
 const (
 	AllYear         DottoFoundationV1CourseSemester = "AllYear"
@@ -42,17 +51,6 @@ const (
 	Q4              DottoFoundationV1CourseSemester = "Q4"
 	SummerIntensive DottoFoundationV1CourseSemester = "SummerIntensive"
 	WinterIntensive DottoFoundationV1CourseSemester = "WinterIntensive"
-)
-
-// Defines values for DottoFoundationV1DayOfWeek.
-const (
-	Friday    DottoFoundationV1DayOfWeek = "Friday"
-	Monday    DottoFoundationV1DayOfWeek = "Monday"
-	Saturday  DottoFoundationV1DayOfWeek = "Saturday"
-	Sunday    DottoFoundationV1DayOfWeek = "Sunday"
-	Thursday  DottoFoundationV1DayOfWeek = "Thursday"
-	Tuesday   DottoFoundationV1DayOfWeek = "Tuesday"
-	Wednesday DottoFoundationV1DayOfWeek = "Wednesday"
 )
 
 // Defines values for DottoFoundationV1Grade.
@@ -75,16 +73,6 @@ const (
 	Required         DottoFoundationV1SubjectRequirementType = "Required"
 )
 
-// Defines values for DottoFoundationV1TimetableSlot.
-const (
-	Slot1 DottoFoundationV1TimetableSlot = "Slot1"
-	Slot2 DottoFoundationV1TimetableSlot = "Slot2"
-	Slot3 DottoFoundationV1TimetableSlot = "Slot3"
-	Slot4 DottoFoundationV1TimetableSlot = "Slot4"
-	Slot5 DottoFoundationV1TimetableSlot = "Slot5"
-	Slot6 DottoFoundationV1TimetableSlot = "Slot6"
-)
-
 // AnnouncementServiceAnnouncement defines model for AnnouncementService.Announcement.
 type AnnouncementServiceAnnouncement struct {
 	AvailableFrom  time.Time  `json:"availableFrom"`
@@ -105,11 +93,24 @@ type AnnouncementServiceAnnouncementRequest struct {
 // DottoFoundationV1Class クラス
 type DottoFoundationV1Class string
 
+// DottoFoundationV1Course コース
+type DottoFoundationV1Course string
+
 // DottoFoundationV1CourseSemester 開講時期
 type DottoFoundationV1CourseSemester string
 
-// DottoFoundationV1DayOfWeek defines model for DottoFoundationV1.DayOfWeek.
-type DottoFoundationV1DayOfWeek string
+// DottoFoundationV1Faculty 教員
+type DottoFoundationV1Faculty struct {
+	Email string `json:"email"`
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+}
+
+// DottoFoundationV1FacultyRequest defines model for DottoFoundationV1.FacultyRequest.
+type DottoFoundationV1FacultyRequest struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
 
 // DottoFoundationV1Grade 学年
 type DottoFoundationV1Grade string
@@ -117,111 +118,40 @@ type DottoFoundationV1Grade string
 // DottoFoundationV1SubjectRequirementType 必修・選択
 type DottoFoundationV1SubjectRequirementType string
 
-// DottoFoundationV1TimetableSlot 授業時間
-type DottoFoundationV1TimetableSlot string
-
-// SubjectServiceCourse コース
-type SubjectServiceCourse struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-}
-
-// SubjectServiceCourseRequest defines model for SubjectService.CourseRequest.
-type SubjectServiceCourseRequest struct {
-	Name string `json:"name"`
-}
-
-// SubjectServiceDayOfWeekTimetableSlot 曜日・時限
-type SubjectServiceDayOfWeekTimetableSlot struct {
-	DayOfWeek DottoFoundationV1DayOfWeek `json:"dayOfWeek"`
-	Id        string                     `json:"id"`
-
-	// TimetableSlot 授業時間
-	TimetableSlot DottoFoundationV1TimetableSlot `json:"timetableSlot"`
-}
-
-// SubjectServiceDayOfWeekTimetableSlotRequest defines model for SubjectService.DayOfWeekTimetableSlotRequest.
-type SubjectServiceDayOfWeekTimetableSlotRequest struct {
-	DayOfWeek DottoFoundationV1DayOfWeek `json:"dayOfWeek"`
-
-	// TimetableSlot 授業時間
-	TimetableSlot DottoFoundationV1TimetableSlot `json:"timetableSlot"`
-}
-
-// SubjectServiceFaculty 教員
-type SubjectServiceFaculty struct {
-	Email string `json:"email"`
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-}
-
-// SubjectServiceFacultyRequest defines model for SubjectService.FacultyRequest.
-type SubjectServiceFacultyRequest struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
-}
-
 // SubjectServiceSubject defines model for SubjectService.Subject.
 type SubjectServiceSubject struct {
-	// Categories 科目群・科目区分のリスト
-	Categories              []SubjectServiceSubjectCategory        `json:"categories"`
-	DayOfWeekTimetableSlots []SubjectServiceDayOfWeekTimetableSlot `json:"dayOfWeekTimetableSlots"`
+	// Credit 単位数
+	Credit int `json:"credit"`
 
 	// EligibleAttributes 授業名末尾の`学年-クラス`をもとに決定
 	EligibleAttributes []SubjectServiceSubjectTargetClass `json:"eligibleAttributes"`
-
-	// Faculty 教員
-	Faculty SubjectServiceFaculty `json:"faculty"`
-	Id      string                `json:"id"`
-	Name    string                `json:"name"`
+	Faculties          []SubjectServiceSubjectFaculty     `json:"faculties"`
+	Id                 string                             `json:"id"`
+	Name               string                             `json:"name"`
 
 	// Requirements 科目群・科目区分をもとに決定
 	Requirements []SubjectServiceSubjectRequirement `json:"requirements"`
 
 	// Semester 開講時期
 	Semester DottoFoundationV1CourseSemester `json:"semester"`
-
-	// SyllabusId 教務システムのシラバスID
-	SyllabusId string `json:"syllabusId"`
 }
 
-// SubjectServiceSubjectCategory 科目群・科目区分
-type SubjectServiceSubjectCategory struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-}
-
-// SubjectServiceSubjectCategoryRequest defines model for SubjectService.SubjectCategoryRequest.
-type SubjectServiceSubjectCategoryRequest struct {
-	Name string `json:"name"`
+// SubjectServiceSubjectFaculty defines model for SubjectService.SubjectFaculty.
+type SubjectServiceSubjectFaculty struct {
+	// Faculty 教員
+	Faculty   DottoFoundationV1Faculty `json:"faculty"`
+	IsPrimary bool                     `json:"isPrimary"`
 }
 
 // SubjectServiceSubjectRequest defines model for SubjectService.SubjectRequest.
 type SubjectServiceSubjectRequest struct {
-	CategoryIds               []string                                  `json:"categoryIds"`
-	DayOfWeekTimetableSlotIds []string                                  `json:"dayOfWeekTimetableSlotIds"`
-	EligibleAttributes        []SubjectServiceSubjectTargetClass        `json:"eligibleAttributes"`
-	FacultyId                 string                                    `json:"facultyId"`
-	Name                      string                                    `json:"name"`
-	Requirements              []SubjectServiceSubjectRequirementRequest `json:"requirements"`
-
-	// Semester 開講時期
-	Semester   DottoFoundationV1CourseSemester `json:"semester"`
-	SyllabusId string                          `json:"syllabusId"`
+	SyllabusId string `json:"syllabusId"`
 }
 
 // SubjectServiceSubjectRequirement defines model for SubjectService.SubjectRequirement.
 type SubjectServiceSubjectRequirement struct {
 	// Course コース
-	Course SubjectServiceCourse `json:"course"`
-
-	// RequirementType 必修・選択
-	RequirementType DottoFoundationV1SubjectRequirementType `json:"requirementType"`
-}
-
-// SubjectServiceSubjectRequirementRequest defines model for SubjectService.SubjectRequirementRequest.
-type SubjectServiceSubjectRequirementRequest struct {
-	CourseId string `json:"courseId"`
+	Course DottoFoundationV1Course `json:"course"`
 
 	// RequirementType 必修・選択
 	RequirementType DottoFoundationV1SubjectRequirementType `json:"requirementType"`
@@ -242,29 +172,11 @@ type AnnouncementsV1CreateJSONRequestBody = AnnouncementServiceAnnouncementReque
 // AnnouncementsV1UpdateJSONRequestBody defines body for AnnouncementsV1Update for application/json ContentType.
 type AnnouncementsV1UpdateJSONRequestBody = AnnouncementServiceAnnouncementRequest
 
-// CoursesV1CreateJSONRequestBody defines body for CoursesV1Create for application/json ContentType.
-type CoursesV1CreateJSONRequestBody = SubjectServiceCourseRequest
-
-// CoursesV1UpdateJSONRequestBody defines body for CoursesV1Update for application/json ContentType.
-type CoursesV1UpdateJSONRequestBody = SubjectServiceCourseRequest
-
-// DayOfWeekTimetableSlotsV1CreateJSONRequestBody defines body for DayOfWeekTimetableSlotsV1Create for application/json ContentType.
-type DayOfWeekTimetableSlotsV1CreateJSONRequestBody = SubjectServiceDayOfWeekTimetableSlotRequest
-
-// DayOfWeekTimetableSlotsV1UpdateJSONRequestBody defines body for DayOfWeekTimetableSlotsV1Update for application/json ContentType.
-type DayOfWeekTimetableSlotsV1UpdateJSONRequestBody = SubjectServiceDayOfWeekTimetableSlotRequest
-
 // FacultiesV1CreateJSONRequestBody defines body for FacultiesV1Create for application/json ContentType.
-type FacultiesV1CreateJSONRequestBody = SubjectServiceFacultyRequest
+type FacultiesV1CreateJSONRequestBody = DottoFoundationV1FacultyRequest
 
 // FacultiesV1UpdateJSONRequestBody defines body for FacultiesV1Update for application/json ContentType.
-type FacultiesV1UpdateJSONRequestBody = SubjectServiceFacultyRequest
-
-// SubjectCategoriesV1CreateJSONRequestBody defines body for SubjectCategoriesV1Create for application/json ContentType.
-type SubjectCategoriesV1CreateJSONRequestBody = SubjectServiceSubjectCategoryRequest
-
-// SubjectCategoriesV1UpdateJSONRequestBody defines body for SubjectCategoriesV1Update for application/json ContentType.
-type SubjectCategoriesV1UpdateJSONRequestBody = SubjectServiceSubjectCategoryRequest
+type FacultiesV1UpdateJSONRequestBody = DottoFoundationV1FacultyRequest
 
 // SubjectsV1CreateJSONRequestBody defines body for SubjectsV1Create for application/json ContentType.
 type SubjectsV1CreateJSONRequestBody = SubjectServiceSubjectRequest
@@ -290,36 +202,6 @@ type ServerInterface interface {
 	// (PUT /v1/announcements/{id})
 	AnnouncementsV1Update(c *gin.Context, id string)
 
-	// (GET /v1/courses)
-	CoursesV1List(c *gin.Context)
-
-	// (POST /v1/courses)
-	CoursesV1Create(c *gin.Context)
-
-	// (DELETE /v1/courses/{id})
-	CoursesV1Delete(c *gin.Context, id string)
-
-	// (GET /v1/courses/{id})
-	CoursesV1Detail(c *gin.Context, id string)
-
-	// (PUT /v1/courses/{id})
-	CoursesV1Update(c *gin.Context, id string)
-
-	// (GET /v1/day-of-week-timetable-slots)
-	DayOfWeekTimetableSlotsV1List(c *gin.Context)
-
-	// (POST /v1/day-of-week-timetable-slots)
-	DayOfWeekTimetableSlotsV1Create(c *gin.Context)
-
-	// (DELETE /v1/day-of-week-timetable-slots/{id})
-	DayOfWeekTimetableSlotsV1Delete(c *gin.Context, id string)
-
-	// (GET /v1/day-of-week-timetable-slots/{id})
-	DayOfWeekTimetableSlotsV1Detail(c *gin.Context, id string)
-
-	// (PUT /v1/day-of-week-timetable-slots/{id})
-	DayOfWeekTimetableSlotsV1Update(c *gin.Context, id string)
-
 	// (GET /v1/faculties)
 	FacultiesV1List(c *gin.Context)
 
@@ -334,21 +216,6 @@ type ServerInterface interface {
 
 	// (PUT /v1/faculties/{id})
 	FacultiesV1Update(c *gin.Context, id string)
-
-	// (GET /v1/subject-categories)
-	SubjectCategoriesV1List(c *gin.Context)
-
-	// (POST /v1/subject-categories)
-	SubjectCategoriesV1Create(c *gin.Context)
-
-	// (DELETE /v1/subject-categories/{id})
-	SubjectCategoriesV1Delete(c *gin.Context, id string)
-
-	// (GET /v1/subject-categories/{id})
-	SubjectCategoriesV1Detail(c *gin.Context, id string)
-
-	// (PUT /v1/subject-categories/{id})
-	SubjectCategoriesV1Update(c *gin.Context, id string)
 
 	// (GET /v1/subjects)
 	SubjectsV1List(c *gin.Context)
@@ -473,202 +340,6 @@ func (siw *ServerInterfaceWrapper) AnnouncementsV1Update(c *gin.Context) {
 	siw.Handler.AnnouncementsV1Update(c, id)
 }
 
-// CoursesV1List operation middleware
-func (siw *ServerInterfaceWrapper) CoursesV1List(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.CoursesV1List(c)
-}
-
-// CoursesV1Create operation middleware
-func (siw *ServerInterfaceWrapper) CoursesV1Create(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.CoursesV1Create(c)
-}
-
-// CoursesV1Delete operation middleware
-func (siw *ServerInterfaceWrapper) CoursesV1Delete(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.CoursesV1Delete(c, id)
-}
-
-// CoursesV1Detail operation middleware
-func (siw *ServerInterfaceWrapper) CoursesV1Detail(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.CoursesV1Detail(c, id)
-}
-
-// CoursesV1Update operation middleware
-func (siw *ServerInterfaceWrapper) CoursesV1Update(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.CoursesV1Update(c, id)
-}
-
-// DayOfWeekTimetableSlotsV1List operation middleware
-func (siw *ServerInterfaceWrapper) DayOfWeekTimetableSlotsV1List(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.DayOfWeekTimetableSlotsV1List(c)
-}
-
-// DayOfWeekTimetableSlotsV1Create operation middleware
-func (siw *ServerInterfaceWrapper) DayOfWeekTimetableSlotsV1Create(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.DayOfWeekTimetableSlotsV1Create(c)
-}
-
-// DayOfWeekTimetableSlotsV1Delete operation middleware
-func (siw *ServerInterfaceWrapper) DayOfWeekTimetableSlotsV1Delete(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.DayOfWeekTimetableSlotsV1Delete(c, id)
-}
-
-// DayOfWeekTimetableSlotsV1Detail operation middleware
-func (siw *ServerInterfaceWrapper) DayOfWeekTimetableSlotsV1Detail(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.DayOfWeekTimetableSlotsV1Detail(c, id)
-}
-
-// DayOfWeekTimetableSlotsV1Update operation middleware
-func (siw *ServerInterfaceWrapper) DayOfWeekTimetableSlotsV1Update(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.DayOfWeekTimetableSlotsV1Update(c, id)
-}
-
 // FacultiesV1List operation middleware
 func (siw *ServerInterfaceWrapper) FacultiesV1List(c *gin.Context) {
 
@@ -765,104 +436,6 @@ func (siw *ServerInterfaceWrapper) FacultiesV1Update(c *gin.Context) {
 	}
 
 	siw.Handler.FacultiesV1Update(c, id)
-}
-
-// SubjectCategoriesV1List operation middleware
-func (siw *ServerInterfaceWrapper) SubjectCategoriesV1List(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.SubjectCategoriesV1List(c)
-}
-
-// SubjectCategoriesV1Create operation middleware
-func (siw *ServerInterfaceWrapper) SubjectCategoriesV1Create(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.SubjectCategoriesV1Create(c)
-}
-
-// SubjectCategoriesV1Delete operation middleware
-func (siw *ServerInterfaceWrapper) SubjectCategoriesV1Delete(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.SubjectCategoriesV1Delete(c, id)
-}
-
-// SubjectCategoriesV1Detail operation middleware
-func (siw *ServerInterfaceWrapper) SubjectCategoriesV1Detail(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.SubjectCategoriesV1Detail(c, id)
-}
-
-// SubjectCategoriesV1Update operation middleware
-func (siw *ServerInterfaceWrapper) SubjectCategoriesV1Update(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.SubjectCategoriesV1Update(c, id)
 }
 
 // SubjectsV1List operation middleware
@@ -995,26 +568,11 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Delete)
 	router.GET(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Detail)
 	router.PUT(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Update)
-	router.GET(options.BaseURL+"/v1/courses", wrapper.CoursesV1List)
-	router.POST(options.BaseURL+"/v1/courses", wrapper.CoursesV1Create)
-	router.DELETE(options.BaseURL+"/v1/courses/:id", wrapper.CoursesV1Delete)
-	router.GET(options.BaseURL+"/v1/courses/:id", wrapper.CoursesV1Detail)
-	router.PUT(options.BaseURL+"/v1/courses/:id", wrapper.CoursesV1Update)
-	router.GET(options.BaseURL+"/v1/day-of-week-timetable-slots", wrapper.DayOfWeekTimetableSlotsV1List)
-	router.POST(options.BaseURL+"/v1/day-of-week-timetable-slots", wrapper.DayOfWeekTimetableSlotsV1Create)
-	router.DELETE(options.BaseURL+"/v1/day-of-week-timetable-slots/:id", wrapper.DayOfWeekTimetableSlotsV1Delete)
-	router.GET(options.BaseURL+"/v1/day-of-week-timetable-slots/:id", wrapper.DayOfWeekTimetableSlotsV1Detail)
-	router.PUT(options.BaseURL+"/v1/day-of-week-timetable-slots/:id", wrapper.DayOfWeekTimetableSlotsV1Update)
 	router.GET(options.BaseURL+"/v1/faculties", wrapper.FacultiesV1List)
 	router.POST(options.BaseURL+"/v1/faculties", wrapper.FacultiesV1Create)
 	router.DELETE(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Delete)
 	router.GET(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Detail)
 	router.PUT(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Update)
-	router.GET(options.BaseURL+"/v1/subject-categories", wrapper.SubjectCategoriesV1List)
-	router.POST(options.BaseURL+"/v1/subject-categories", wrapper.SubjectCategoriesV1Create)
-	router.DELETE(options.BaseURL+"/v1/subject-categories/:id", wrapper.SubjectCategoriesV1Delete)
-	router.GET(options.BaseURL+"/v1/subject-categories/:id", wrapper.SubjectCategoriesV1Detail)
-	router.PUT(options.BaseURL+"/v1/subject-categories/:id", wrapper.SubjectCategoriesV1Update)
 	router.GET(options.BaseURL+"/v1/subjects", wrapper.SubjectsV1List)
 	router.POST(options.BaseURL+"/v1/subjects", wrapper.SubjectsV1Create)
 	router.DELETE(options.BaseURL+"/v1/subjects/:id", wrapper.SubjectsV1Delete)
@@ -1114,196 +672,6 @@ func (response AnnouncementsV1Update200JSONResponse) VisitAnnouncementsV1UpdateR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CoursesV1ListRequestObject struct {
-}
-
-type CoursesV1ListResponseObject interface {
-	VisitCoursesV1ListResponse(w http.ResponseWriter) error
-}
-
-type CoursesV1List200JSONResponse struct {
-	Courses []SubjectServiceCourse `json:"courses"`
-}
-
-func (response CoursesV1List200JSONResponse) VisitCoursesV1ListResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type CoursesV1CreateRequestObject struct {
-	Body *CoursesV1CreateJSONRequestBody
-}
-
-type CoursesV1CreateResponseObject interface {
-	VisitCoursesV1CreateResponse(w http.ResponseWriter) error
-}
-
-type CoursesV1Create201JSONResponse struct {
-	// Course コース
-	Course SubjectServiceCourse `json:"course"`
-}
-
-func (response CoursesV1Create201JSONResponse) VisitCoursesV1CreateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type CoursesV1DeleteRequestObject struct {
-	Id string `json:"id"`
-}
-
-type CoursesV1DeleteResponseObject interface {
-	VisitCoursesV1DeleteResponse(w http.ResponseWriter) error
-}
-
-type CoursesV1Delete204Response struct {
-}
-
-func (response CoursesV1Delete204Response) VisitCoursesV1DeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(204)
-	return nil
-}
-
-type CoursesV1DetailRequestObject struct {
-	Id string `json:"id"`
-}
-
-type CoursesV1DetailResponseObject interface {
-	VisitCoursesV1DetailResponse(w http.ResponseWriter) error
-}
-
-type CoursesV1Detail200JSONResponse struct {
-	// Course コース
-	Course SubjectServiceCourse `json:"course"`
-}
-
-func (response CoursesV1Detail200JSONResponse) VisitCoursesV1DetailResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type CoursesV1UpdateRequestObject struct {
-	Id   string `json:"id"`
-	Body *CoursesV1UpdateJSONRequestBody
-}
-
-type CoursesV1UpdateResponseObject interface {
-	VisitCoursesV1UpdateResponse(w http.ResponseWriter) error
-}
-
-type CoursesV1Update200JSONResponse struct {
-	// Course コース
-	Course SubjectServiceCourse `json:"course"`
-}
-
-func (response CoursesV1Update200JSONResponse) VisitCoursesV1UpdateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DayOfWeekTimetableSlotsV1ListRequestObject struct {
-}
-
-type DayOfWeekTimetableSlotsV1ListResponseObject interface {
-	VisitDayOfWeekTimetableSlotsV1ListResponse(w http.ResponseWriter) error
-}
-
-type DayOfWeekTimetableSlotsV1List200JSONResponse struct {
-	DayOfWeekTimetableSlots []SubjectServiceDayOfWeekTimetableSlot `json:"dayOfWeekTimetableSlots"`
-}
-
-func (response DayOfWeekTimetableSlotsV1List200JSONResponse) VisitDayOfWeekTimetableSlotsV1ListResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DayOfWeekTimetableSlotsV1CreateRequestObject struct {
-	Body *DayOfWeekTimetableSlotsV1CreateJSONRequestBody
-}
-
-type DayOfWeekTimetableSlotsV1CreateResponseObject interface {
-	VisitDayOfWeekTimetableSlotsV1CreateResponse(w http.ResponseWriter) error
-}
-
-type DayOfWeekTimetableSlotsV1Create201JSONResponse struct {
-	// DayOfWeekTimetableSlot 曜日・時限
-	DayOfWeekTimetableSlot SubjectServiceDayOfWeekTimetableSlot `json:"dayOfWeekTimetableSlot"`
-}
-
-func (response DayOfWeekTimetableSlotsV1Create201JSONResponse) VisitDayOfWeekTimetableSlotsV1CreateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DayOfWeekTimetableSlotsV1DeleteRequestObject struct {
-	Id string `json:"id"`
-}
-
-type DayOfWeekTimetableSlotsV1DeleteResponseObject interface {
-	VisitDayOfWeekTimetableSlotsV1DeleteResponse(w http.ResponseWriter) error
-}
-
-type DayOfWeekTimetableSlotsV1Delete204Response struct {
-}
-
-func (response DayOfWeekTimetableSlotsV1Delete204Response) VisitDayOfWeekTimetableSlotsV1DeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(204)
-	return nil
-}
-
-type DayOfWeekTimetableSlotsV1DetailRequestObject struct {
-	Id string `json:"id"`
-}
-
-type DayOfWeekTimetableSlotsV1DetailResponseObject interface {
-	VisitDayOfWeekTimetableSlotsV1DetailResponse(w http.ResponseWriter) error
-}
-
-type DayOfWeekTimetableSlotsV1Detail200JSONResponse struct {
-	// DayOfWeekTimetableSlot 曜日・時限
-	DayOfWeekTimetableSlot SubjectServiceDayOfWeekTimetableSlot `json:"dayOfWeekTimetableSlot"`
-}
-
-func (response DayOfWeekTimetableSlotsV1Detail200JSONResponse) VisitDayOfWeekTimetableSlotsV1DetailResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DayOfWeekTimetableSlotsV1UpdateRequestObject struct {
-	Id   string `json:"id"`
-	Body *DayOfWeekTimetableSlotsV1UpdateJSONRequestBody
-}
-
-type DayOfWeekTimetableSlotsV1UpdateResponseObject interface {
-	VisitDayOfWeekTimetableSlotsV1UpdateResponse(w http.ResponseWriter) error
-}
-
-type DayOfWeekTimetableSlotsV1Update200JSONResponse struct {
-	// DayOfWeekTimetableSlot 曜日・時限
-	DayOfWeekTimetableSlot SubjectServiceDayOfWeekTimetableSlot `json:"dayOfWeekTimetableSlot"`
-}
-
-func (response DayOfWeekTimetableSlotsV1Update200JSONResponse) VisitDayOfWeekTimetableSlotsV1UpdateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
 type FacultiesV1ListRequestObject struct {
 }
 
@@ -1312,7 +680,7 @@ type FacultiesV1ListResponseObject interface {
 }
 
 type FacultiesV1List200JSONResponse struct {
-	Faculties []SubjectServiceFaculty `json:"faculties"`
+	Faculties []DottoFoundationV1Faculty `json:"faculties"`
 }
 
 func (response FacultiesV1List200JSONResponse) VisitFacultiesV1ListResponse(w http.ResponseWriter) error {
@@ -1332,7 +700,7 @@ type FacultiesV1CreateResponseObject interface {
 
 type FacultiesV1Create201JSONResponse struct {
 	// Faculty 教員
-	Faculty SubjectServiceFaculty `json:"faculty"`
+	Faculty DottoFoundationV1Faculty `json:"faculty"`
 }
 
 func (response FacultiesV1Create201JSONResponse) VisitFacultiesV1CreateResponse(w http.ResponseWriter) error {
@@ -1368,7 +736,7 @@ type FacultiesV1DetailResponseObject interface {
 
 type FacultiesV1Detail200JSONResponse struct {
 	// Faculty 教員
-	Faculty SubjectServiceFaculty `json:"faculty"`
+	Faculty DottoFoundationV1Faculty `json:"faculty"`
 }
 
 func (response FacultiesV1Detail200JSONResponse) VisitFacultiesV1DetailResponse(w http.ResponseWriter) error {
@@ -1389,105 +757,10 @@ type FacultiesV1UpdateResponseObject interface {
 
 type FacultiesV1Update200JSONResponse struct {
 	// Faculty 教員
-	Faculty SubjectServiceFaculty `json:"faculty"`
+	Faculty DottoFoundationV1Faculty `json:"faculty"`
 }
 
 func (response FacultiesV1Update200JSONResponse) VisitFacultiesV1UpdateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SubjectCategoriesV1ListRequestObject struct {
-}
-
-type SubjectCategoriesV1ListResponseObject interface {
-	VisitSubjectCategoriesV1ListResponse(w http.ResponseWriter) error
-}
-
-type SubjectCategoriesV1List200JSONResponse struct {
-	SubjectCategories []SubjectServiceSubjectCategory `json:"subjectCategories"`
-}
-
-func (response SubjectCategoriesV1List200JSONResponse) VisitSubjectCategoriesV1ListResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SubjectCategoriesV1CreateRequestObject struct {
-	Body *SubjectCategoriesV1CreateJSONRequestBody
-}
-
-type SubjectCategoriesV1CreateResponseObject interface {
-	VisitSubjectCategoriesV1CreateResponse(w http.ResponseWriter) error
-}
-
-type SubjectCategoriesV1Create201JSONResponse struct {
-	// SubjectCategory 科目群・科目区分
-	SubjectCategory SubjectServiceSubjectCategory `json:"subjectCategory"`
-}
-
-func (response SubjectCategoriesV1Create201JSONResponse) VisitSubjectCategoriesV1CreateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SubjectCategoriesV1DeleteRequestObject struct {
-	Id string `json:"id"`
-}
-
-type SubjectCategoriesV1DeleteResponseObject interface {
-	VisitSubjectCategoriesV1DeleteResponse(w http.ResponseWriter) error
-}
-
-type SubjectCategoriesV1Delete204Response struct {
-}
-
-func (response SubjectCategoriesV1Delete204Response) VisitSubjectCategoriesV1DeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(204)
-	return nil
-}
-
-type SubjectCategoriesV1DetailRequestObject struct {
-	Id string `json:"id"`
-}
-
-type SubjectCategoriesV1DetailResponseObject interface {
-	VisitSubjectCategoriesV1DetailResponse(w http.ResponseWriter) error
-}
-
-type SubjectCategoriesV1Detail200JSONResponse struct {
-	// SubjectCategory 科目群・科目区分
-	SubjectCategory SubjectServiceSubjectCategory `json:"subjectCategory"`
-}
-
-func (response SubjectCategoriesV1Detail200JSONResponse) VisitSubjectCategoriesV1DetailResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SubjectCategoriesV1UpdateRequestObject struct {
-	Id   string `json:"id"`
-	Body *SubjectCategoriesV1UpdateJSONRequestBody
-}
-
-type SubjectCategoriesV1UpdateResponseObject interface {
-	VisitSubjectCategoriesV1UpdateResponse(w http.ResponseWriter) error
-}
-
-type SubjectCategoriesV1Update200JSONResponse struct {
-	// SubjectCategory 科目群・科目区分
-	SubjectCategory SubjectServiceSubjectCategory `json:"subjectCategory"`
-}
-
-func (response SubjectCategoriesV1Update200JSONResponse) VisitSubjectCategoriesV1UpdateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
@@ -1604,36 +877,6 @@ type StrictServerInterface interface {
 	// (PUT /v1/announcements/{id})
 	AnnouncementsV1Update(ctx context.Context, request AnnouncementsV1UpdateRequestObject) (AnnouncementsV1UpdateResponseObject, error)
 
-	// (GET /v1/courses)
-	CoursesV1List(ctx context.Context, request CoursesV1ListRequestObject) (CoursesV1ListResponseObject, error)
-
-	// (POST /v1/courses)
-	CoursesV1Create(ctx context.Context, request CoursesV1CreateRequestObject) (CoursesV1CreateResponseObject, error)
-
-	// (DELETE /v1/courses/{id})
-	CoursesV1Delete(ctx context.Context, request CoursesV1DeleteRequestObject) (CoursesV1DeleteResponseObject, error)
-
-	// (GET /v1/courses/{id})
-	CoursesV1Detail(ctx context.Context, request CoursesV1DetailRequestObject) (CoursesV1DetailResponseObject, error)
-
-	// (PUT /v1/courses/{id})
-	CoursesV1Update(ctx context.Context, request CoursesV1UpdateRequestObject) (CoursesV1UpdateResponseObject, error)
-
-	// (GET /v1/day-of-week-timetable-slots)
-	DayOfWeekTimetableSlotsV1List(ctx context.Context, request DayOfWeekTimetableSlotsV1ListRequestObject) (DayOfWeekTimetableSlotsV1ListResponseObject, error)
-
-	// (POST /v1/day-of-week-timetable-slots)
-	DayOfWeekTimetableSlotsV1Create(ctx context.Context, request DayOfWeekTimetableSlotsV1CreateRequestObject) (DayOfWeekTimetableSlotsV1CreateResponseObject, error)
-
-	// (DELETE /v1/day-of-week-timetable-slots/{id})
-	DayOfWeekTimetableSlotsV1Delete(ctx context.Context, request DayOfWeekTimetableSlotsV1DeleteRequestObject) (DayOfWeekTimetableSlotsV1DeleteResponseObject, error)
-
-	// (GET /v1/day-of-week-timetable-slots/{id})
-	DayOfWeekTimetableSlotsV1Detail(ctx context.Context, request DayOfWeekTimetableSlotsV1DetailRequestObject) (DayOfWeekTimetableSlotsV1DetailResponseObject, error)
-
-	// (PUT /v1/day-of-week-timetable-slots/{id})
-	DayOfWeekTimetableSlotsV1Update(ctx context.Context, request DayOfWeekTimetableSlotsV1UpdateRequestObject) (DayOfWeekTimetableSlotsV1UpdateResponseObject, error)
-
 	// (GET /v1/faculties)
 	FacultiesV1List(ctx context.Context, request FacultiesV1ListRequestObject) (FacultiesV1ListResponseObject, error)
 
@@ -1648,21 +891,6 @@ type StrictServerInterface interface {
 
 	// (PUT /v1/faculties/{id})
 	FacultiesV1Update(ctx context.Context, request FacultiesV1UpdateRequestObject) (FacultiesV1UpdateResponseObject, error)
-
-	// (GET /v1/subject-categories)
-	SubjectCategoriesV1List(ctx context.Context, request SubjectCategoriesV1ListRequestObject) (SubjectCategoriesV1ListResponseObject, error)
-
-	// (POST /v1/subject-categories)
-	SubjectCategoriesV1Create(ctx context.Context, request SubjectCategoriesV1CreateRequestObject) (SubjectCategoriesV1CreateResponseObject, error)
-
-	// (DELETE /v1/subject-categories/{id})
-	SubjectCategoriesV1Delete(ctx context.Context, request SubjectCategoriesV1DeleteRequestObject) (SubjectCategoriesV1DeleteResponseObject, error)
-
-	// (GET /v1/subject-categories/{id})
-	SubjectCategoriesV1Detail(ctx context.Context, request SubjectCategoriesV1DetailRequestObject) (SubjectCategoriesV1DetailResponseObject, error)
-
-	// (PUT /v1/subject-categories/{id})
-	SubjectCategoriesV1Update(ctx context.Context, request SubjectCategoriesV1UpdateRequestObject) (SubjectCategoriesV1UpdateResponseObject, error)
 
 	// (GET /v1/subjects)
 	SubjectsV1List(ctx context.Context, request SubjectsV1ListRequestObject) (SubjectsV1ListResponseObject, error)
@@ -1839,300 +1067,6 @@ func (sh *strictHandler) AnnouncementsV1Update(ctx *gin.Context, id string) {
 	}
 }
 
-// CoursesV1List operation middleware
-func (sh *strictHandler) CoursesV1List(ctx *gin.Context) {
-	var request CoursesV1ListRequestObject
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CoursesV1List(ctx, request.(CoursesV1ListRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CoursesV1List")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(CoursesV1ListResponseObject); ok {
-		if err := validResponse.VisitCoursesV1ListResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// CoursesV1Create operation middleware
-func (sh *strictHandler) CoursesV1Create(ctx *gin.Context) {
-	var request CoursesV1CreateRequestObject
-
-	var body CoursesV1CreateJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CoursesV1Create(ctx, request.(CoursesV1CreateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CoursesV1Create")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(CoursesV1CreateResponseObject); ok {
-		if err := validResponse.VisitCoursesV1CreateResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// CoursesV1Delete operation middleware
-func (sh *strictHandler) CoursesV1Delete(ctx *gin.Context, id string) {
-	var request CoursesV1DeleteRequestObject
-
-	request.Id = id
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CoursesV1Delete(ctx, request.(CoursesV1DeleteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CoursesV1Delete")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(CoursesV1DeleteResponseObject); ok {
-		if err := validResponse.VisitCoursesV1DeleteResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// CoursesV1Detail operation middleware
-func (sh *strictHandler) CoursesV1Detail(ctx *gin.Context, id string) {
-	var request CoursesV1DetailRequestObject
-
-	request.Id = id
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CoursesV1Detail(ctx, request.(CoursesV1DetailRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CoursesV1Detail")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(CoursesV1DetailResponseObject); ok {
-		if err := validResponse.VisitCoursesV1DetailResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// CoursesV1Update operation middleware
-func (sh *strictHandler) CoursesV1Update(ctx *gin.Context, id string) {
-	var request CoursesV1UpdateRequestObject
-
-	request.Id = id
-
-	var body CoursesV1UpdateJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CoursesV1Update(ctx, request.(CoursesV1UpdateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "CoursesV1Update")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(CoursesV1UpdateResponseObject); ok {
-		if err := validResponse.VisitCoursesV1UpdateResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// DayOfWeekTimetableSlotsV1List operation middleware
-func (sh *strictHandler) DayOfWeekTimetableSlotsV1List(ctx *gin.Context) {
-	var request DayOfWeekTimetableSlotsV1ListRequestObject
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DayOfWeekTimetableSlotsV1List(ctx, request.(DayOfWeekTimetableSlotsV1ListRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DayOfWeekTimetableSlotsV1List")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(DayOfWeekTimetableSlotsV1ListResponseObject); ok {
-		if err := validResponse.VisitDayOfWeekTimetableSlotsV1ListResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// DayOfWeekTimetableSlotsV1Create operation middleware
-func (sh *strictHandler) DayOfWeekTimetableSlotsV1Create(ctx *gin.Context) {
-	var request DayOfWeekTimetableSlotsV1CreateRequestObject
-
-	var body DayOfWeekTimetableSlotsV1CreateJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DayOfWeekTimetableSlotsV1Create(ctx, request.(DayOfWeekTimetableSlotsV1CreateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DayOfWeekTimetableSlotsV1Create")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(DayOfWeekTimetableSlotsV1CreateResponseObject); ok {
-		if err := validResponse.VisitDayOfWeekTimetableSlotsV1CreateResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// DayOfWeekTimetableSlotsV1Delete operation middleware
-func (sh *strictHandler) DayOfWeekTimetableSlotsV1Delete(ctx *gin.Context, id string) {
-	var request DayOfWeekTimetableSlotsV1DeleteRequestObject
-
-	request.Id = id
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DayOfWeekTimetableSlotsV1Delete(ctx, request.(DayOfWeekTimetableSlotsV1DeleteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DayOfWeekTimetableSlotsV1Delete")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(DayOfWeekTimetableSlotsV1DeleteResponseObject); ok {
-		if err := validResponse.VisitDayOfWeekTimetableSlotsV1DeleteResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// DayOfWeekTimetableSlotsV1Detail operation middleware
-func (sh *strictHandler) DayOfWeekTimetableSlotsV1Detail(ctx *gin.Context, id string) {
-	var request DayOfWeekTimetableSlotsV1DetailRequestObject
-
-	request.Id = id
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DayOfWeekTimetableSlotsV1Detail(ctx, request.(DayOfWeekTimetableSlotsV1DetailRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DayOfWeekTimetableSlotsV1Detail")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(DayOfWeekTimetableSlotsV1DetailResponseObject); ok {
-		if err := validResponse.VisitDayOfWeekTimetableSlotsV1DetailResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// DayOfWeekTimetableSlotsV1Update operation middleware
-func (sh *strictHandler) DayOfWeekTimetableSlotsV1Update(ctx *gin.Context, id string) {
-	var request DayOfWeekTimetableSlotsV1UpdateRequestObject
-
-	request.Id = id
-
-	var body DayOfWeekTimetableSlotsV1UpdateJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DayOfWeekTimetableSlotsV1Update(ctx, request.(DayOfWeekTimetableSlotsV1UpdateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DayOfWeekTimetableSlotsV1Update")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(DayOfWeekTimetableSlotsV1UpdateResponseObject); ok {
-		if err := validResponse.VisitDayOfWeekTimetableSlotsV1UpdateResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
 // FacultiesV1List operation middleware
 func (sh *strictHandler) FacultiesV1List(ctx *gin.Context) {
 	var request FacultiesV1ListRequestObject
@@ -2273,153 +1207,6 @@ func (sh *strictHandler) FacultiesV1Update(ctx *gin.Context, id string) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(FacultiesV1UpdateResponseObject); ok {
 		if err := validResponse.VisitFacultiesV1UpdateResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// SubjectCategoriesV1List operation middleware
-func (sh *strictHandler) SubjectCategoriesV1List(ctx *gin.Context) {
-	var request SubjectCategoriesV1ListRequestObject
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectCategoriesV1List(ctx, request.(SubjectCategoriesV1ListRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectCategoriesV1List")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectCategoriesV1ListResponseObject); ok {
-		if err := validResponse.VisitSubjectCategoriesV1ListResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// SubjectCategoriesV1Create operation middleware
-func (sh *strictHandler) SubjectCategoriesV1Create(ctx *gin.Context) {
-	var request SubjectCategoriesV1CreateRequestObject
-
-	var body SubjectCategoriesV1CreateJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectCategoriesV1Create(ctx, request.(SubjectCategoriesV1CreateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectCategoriesV1Create")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectCategoriesV1CreateResponseObject); ok {
-		if err := validResponse.VisitSubjectCategoriesV1CreateResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// SubjectCategoriesV1Delete operation middleware
-func (sh *strictHandler) SubjectCategoriesV1Delete(ctx *gin.Context, id string) {
-	var request SubjectCategoriesV1DeleteRequestObject
-
-	request.Id = id
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectCategoriesV1Delete(ctx, request.(SubjectCategoriesV1DeleteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectCategoriesV1Delete")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectCategoriesV1DeleteResponseObject); ok {
-		if err := validResponse.VisitSubjectCategoriesV1DeleteResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// SubjectCategoriesV1Detail operation middleware
-func (sh *strictHandler) SubjectCategoriesV1Detail(ctx *gin.Context, id string) {
-	var request SubjectCategoriesV1DetailRequestObject
-
-	request.Id = id
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectCategoriesV1Detail(ctx, request.(SubjectCategoriesV1DetailRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectCategoriesV1Detail")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectCategoriesV1DetailResponseObject); ok {
-		if err := validResponse.VisitSubjectCategoriesV1DetailResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// SubjectCategoriesV1Update operation middleware
-func (sh *strictHandler) SubjectCategoriesV1Update(ctx *gin.Context, id string) {
-	var request SubjectCategoriesV1UpdateRequestObject
-
-	request.Id = id
-
-	var body SubjectCategoriesV1UpdateJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectCategoriesV1Update(ctx, request.(SubjectCategoriesV1UpdateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectCategoriesV1Update")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectCategoriesV1UpdateResponseObject); ok {
-		if err := validResponse.VisitSubjectCategoriesV1UpdateResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
