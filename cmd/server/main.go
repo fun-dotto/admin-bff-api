@@ -5,10 +5,10 @@ import (
 	"log"
 
 	firebase "firebase.google.com/go/v4"
-	api "github.com/fun-dotto/api-template/generated"
-	"github.com/fun-dotto/api-template/internal/handler"
-	"github.com/fun-dotto/api-template/internal/infrastructure"
-	"github.com/fun-dotto/api-template/internal/middleware"
+	api "github.com/fun-dotto/admin-bff-api/generated"
+	"github.com/fun-dotto/admin-bff-api/internal/handler"
+	"github.com/fun-dotto/admin-bff-api/internal/infrastructure"
+	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -47,7 +47,7 @@ func main() {
 		log.Fatalf("Failed to initialize external clients: %v", err)
 	}
 
-	h := handler.NewHandler(clients.Announcement, clients.Subject)
+	h := handler.NewHandler(clients.Announcement, clients.Faculty, clients.Subject)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"
