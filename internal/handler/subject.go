@@ -16,7 +16,14 @@ func (h *Handler) SubjectSubjectsV1List(c *gin.Context, params api.SubjectSubjec
 		return
 	}
 
-	clientParams := &subject_api.SubjectsV1ListParams{}
+	clientParams := &subject_api.SubjectsV1ListParams{
+		Q:              params.Q,
+		Grade:          convertSlicePtr[api.DottoFoundationV1Grade, subject_api.DottoFoundationV1Grade](params.Grade),
+		Courses:        convertSlicePtr[api.DottoFoundationV1Course, subject_api.DottoFoundationV1Course](params.Courses),
+		Class:          convertSlicePtr[api.DottoFoundationV1Class, subject_api.DottoFoundationV1Class](params.Class),
+		Classification: convertSlicePtr[api.DottoFoundationV1SubjectClassification, subject_api.DottoFoundationV1SubjectClassification](params.Classification),
+		Year:           params.Year,
+	}
 
 	response, err := h.subjectClient.SubjectsV1ListWithResponse(c.Request.Context(), clientParams)
 	if err != nil {
@@ -96,4 +103,15 @@ func (h *Handler) SubjectSubjectsV1Delete(c *gin.Context, id string) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func convertSlicePtr[From, To ~string](src *[]From) *[]To {
+	if src == nil {
+		return nil
+	}
+	result := make([]To, len(*src))
+	for i, v := range *src {
+		result[i] = To(v)
+	}
+	return &result
 }
