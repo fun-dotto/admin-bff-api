@@ -5,12 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/fun-dotto/api-template/generated/external/announcement_api"
-	"github.com/fun-dotto/api-template/internal/middleware"
+	"github.com/fun-dotto/admin-bff-api/generated/external/announcement_api"
+	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 )
 
-// AnnouncementsV1List 一覧を取得する
-func (h *Handler) AnnouncementsV1List(c *gin.Context) {
+// AnnouncementAnnouncementsV1List 一覧を取得する
+func (h *Handler) AnnouncementAnnouncementsV1List(c *gin.Context) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
 		return
 	}
@@ -29,8 +29,8 @@ func (h *Handler) AnnouncementsV1List(c *gin.Context) {
 	c.JSON(http.StatusOK, response.JSON200)
 }
 
-// AnnouncementsV1Detail 詳細を取得する
-func (h *Handler) AnnouncementsV1Detail(c *gin.Context, id string) {
+// AnnouncementAnnouncementsV1Detail 詳細を取得する
+func (h *Handler) AnnouncementAnnouncementsV1Detail(c *gin.Context, id string) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
 		return
 	}
@@ -49,8 +49,8 @@ func (h *Handler) AnnouncementsV1Detail(c *gin.Context, id string) {
 	c.JSON(http.StatusOK, response.JSON200)
 }
 
-// AnnouncementsV1Create 新規作成する
-func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
+// AnnouncementAnnouncementsV1Create 新規作成する
+func (h *Handler) AnnouncementAnnouncementsV1Create(c *gin.Context) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
 		return
 	}
@@ -75,8 +75,8 @@ func (h *Handler) AnnouncementsV1Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, response.JSON201)
 }
 
-// AnnouncementsV1Delete 削除する
-func (h *Handler) AnnouncementsV1Delete(c *gin.Context, id string) {
+// AnnouncementAnnouncementsV1Delete 削除する
+func (h *Handler) AnnouncementAnnouncementsV1Delete(c *gin.Context, id string) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
 		return
 	}
@@ -95,8 +95,8 @@ func (h *Handler) AnnouncementsV1Delete(c *gin.Context, id string) {
 	c.Status(http.StatusNoContent)
 }
 
-// AnnouncementsV1Update 更新する
-func (h *Handler) AnnouncementsV1Update(c *gin.Context, id string) {
+// AnnouncementAnnouncementsV1Update 更新する
+func (h *Handler) AnnouncementAnnouncementsV1Update(c *gin.Context, id string) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
 		return
 	}

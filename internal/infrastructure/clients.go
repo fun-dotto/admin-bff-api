@@ -7,8 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/fun-dotto/api-template/generated/external/announcement_api"
-	"github.com/fun-dotto/api-template/generated/external/subject_api"
+	"github.com/fun-dotto/admin-bff-api/generated/external/announcement_api"
+	"github.com/fun-dotto/admin-bff-api/generated/external/faculty_api"
+	"github.com/fun-dotto/admin-bff-api/generated/external/subject_api"
 	"google.golang.org/api/idtoken"
 )
 
@@ -17,6 +18,7 @@ const httpClientTimeout = 30 * time.Second
 // ExternalClients 外部APIクライアントをまとめて管理
 type ExternalClients struct {
 	Announcement *announcement_api.ClientWithResponses
+	Faculty      *faculty_api.ClientWithResponses
 	Subject      *subject_api.ClientWithResponses
 }
 
@@ -27,6 +29,11 @@ func NewExternalClients(ctx context.Context) (*ExternalClients, error) {
 		return nil, fmt.Errorf("announcement client: %w", err)
 	}
 
+	faculty, err := newFacultyClient(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("faculty client: %w", err)
+	}
+
 	subject, err := newSubjectClient(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("subject client: %w", err)
@@ -34,6 +41,7 @@ func NewExternalClients(ctx context.Context) (*ExternalClients, error) {
 
 	return &ExternalClients{
 		Announcement: announcement,
+		Faculty:      faculty,
 		Subject:      subject,
 	}, nil
 }
@@ -52,6 +60,23 @@ func newAnnouncementClient(ctx context.Context) (*announcement_api.ClientWithRes
 	return announcement_api.NewClientWithResponses(
 		url,
 		announcement_api.WithHTTPClient(authClient),
+	)
+}
+
+func newFacultyClient(ctx context.Context) (*faculty_api.ClientWithResponses, error) {
+	url := os.Getenv("FACULTY_API_URL")
+	if url == "" {
+		return nil, fmt.Errorf("FACULTY_API_URL is required")
+	}
+
+	authClient, err := newAuthHTTPClient(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	return faculty_api.NewClientWithResponses(
+		url,
+		faculty_api.WithHTTPClient(authClient),
 	)
 }
 
