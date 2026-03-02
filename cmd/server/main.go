@@ -47,7 +47,7 @@ func main() {
 		log.Fatalf("Failed to initialize external clients: %v", err)
 	}
 
-	h := handler.NewHandler(clients.Announcement, clients.Subject)
+	h := handler.NewHandler(clients.Announcement, clients.Faculty, clients.Subject)
 	api.RegisterHandlers(router, h)
 
 	addr := ":8080"
