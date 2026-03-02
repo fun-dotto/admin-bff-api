@@ -99,24 +99,24 @@ type DottoFoundationV1Course string
 // DottoFoundationV1CourseSemester 開講時期
 type DottoFoundationV1CourseSemester string
 
-// DottoFoundationV1Faculty 教員
-type DottoFoundationV1Faculty struct {
-	Email string `json:"email"`
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-}
-
-// DottoFoundationV1FacultyRequest defines model for DottoFoundationV1.FacultyRequest.
-type DottoFoundationV1FacultyRequest struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
-}
-
 // DottoFoundationV1Grade 学年
 type DottoFoundationV1Grade string
 
 // DottoFoundationV1SubjectRequirementType 必修・選択
 type DottoFoundationV1SubjectRequirementType string
+
+// FacultyServiceFaculty 教員
+type FacultyServiceFaculty struct {
+	Email string `json:"email"`
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+}
+
+// FacultyServiceFacultyRequest defines model for FacultyService.FacultyRequest.
+type FacultyServiceFacultyRequest struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
 
 // SubjectServiceSubject defines model for SubjectService.Subject.
 type SubjectServiceSubject struct {
@@ -138,9 +138,8 @@ type SubjectServiceSubject struct {
 
 // SubjectServiceSubjectFaculty defines model for SubjectService.SubjectFaculty.
 type SubjectServiceSubjectFaculty struct {
-	// Faculty 教員
-	Faculty   DottoFoundationV1Faculty `json:"faculty"`
-	IsPrimary bool                     `json:"isPrimary"`
+	FacultyId string `json:"facultyId"`
+	IsPrimary bool   `json:"isPrimary"`
 }
 
 // SubjectServiceSubjectRequest defines model for SubjectService.SubjectRequest.
@@ -155,6 +154,13 @@ type SubjectServiceSubjectRequirement struct {
 
 	// RequirementType 必修・選択
 	RequirementType DottoFoundationV1SubjectRequirementType `json:"requirementType"`
+}
+
+// SubjectServiceSubjectSummary defines model for SubjectService.SubjectSummary.
+type SubjectServiceSubjectSummary struct {
+	Faculties []SubjectServiceSubjectFaculty `json:"faculties"`
+	Id        string                         `json:"id"`
+	Name      string                         `json:"name"`
 }
 
 // SubjectServiceSubjectTargetClass 対象学年・クラス
@@ -173,10 +179,10 @@ type AnnouncementsV1CreateJSONRequestBody = AnnouncementServiceAnnouncementReque
 type AnnouncementsV1UpdateJSONRequestBody = AnnouncementServiceAnnouncementRequest
 
 // FacultiesV1CreateJSONRequestBody defines body for FacultiesV1Create for application/json ContentType.
-type FacultiesV1CreateJSONRequestBody = DottoFoundationV1FacultyRequest
+type FacultiesV1CreateJSONRequestBody = FacultyServiceFacultyRequest
 
 // FacultiesV1UpdateJSONRequestBody defines body for FacultiesV1Update for application/json ContentType.
-type FacultiesV1UpdateJSONRequestBody = DottoFoundationV1FacultyRequest
+type FacultiesV1UpdateJSONRequestBody = FacultyServiceFacultyRequest
 
 // SubjectsV1CreateJSONRequestBody defines body for SubjectsV1Create for application/json ContentType.
 type SubjectsV1CreateJSONRequestBody = SubjectServiceSubjectRequest
@@ -680,7 +686,7 @@ type FacultiesV1ListResponseObject interface {
 }
 
 type FacultiesV1List200JSONResponse struct {
-	Faculties []DottoFoundationV1Faculty `json:"faculties"`
+	Faculties []FacultyServiceFaculty `json:"faculties"`
 }
 
 func (response FacultiesV1List200JSONResponse) VisitFacultiesV1ListResponse(w http.ResponseWriter) error {
@@ -700,7 +706,7 @@ type FacultiesV1CreateResponseObject interface {
 
 type FacultiesV1Create201JSONResponse struct {
 	// Faculty 教員
-	Faculty DottoFoundationV1Faculty `json:"faculty"`
+	Faculty FacultyServiceFaculty `json:"faculty"`
 }
 
 func (response FacultiesV1Create201JSONResponse) VisitFacultiesV1CreateResponse(w http.ResponseWriter) error {
@@ -736,7 +742,7 @@ type FacultiesV1DetailResponseObject interface {
 
 type FacultiesV1Detail200JSONResponse struct {
 	// Faculty 教員
-	Faculty DottoFoundationV1Faculty `json:"faculty"`
+	Faculty FacultyServiceFaculty `json:"faculty"`
 }
 
 func (response FacultiesV1Detail200JSONResponse) VisitFacultiesV1DetailResponse(w http.ResponseWriter) error {
@@ -757,7 +763,7 @@ type FacultiesV1UpdateResponseObject interface {
 
 type FacultiesV1Update200JSONResponse struct {
 	// Faculty 教員
-	Faculty DottoFoundationV1Faculty `json:"faculty"`
+	Faculty FacultyServiceFaculty `json:"faculty"`
 }
 
 func (response FacultiesV1Update200JSONResponse) VisitFacultiesV1UpdateResponse(w http.ResponseWriter) error {
@@ -775,7 +781,7 @@ type SubjectsV1ListResponseObject interface {
 }
 
 type SubjectsV1List200JSONResponse struct {
-	Subjects []SubjectServiceSubject `json:"subjects"`
+	Subjects []SubjectServiceSubjectSummary `json:"subjects"`
 }
 
 func (response SubjectsV1List200JSONResponse) VisitSubjectsV1ListResponse(w http.ResponseWriter) error {
