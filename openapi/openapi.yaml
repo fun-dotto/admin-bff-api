@@ -262,12 +262,12 @@ paths:
       tags:
         - Subjects
     post:
-      operationId: SubjectsV1_create
-      description: 科目を作成する
+      operationId: SubjectsV1_upsert
+      description: 科目を作成または更新する
       parameters: []
       responses:
-        '201':
-          description: 作成された科目
+        '200':
+          description: 作成または更新された科目
           content:
             application/json:
               schema:
@@ -285,7 +285,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SubjectService.SubjectRequest'
-        description: 作成する科目の情報
+        description: 作成または更新する科目の情報
   /v1/subjects/{id}:
     get:
       operationId: SubjectsV1_detail
@@ -311,37 +311,6 @@ paths:
                   - subject
       tags:
         - Subjects
-    put:
-      operationId: SubjectsV1_update
-      description: 科目を更新する
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: 科目ID
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 更新された科目
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  subject:
-                    $ref: '#/components/schemas/SubjectService.Subject'
-                required:
-                  - subject
-      tags:
-        - Subjects
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubjectService.SubjectRequest'
-        description: 更新する科目の情報
     delete:
       operationId: SubjectsV1_delete
       description: 科目を削除する
