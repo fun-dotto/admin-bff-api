@@ -7,9 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/fun-dotto/admin-bff-api/generated/external/academic_api"
 	"github.com/fun-dotto/admin-bff-api/generated/external/announcement_api"
-	"github.com/fun-dotto/admin-bff-api/generated/external/faculty_api"
-	"github.com/fun-dotto/admin-bff-api/generated/external/subject_api"
 	"google.golang.org/api/idtoken"
 )
 
@@ -17,33 +16,43 @@ const httpClientTimeout = 30 * time.Second
 
 // ExternalClients 外部APIクライアントをまとめて管理
 type ExternalClients struct {
+	Academic     *academic_api.ClientWithResponses
 	Announcement *announcement_api.ClientWithResponses
-	Faculty      *faculty_api.ClientWithResponses
-	Subject      *subject_api.ClientWithResponses
 }
 
 // NewExternalClients 全ての外部APIクライアントを初期化
 func NewExternalClients(ctx context.Context) (*ExternalClients, error) {
+	academic, err := newAcademicClient(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("academic client: %w", err)
+	}
+
 	announcement, err := newAnnouncementClient(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("announcement client: %w", err)
 	}
 
-	faculty, err := newFacultyClient(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("faculty client: %w", err)
-	}
-
-	subject, err := newSubjectClient(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("subject client: %w", err)
-	}
-
 	return &ExternalClients{
+		Academic:     academic,
 		Announcement: announcement,
-		Faculty:      faculty,
-		Subject:      subject,
 	}, nil
+}
+
+func newAcademicClient(ctx context.Context) (*academic_api.ClientWithResponses, error) {
+	url := os.Getenv("ACADEMIC_API_URL")
+	if url == "" {
+		return nil, fmt.Errorf("ACADEMIC_API_URL is required")
+	}
+
+	authClient, err := newAuthHTTPClient(ctx, url)
+	if err != nil {
+		return nil, err
+	}
+
+	return academic_api.NewClientWithResponses(
+		url,
+		academic_api.WithHTTPClient(authClient),
+	)
 }
 
 func newAnnouncementClient(ctx context.Context) (*announcement_api.ClientWithResponses, error) {
@@ -60,40 +69,6 @@ func newAnnouncementClient(ctx context.Context) (*announcement_api.ClientWithRes
 	return announcement_api.NewClientWithResponses(
 		url,
 		announcement_api.WithHTTPClient(authClient),
-	)
-}
-
-func newFacultyClient(ctx context.Context) (*faculty_api.ClientWithResponses, error) {
-	url := os.Getenv("FACULTY_API_URL")
-	if url == "" {
-		return nil, fmt.Errorf("FACULTY_API_URL is required")
-	}
-
-	authClient, err := newAuthHTTPClient(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	return faculty_api.NewClientWithResponses(
-		url,
-		faculty_api.WithHTTPClient(authClient),
-	)
-}
-
-func newSubjectClient(ctx context.Context) (*subject_api.ClientWithResponses, error) {
-	url := os.Getenv("SUBJECT_API_URL")
-	if url == "" {
-		return nil, fmt.Errorf("SUBJECT_API_URL is required")
-	}
-
-	authClient, err := newAuthHTTPClient(ctx, url)
-	if err != nil {
-		return nil, err
-	}
-
-	return subject_api.NewClientWithResponses(
-		url,
-		subject_api.WithHTTPClient(authClient),
 	)
 }
 
