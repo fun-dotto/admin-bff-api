@@ -121,6 +121,126 @@ const (
 	Required         DottoFoundationV1SubjectRequirementType = "Required"
 )
 
+// AcademicServiceCourseRegistration defines model for AcademicService.CourseRegistration.
+type AcademicServiceCourseRegistration struct {
+	Id        string `json:"id"`
+	SubjectId string `json:"subjectId"`
+	UserId    string `json:"userId"`
+}
+
+// AcademicServiceCourseRegistrationRequest defines model for AcademicService.CourseRegistrationRequest.
+type AcademicServiceCourseRegistrationRequest struct {
+	SubjectId string `json:"subjectId"`
+	UserId    string `json:"userId"`
+}
+
+// AcademicServiceFaculty 教員
+type AcademicServiceFaculty struct {
+	Email string `json:"email"`
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+}
+
+// AcademicServiceFacultyRequest defines model for AcademicService.FacultyRequest.
+type AcademicServiceFacultyRequest struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
+
+// AcademicServiceReservation defines model for AcademicService.Reservation.
+type AcademicServiceReservation struct {
+	EndAt   time.Time `json:"endAt"`
+	StartAt time.Time `json:"startAt"`
+	Title   string    `json:"title"`
+}
+
+// AcademicServiceRoom defines model for AcademicService.Room.
+type AcademicServiceRoom struct {
+	Floor DottoFoundationV1Floor `json:"floor"`
+	Id    string                 `json:"id"`
+	Name  string                 `json:"name"`
+}
+
+// AcademicServiceRoomRequest defines model for AcademicService.RoomRequest.
+type AcademicServiceRoomRequest struct {
+	Floor DottoFoundationV1Floor `json:"floor"`
+	Name  string                 `json:"name"`
+}
+
+// AcademicServiceSubject defines model for AcademicService.Subject.
+type AcademicServiceSubject struct {
+	// Credit 単位数
+	Credit int `json:"credit"`
+
+	// EligibleAttributes 授業名末尾の`学年-クラス`をもとに決定
+	EligibleAttributes []AcademicServiceSubjectTargetClass `json:"eligibleAttributes"`
+	Faculties          []AcademicServiceSubjectFaculty     `json:"faculties"`
+	Id                 string                              `json:"id"`
+	Name               string                              `json:"name"`
+
+	// Requirements 科目群・科目区分をもとに決定
+	Requirements []AcademicServiceSubjectRequirement `json:"requirements"`
+
+	// Semester 開講時期
+	Semester DottoFoundationV1CourseSemester `json:"semester"`
+
+	// Year 開講年度
+	Year int `json:"year"`
+}
+
+// AcademicServiceSubjectFaculty defines model for AcademicService.SubjectFaculty.
+type AcademicServiceSubjectFaculty struct {
+	FacultyId string `json:"facultyId"`
+	IsPrimary bool   `json:"isPrimary"`
+}
+
+// AcademicServiceSubjectRequest defines model for AcademicService.SubjectRequest.
+type AcademicServiceSubjectRequest struct {
+	SyllabusId string `json:"syllabusId"`
+}
+
+// AcademicServiceSubjectRequirement defines model for AcademicService.SubjectRequirement.
+type AcademicServiceSubjectRequirement struct {
+	// Course コース
+	Course DottoFoundationV1Course `json:"course"`
+
+	// RequirementType 必修・選択
+	RequirementType DottoFoundationV1SubjectRequirementType `json:"requirementType"`
+}
+
+// AcademicServiceSubjectSummary defines model for AcademicService.SubjectSummary.
+type AcademicServiceSubjectSummary struct {
+	Faculties []AcademicServiceSubjectFaculty `json:"faculties"`
+	Id        string                          `json:"id"`
+	Name      string                          `json:"name"`
+}
+
+// AcademicServiceSubjectTargetClass 対象学年・クラス
+type AcademicServiceSubjectTargetClass struct {
+	// Class 修士課程・博士課程対象の場合はnull
+	Class *DottoFoundationV1Class `json:"class,omitempty"`
+
+	// Grade 学年
+	Grade DottoFoundationV1Grade `json:"grade"`
+}
+
+// AcademicServiceTimetableItem defines model for AcademicService.TimetableItem.
+type AcademicServiceTimetableItem struct {
+	DayOfWeek DottoFoundationV1DayOfWeek `json:"dayOfWeek"`
+	Id        string                     `json:"id"`
+	Period    DottoFoundationV1Period    `json:"period"`
+	RoomId    string                     `json:"roomId"`
+	SubjectId string                     `json:"subjectId"`
+}
+
+// AcademicServiceTimetableItemRequest defines model for AcademicService.TimetableItemRequest.
+type AcademicServiceTimetableItemRequest struct {
+	DayOfWeek DottoFoundationV1DayOfWeek `json:"dayOfWeek"`
+	Period    DottoFoundationV1Period    `json:"period"`
+	RoomId    string                     `json:"roomId"`
+	SubjectId string                     `json:"subjectId"`
+}
+
 // AnnouncementServiceAnnouncement defines model for AnnouncementService.Announcement.
 type AnnouncementServiceAnnouncement struct {
 	AvailableFrom  time.Time  `json:"availableFrom"`
@@ -136,19 +256,6 @@ type AnnouncementServiceAnnouncementRequest struct {
 	AvailableUntil *time.Time `json:"availableUntil,omitempty"`
 	Title          string     `json:"title"`
 	Url            string     `json:"url"`
-}
-
-// CourseServiceRegistration defines model for CourseService.Registration.
-type CourseServiceRegistration struct {
-	Id        string `json:"id"`
-	SubjectId string `json:"subjectId"`
-	UserId    string `json:"userId"`
-}
-
-// CourseServiceRegistrationRequest defines model for CourseService.RegistrationRequest.
-type CourseServiceRegistrationRequest struct {
-	SubjectId string `json:"subjectId"`
-	UserId    string `json:"userId"`
 }
 
 // DottoFoundationV1Class クラス
@@ -181,113 +288,6 @@ type DottoFoundationV1SubjectClassification string
 // DottoFoundationV1SubjectRequirementType 必修・選択
 type DottoFoundationV1SubjectRequirementType string
 
-// FacilityServiceReservation defines model for FacilityService.Reservation.
-type FacilityServiceReservation struct {
-	EndAt   time.Time `json:"endAt"`
-	StartAt time.Time `json:"startAt"`
-	Title   string    `json:"title"`
-}
-
-// FacilityServiceRoom defines model for FacilityService.Room.
-type FacilityServiceRoom struct {
-	Floor DottoFoundationV1Floor `json:"floor"`
-	Id    string                 `json:"id"`
-	Name  string                 `json:"name"`
-}
-
-// FacilityServiceRoomRequest defines model for FacilityService.RoomRequest.
-type FacilityServiceRoomRequest struct {
-	Floor DottoFoundationV1Floor `json:"floor"`
-	Name  string                 `json:"name"`
-}
-
-// FacultyServiceFaculty 教員
-type FacultyServiceFaculty struct {
-	Email string `json:"email"`
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-}
-
-// FacultyServiceFacultyRequest defines model for FacultyService.FacultyRequest.
-type FacultyServiceFacultyRequest struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
-}
-
-// SubjectServiceSubject defines model for SubjectService.Subject.
-type SubjectServiceSubject struct {
-	// Credit 単位数
-	Credit int `json:"credit"`
-
-	// EligibleAttributes 授業名末尾の`学年-クラス`をもとに決定
-	EligibleAttributes []SubjectServiceSubjectTargetClass `json:"eligibleAttributes"`
-	Faculties          []SubjectServiceSubjectFaculty     `json:"faculties"`
-	Id                 string                             `json:"id"`
-	Name               string                             `json:"name"`
-
-	// Requirements 科目群・科目区分をもとに決定
-	Requirements []SubjectServiceSubjectRequirement `json:"requirements"`
-
-	// Semester 開講時期
-	Semester DottoFoundationV1CourseSemester `json:"semester"`
-
-	// Year 開講年度
-	Year int `json:"year"`
-}
-
-// SubjectServiceSubjectFaculty defines model for SubjectService.SubjectFaculty.
-type SubjectServiceSubjectFaculty struct {
-	FacultyId string `json:"facultyId"`
-	IsPrimary bool   `json:"isPrimary"`
-}
-
-// SubjectServiceSubjectRequest defines model for SubjectService.SubjectRequest.
-type SubjectServiceSubjectRequest struct {
-	SyllabusId string `json:"syllabusId"`
-}
-
-// SubjectServiceSubjectRequirement defines model for SubjectService.SubjectRequirement.
-type SubjectServiceSubjectRequirement struct {
-	// Course コース
-	Course DottoFoundationV1Course `json:"course"`
-
-	// RequirementType 必修・選択
-	RequirementType DottoFoundationV1SubjectRequirementType `json:"requirementType"`
-}
-
-// SubjectServiceSubjectSummary defines model for SubjectService.SubjectSummary.
-type SubjectServiceSubjectSummary struct {
-	Faculties []SubjectServiceSubjectFaculty `json:"faculties"`
-	Id        string                         `json:"id"`
-	Name      string                         `json:"name"`
-}
-
-// SubjectServiceSubjectTargetClass 対象学年・クラス
-type SubjectServiceSubjectTargetClass struct {
-	// Class 修士課程・博士課程対象の場合はnull
-	Class *DottoFoundationV1Class `json:"class,omitempty"`
-
-	// Grade 学年
-	Grade DottoFoundationV1Grade `json:"grade"`
-}
-
-// TimetableServiceItem defines model for TimetableService.Item.
-type TimetableServiceItem struct {
-	DayOfWeek DottoFoundationV1DayOfWeek `json:"dayOfWeek"`
-	Id        string                     `json:"id"`
-	Period    DottoFoundationV1Period    `json:"period"`
-	RoomId    string                     `json:"roomId"`
-	SubjectId string                     `json:"subjectId"`
-}
-
-// TimetableServiceItemRequest defines model for TimetableService.ItemRequest.
-type TimetableServiceItemRequest struct {
-	DayOfWeek DottoFoundationV1DayOfWeek `json:"dayOfWeek"`
-	Period    DottoFoundationV1Period    `json:"period"`
-	RoomId    string                     `json:"roomId"`
-	SubjectId string                     `json:"subjectId"`
-}
-
 // UserServiceUser defines model for UserService.User.
 type UserServiceUser struct {
 	// Class クラス
@@ -318,13 +318,13 @@ type CourseRegistrationsV1ListParams struct {
 	Semester DottoFoundationV1CourseSemester `form:"semester" json:"semester"`
 }
 
-// FacilityRoomsV1ListParams defines parameters for FacilityRoomsV1List.
-type FacilityRoomsV1ListParams struct {
+// RoomsV1ListParams defines parameters for RoomsV1List.
+type RoomsV1ListParams struct {
 	Floor *[]DottoFoundationV1Floor `form:"floor,omitempty" json:"floor,omitempty"`
 }
 
-// FacilityReservationsV1ListParams defines parameters for FacilityReservationsV1List.
-type FacilityReservationsV1ListParams struct {
+// ReservationsV1ListParams defines parameters for ReservationsV1List.
+type ReservationsV1ListParams struct {
 	// From 開始日時
 	From *time.Time `form:"from,omitempty" json:"from,omitempty"`
 
@@ -332,8 +332,8 @@ type FacilityReservationsV1ListParams struct {
 	Until *time.Time `form:"until,omitempty" json:"until,omitempty"`
 }
 
-// SubjectSubjectsV1ListParams defines parameters for SubjectSubjectsV1List.
-type SubjectSubjectsV1ListParams struct {
+// SubjectsV1ListParams defines parameters for SubjectsV1List.
+type SubjectsV1ListParams struct {
 	// Q 検索ワード
 	Q *string `form:"q,omitempty" json:"q,omitempty"`
 
@@ -371,119 +371,119 @@ type TimetableItemsV1ListParams struct {
 	Semester DottoFoundationV1CourseSemester `form:"semester" json:"semester"`
 
 	// DayOfWeek 曜日; 複数指定時はORでフィルタリングされる; 指定しない場合は全ての曜日が選択される
-	DayOfWeek []DottoFoundationV1DayOfWeek `form:"dayOfWeek" json:"dayOfWeek"`
+	DayOfWeek *[]DottoFoundationV1DayOfWeek `form:"dayOfWeek,omitempty" json:"dayOfWeek,omitempty"`
 }
 
-// AnnouncementAnnouncementsV1CreateJSONRequestBody defines body for AnnouncementAnnouncementsV1Create for application/json ContentType.
-type AnnouncementAnnouncementsV1CreateJSONRequestBody = AnnouncementServiceAnnouncementRequest
+// AnnouncementsV1CreateJSONRequestBody defines body for AnnouncementsV1Create for application/json ContentType.
+type AnnouncementsV1CreateJSONRequestBody = AnnouncementServiceAnnouncementRequest
 
-// AnnouncementAnnouncementsV1UpdateJSONRequestBody defines body for AnnouncementAnnouncementsV1Update for application/json ContentType.
-type AnnouncementAnnouncementsV1UpdateJSONRequestBody = AnnouncementServiceAnnouncementRequest
+// AnnouncementsV1UpdateJSONRequestBody defines body for AnnouncementsV1Update for application/json ContentType.
+type AnnouncementsV1UpdateJSONRequestBody = AnnouncementServiceAnnouncementRequest
 
 // CourseRegistrationsV1CreateJSONRequestBody defines body for CourseRegistrationsV1Create for application/json ContentType.
-type CourseRegistrationsV1CreateJSONRequestBody = CourseServiceRegistrationRequest
+type CourseRegistrationsV1CreateJSONRequestBody = AcademicServiceCourseRegistrationRequest
 
-// FacilityRoomsV1CreateJSONRequestBody defines body for FacilityRoomsV1Create for application/json ContentType.
-type FacilityRoomsV1CreateJSONRequestBody = FacilityServiceRoomRequest
+// FacultiesV1CreateJSONRequestBody defines body for FacultiesV1Create for application/json ContentType.
+type FacultiesV1CreateJSONRequestBody = AcademicServiceFacultyRequest
 
-// FacilityRoomsV1UpdateJSONRequestBody defines body for FacilityRoomsV1Update for application/json ContentType.
-type FacilityRoomsV1UpdateJSONRequestBody = FacilityServiceRoomRequest
+// FacultiesV1UpdateJSONRequestBody defines body for FacultiesV1Update for application/json ContentType.
+type FacultiesV1UpdateJSONRequestBody = AcademicServiceFacultyRequest
 
-// FacultyFacultiesV1CreateJSONRequestBody defines body for FacultyFacultiesV1Create for application/json ContentType.
-type FacultyFacultiesV1CreateJSONRequestBody = FacultyServiceFacultyRequest
+// RoomsV1CreateJSONRequestBody defines body for RoomsV1Create for application/json ContentType.
+type RoomsV1CreateJSONRequestBody = AcademicServiceRoomRequest
 
-// FacultyFacultiesV1UpdateJSONRequestBody defines body for FacultyFacultiesV1Update for application/json ContentType.
-type FacultyFacultiesV1UpdateJSONRequestBody = FacultyServiceFacultyRequest
+// RoomsV1UpdateJSONRequestBody defines body for RoomsV1Update for application/json ContentType.
+type RoomsV1UpdateJSONRequestBody = AcademicServiceRoomRequest
 
-// SubjectSubjectsV1UpsertJSONRequestBody defines body for SubjectSubjectsV1Upsert for application/json ContentType.
-type SubjectSubjectsV1UpsertJSONRequestBody = SubjectServiceSubjectRequest
+// SubjectsV1UpsertJSONRequestBody defines body for SubjectsV1Upsert for application/json ContentType.
+type SubjectsV1UpsertJSONRequestBody = AcademicServiceSubjectRequest
 
 // TimetableItemsV1CreateJSONRequestBody defines body for TimetableItemsV1Create for application/json ContentType.
-type TimetableItemsV1CreateJSONRequestBody = TimetableServiceItemRequest
+type TimetableItemsV1CreateJSONRequestBody = AcademicServiceTimetableItemRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (GET /v1/announcement/announcements)
-	AnnouncementAnnouncementsV1List(c *gin.Context)
+	// (GET /v1/announcements)
+	AnnouncementsV1List(c *gin.Context)
 
-	// (POST /v1/announcement/announcements)
-	AnnouncementAnnouncementsV1Create(c *gin.Context)
+	// (POST /v1/announcements)
+	AnnouncementsV1Create(c *gin.Context)
 
-	// (DELETE /v1/announcement/announcements/{id})
-	AnnouncementAnnouncementsV1Delete(c *gin.Context, id string)
+	// (DELETE /v1/announcements/{id})
+	AnnouncementsV1Delete(c *gin.Context, id string)
 
-	// (GET /v1/announcement/announcements/{id})
-	AnnouncementAnnouncementsV1Detail(c *gin.Context, id string)
+	// (GET /v1/announcements/{id})
+	AnnouncementsV1Detail(c *gin.Context, id string)
 
-	// (PUT /v1/announcement/announcements/{id})
-	AnnouncementAnnouncementsV1Update(c *gin.Context, id string)
+	// (PUT /v1/announcements/{id})
+	AnnouncementsV1Update(c *gin.Context, id string)
 
-	// (GET /v1/course/registrations)
+	// (GET /v1/courseRegistrations)
 	CourseRegistrationsV1List(c *gin.Context, params CourseRegistrationsV1ListParams)
 
-	// (POST /v1/course/registrations)
+	// (POST /v1/courseRegistrations)
 	CourseRegistrationsV1Create(c *gin.Context)
 
-	// (DELETE /v1/course/registrations/{id})
+	// (DELETE /v1/courseRegistrations/{id})
 	CourseRegistrationsV1Delete(c *gin.Context, id string)
 
-	// (GET /v1/facility/rooms)
-	FacilityRoomsV1List(c *gin.Context, params FacilityRoomsV1ListParams)
+	// (GET /v1/faculties)
+	FacultiesV1List(c *gin.Context)
 
-	// (POST /v1/facility/rooms)
-	FacilityRoomsV1Create(c *gin.Context)
+	// (POST /v1/faculties)
+	FacultiesV1Create(c *gin.Context)
 
-	// (DELETE /v1/facility/rooms/{id})
-	FacilityRoomsV1Delete(c *gin.Context, id string)
+	// (DELETE /v1/faculties/{id})
+	FacultiesV1Delete(c *gin.Context, id string)
 
-	// (GET /v1/facility/rooms/{id})
-	FacilityRoomsV1Detail(c *gin.Context, id string)
+	// (GET /v1/faculties/{id})
+	FacultiesV1Detail(c *gin.Context, id string)
 
-	// (PUT /v1/facility/rooms/{id})
-	FacilityRoomsV1Update(c *gin.Context, id string)
+	// (PUT /v1/faculties/{id})
+	FacultiesV1Update(c *gin.Context, id string)
 
-	// (GET /v1/facility/rooms/{id}/reservations)
-	FacilityReservationsV1List(c *gin.Context, id string, params FacilityReservationsV1ListParams)
+	// (GET /v1/rooms)
+	RoomsV1List(c *gin.Context, params RoomsV1ListParams)
 
-	// (GET /v1/faculty/faculties)
-	FacultyFacultiesV1List(c *gin.Context)
+	// (POST /v1/rooms)
+	RoomsV1Create(c *gin.Context)
 
-	// (POST /v1/faculty/faculties)
-	FacultyFacultiesV1Create(c *gin.Context)
+	// (DELETE /v1/rooms/{id})
+	RoomsV1Delete(c *gin.Context, id string)
 
-	// (DELETE /v1/faculty/faculties/{id})
-	FacultyFacultiesV1Delete(c *gin.Context, id string)
+	// (GET /v1/rooms/{id})
+	RoomsV1Detail(c *gin.Context, id string)
 
-	// (GET /v1/faculty/faculties/{id})
-	FacultyFacultiesV1Detail(c *gin.Context, id string)
+	// (PUT /v1/rooms/{id})
+	RoomsV1Update(c *gin.Context, id string)
 
-	// (PUT /v1/faculty/faculties/{id})
-	FacultyFacultiesV1Update(c *gin.Context, id string)
+	// (GET /v1/rooms/{id}/reservations)
+	ReservationsV1List(c *gin.Context, id string, params ReservationsV1ListParams)
 
-	// (GET /v1/subject/subjects)
-	SubjectSubjectsV1List(c *gin.Context, params SubjectSubjectsV1ListParams)
+	// (GET /v1/subjects)
+	SubjectsV1List(c *gin.Context, params SubjectsV1ListParams)
 
-	// (POST /v1/subject/subjects)
-	SubjectSubjectsV1Upsert(c *gin.Context)
+	// (POST /v1/subjects)
+	SubjectsV1Upsert(c *gin.Context)
 
-	// (DELETE /v1/subject/subjects/{id})
-	SubjectSubjectsV1Delete(c *gin.Context, id string)
+	// (DELETE /v1/subjects/{id})
+	SubjectsV1Delete(c *gin.Context, id string)
 
-	// (GET /v1/subject/subjects/{id})
-	SubjectSubjectsV1Detail(c *gin.Context, id string)
+	// (GET /v1/subjects/{id})
+	SubjectsV1Detail(c *gin.Context, id string)
 
-	// (GET /v1/timetable/itmes)
+	// (GET /v1/timetableItmes)
 	TimetableItemsV1List(c *gin.Context, params TimetableItemsV1ListParams)
 
-	// (POST /v1/timetable/itmes)
+	// (POST /v1/timetableItmes)
 	TimetableItemsV1Create(c *gin.Context)
 
-	// (DELETE /v1/timetable/itmes/{id})
+	// (DELETE /v1/timetableItmes/{id})
 	TimetableItemsV1Delete(c *gin.Context, id string)
 
-	// (GET /v1/user/users/{id})
-	UserUsersV1Detail(c *gin.Context, id string)
+	// (GET /v1/users/{id})
+	UsersV1Detail(c *gin.Context, id string)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -495,8 +495,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// AnnouncementAnnouncementsV1List operation middleware
-func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1List(c *gin.Context) {
+// AnnouncementsV1List operation middleware
+func (siw *ServerInterfaceWrapper) AnnouncementsV1List(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -505,11 +505,11 @@ func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1List(c *gin.Contex
 		}
 	}
 
-	siw.Handler.AnnouncementAnnouncementsV1List(c)
+	siw.Handler.AnnouncementsV1List(c)
 }
 
-// AnnouncementAnnouncementsV1Create operation middleware
-func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1Create(c *gin.Context) {
+// AnnouncementsV1Create operation middleware
+func (siw *ServerInterfaceWrapper) AnnouncementsV1Create(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -518,11 +518,11 @@ func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1Create(c *gin.Cont
 		}
 	}
 
-	siw.Handler.AnnouncementAnnouncementsV1Create(c)
+	siw.Handler.AnnouncementsV1Create(c)
 }
 
-// AnnouncementAnnouncementsV1Delete operation middleware
-func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1Delete(c *gin.Context) {
+// AnnouncementsV1Delete operation middleware
+func (siw *ServerInterfaceWrapper) AnnouncementsV1Delete(c *gin.Context) {
 
 	var err error
 
@@ -542,11 +542,11 @@ func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1Delete(c *gin.Cont
 		}
 	}
 
-	siw.Handler.AnnouncementAnnouncementsV1Delete(c, id)
+	siw.Handler.AnnouncementsV1Delete(c, id)
 }
 
-// AnnouncementAnnouncementsV1Detail operation middleware
-func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1Detail(c *gin.Context) {
+// AnnouncementsV1Detail operation middleware
+func (siw *ServerInterfaceWrapper) AnnouncementsV1Detail(c *gin.Context) {
 
 	var err error
 
@@ -566,11 +566,11 @@ func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1Detail(c *gin.Cont
 		}
 	}
 
-	siw.Handler.AnnouncementAnnouncementsV1Detail(c, id)
+	siw.Handler.AnnouncementsV1Detail(c, id)
 }
 
-// AnnouncementAnnouncementsV1Update operation middleware
-func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1Update(c *gin.Context) {
+// AnnouncementsV1Update operation middleware
+func (siw *ServerInterfaceWrapper) AnnouncementsV1Update(c *gin.Context) {
 
 	var err error
 
@@ -590,7 +590,7 @@ func (siw *ServerInterfaceWrapper) AnnouncementAnnouncementsV1Update(c *gin.Cont
 		}
 	}
 
-	siw.Handler.AnnouncementAnnouncementsV1Update(c, id)
+	siw.Handler.AnnouncementsV1Update(c, id)
 }
 
 // CourseRegistrationsV1List operation middleware
@@ -686,13 +686,111 @@ func (siw *ServerInterfaceWrapper) CourseRegistrationsV1Delete(c *gin.Context) {
 	siw.Handler.CourseRegistrationsV1Delete(c, id)
 }
 
-// FacilityRoomsV1List operation middleware
-func (siw *ServerInterfaceWrapper) FacilityRoomsV1List(c *gin.Context) {
+// FacultiesV1List operation middleware
+func (siw *ServerInterfaceWrapper) FacultiesV1List(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FacultiesV1List(c)
+}
+
+// FacultiesV1Create operation middleware
+func (siw *ServerInterfaceWrapper) FacultiesV1Create(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FacultiesV1Create(c)
+}
+
+// FacultiesV1Delete operation middleware
+func (siw *ServerInterfaceWrapper) FacultiesV1Delete(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FacultiesV1Delete(c, id)
+}
+
+// FacultiesV1Detail operation middleware
+func (siw *ServerInterfaceWrapper) FacultiesV1Detail(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FacultiesV1Detail(c, id)
+}
+
+// FacultiesV1Update operation middleware
+func (siw *ServerInterfaceWrapper) FacultiesV1Update(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FacultiesV1Update(c, id)
+}
+
+// RoomsV1List operation middleware
+func (siw *ServerInterfaceWrapper) RoomsV1List(c *gin.Context) {
 
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params FacilityRoomsV1ListParams
+	var params RoomsV1ListParams
 
 	// ------------- Optional query parameter "floor" -------------
 
@@ -709,11 +807,11 @@ func (siw *ServerInterfaceWrapper) FacilityRoomsV1List(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.FacilityRoomsV1List(c, params)
+	siw.Handler.RoomsV1List(c, params)
 }
 
-// FacilityRoomsV1Create operation middleware
-func (siw *ServerInterfaceWrapper) FacilityRoomsV1Create(c *gin.Context) {
+// RoomsV1Create operation middleware
+func (siw *ServerInterfaceWrapper) RoomsV1Create(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -722,11 +820,11 @@ func (siw *ServerInterfaceWrapper) FacilityRoomsV1Create(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.FacilityRoomsV1Create(c)
+	siw.Handler.RoomsV1Create(c)
 }
 
-// FacilityRoomsV1Delete operation middleware
-func (siw *ServerInterfaceWrapper) FacilityRoomsV1Delete(c *gin.Context) {
+// RoomsV1Delete operation middleware
+func (siw *ServerInterfaceWrapper) RoomsV1Delete(c *gin.Context) {
 
 	var err error
 
@@ -746,11 +844,11 @@ func (siw *ServerInterfaceWrapper) FacilityRoomsV1Delete(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.FacilityRoomsV1Delete(c, id)
+	siw.Handler.RoomsV1Delete(c, id)
 }
 
-// FacilityRoomsV1Detail operation middleware
-func (siw *ServerInterfaceWrapper) FacilityRoomsV1Detail(c *gin.Context) {
+// RoomsV1Detail operation middleware
+func (siw *ServerInterfaceWrapper) RoomsV1Detail(c *gin.Context) {
 
 	var err error
 
@@ -770,11 +868,11 @@ func (siw *ServerInterfaceWrapper) FacilityRoomsV1Detail(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.FacilityRoomsV1Detail(c, id)
+	siw.Handler.RoomsV1Detail(c, id)
 }
 
-// FacilityRoomsV1Update operation middleware
-func (siw *ServerInterfaceWrapper) FacilityRoomsV1Update(c *gin.Context) {
+// RoomsV1Update operation middleware
+func (siw *ServerInterfaceWrapper) RoomsV1Update(c *gin.Context) {
 
 	var err error
 
@@ -794,11 +892,11 @@ func (siw *ServerInterfaceWrapper) FacilityRoomsV1Update(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.FacilityRoomsV1Update(c, id)
+	siw.Handler.RoomsV1Update(c, id)
 }
 
-// FacilityReservationsV1List operation middleware
-func (siw *ServerInterfaceWrapper) FacilityReservationsV1List(c *gin.Context) {
+// ReservationsV1List operation middleware
+func (siw *ServerInterfaceWrapper) ReservationsV1List(c *gin.Context) {
 
 	var err error
 
@@ -812,7 +910,7 @@ func (siw *ServerInterfaceWrapper) FacilityReservationsV1List(c *gin.Context) {
 	}
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params FacilityReservationsV1ListParams
+	var params ReservationsV1ListParams
 
 	// ------------- Optional query parameter "from" -------------
 
@@ -837,114 +935,16 @@ func (siw *ServerInterfaceWrapper) FacilityReservationsV1List(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.FacilityReservationsV1List(c, id, params)
+	siw.Handler.ReservationsV1List(c, id, params)
 }
 
-// FacultyFacultiesV1List operation middleware
-func (siw *ServerInterfaceWrapper) FacultyFacultiesV1List(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.FacultyFacultiesV1List(c)
-}
-
-// FacultyFacultiesV1Create operation middleware
-func (siw *ServerInterfaceWrapper) FacultyFacultiesV1Create(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.FacultyFacultiesV1Create(c)
-}
-
-// FacultyFacultiesV1Delete operation middleware
-func (siw *ServerInterfaceWrapper) FacultyFacultiesV1Delete(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.FacultyFacultiesV1Delete(c, id)
-}
-
-// FacultyFacultiesV1Detail operation middleware
-func (siw *ServerInterfaceWrapper) FacultyFacultiesV1Detail(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.FacultyFacultiesV1Detail(c, id)
-}
-
-// FacultyFacultiesV1Update operation middleware
-func (siw *ServerInterfaceWrapper) FacultyFacultiesV1Update(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.FacultyFacultiesV1Update(c, id)
-}
-
-// SubjectSubjectsV1List operation middleware
-func (siw *ServerInterfaceWrapper) SubjectSubjectsV1List(c *gin.Context) {
+// SubjectsV1List operation middleware
+func (siw *ServerInterfaceWrapper) SubjectsV1List(c *gin.Context) {
 
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params SubjectSubjectsV1ListParams
+	var params SubjectsV1ListParams
 
 	// ------------- Optional query parameter "q" -------------
 
@@ -1025,11 +1025,11 @@ func (siw *ServerInterfaceWrapper) SubjectSubjectsV1List(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.SubjectSubjectsV1List(c, params)
+	siw.Handler.SubjectsV1List(c, params)
 }
 
-// SubjectSubjectsV1Upsert operation middleware
-func (siw *ServerInterfaceWrapper) SubjectSubjectsV1Upsert(c *gin.Context) {
+// SubjectsV1Upsert operation middleware
+func (siw *ServerInterfaceWrapper) SubjectsV1Upsert(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -1038,11 +1038,11 @@ func (siw *ServerInterfaceWrapper) SubjectSubjectsV1Upsert(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.SubjectSubjectsV1Upsert(c)
+	siw.Handler.SubjectsV1Upsert(c)
 }
 
-// SubjectSubjectsV1Delete operation middleware
-func (siw *ServerInterfaceWrapper) SubjectSubjectsV1Delete(c *gin.Context) {
+// SubjectsV1Delete operation middleware
+func (siw *ServerInterfaceWrapper) SubjectsV1Delete(c *gin.Context) {
 
 	var err error
 
@@ -1062,11 +1062,11 @@ func (siw *ServerInterfaceWrapper) SubjectSubjectsV1Delete(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.SubjectSubjectsV1Delete(c, id)
+	siw.Handler.SubjectsV1Delete(c, id)
 }
 
-// SubjectSubjectsV1Detail operation middleware
-func (siw *ServerInterfaceWrapper) SubjectSubjectsV1Detail(c *gin.Context) {
+// SubjectsV1Detail operation middleware
+func (siw *ServerInterfaceWrapper) SubjectsV1Detail(c *gin.Context) {
 
 	var err error
 
@@ -1086,7 +1086,7 @@ func (siw *ServerInterfaceWrapper) SubjectSubjectsV1Detail(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.SubjectSubjectsV1Detail(c, id)
+	siw.Handler.SubjectsV1Detail(c, id)
 }
 
 // TimetableItemsV1List operation middleware
@@ -1120,16 +1120,9 @@ func (siw *ServerInterfaceWrapper) TimetableItemsV1List(c *gin.Context) {
 		return
 	}
 
-	// ------------- Required query parameter "dayOfWeek" -------------
+	// ------------- Optional query parameter "dayOfWeek" -------------
 
-	if paramValue := c.Query("dayOfWeek"); paramValue != "" {
-
-	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Query argument dayOfWeek is required, but not found"), http.StatusBadRequest)
-		return
-	}
-
-	err = runtime.BindQueryParameter("form", false, true, "dayOfWeek", c.Request.URL.Query(), &params.DayOfWeek)
+	err = runtime.BindQueryParameter("form", false, false, "dayOfWeek", c.Request.URL.Query(), &params.DayOfWeek)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter dayOfWeek: %w", err), http.StatusBadRequest)
 		return
@@ -1182,8 +1175,8 @@ func (siw *ServerInterfaceWrapper) TimetableItemsV1Delete(c *gin.Context) {
 	siw.Handler.TimetableItemsV1Delete(c, id)
 }
 
-// UserUsersV1Detail operation middleware
-func (siw *ServerInterfaceWrapper) UserUsersV1Detail(c *gin.Context) {
+// UsersV1Detail operation middleware
+func (siw *ServerInterfaceWrapper) UsersV1Detail(c *gin.Context) {
 
 	var err error
 
@@ -1203,7 +1196,7 @@ func (siw *ServerInterfaceWrapper) UserUsersV1Detail(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.UserUsersV1Detail(c, id)
+	siw.Handler.UsersV1Detail(c, id)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -1233,121 +1226,121 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/v1/announcement/announcements", wrapper.AnnouncementAnnouncementsV1List)
-	router.POST(options.BaseURL+"/v1/announcement/announcements", wrapper.AnnouncementAnnouncementsV1Create)
-	router.DELETE(options.BaseURL+"/v1/announcement/announcements/:id", wrapper.AnnouncementAnnouncementsV1Delete)
-	router.GET(options.BaseURL+"/v1/announcement/announcements/:id", wrapper.AnnouncementAnnouncementsV1Detail)
-	router.PUT(options.BaseURL+"/v1/announcement/announcements/:id", wrapper.AnnouncementAnnouncementsV1Update)
-	router.GET(options.BaseURL+"/v1/course/registrations", wrapper.CourseRegistrationsV1List)
-	router.POST(options.BaseURL+"/v1/course/registrations", wrapper.CourseRegistrationsV1Create)
-	router.DELETE(options.BaseURL+"/v1/course/registrations/:id", wrapper.CourseRegistrationsV1Delete)
-	router.GET(options.BaseURL+"/v1/facility/rooms", wrapper.FacilityRoomsV1List)
-	router.POST(options.BaseURL+"/v1/facility/rooms", wrapper.FacilityRoomsV1Create)
-	router.DELETE(options.BaseURL+"/v1/facility/rooms/:id", wrapper.FacilityRoomsV1Delete)
-	router.GET(options.BaseURL+"/v1/facility/rooms/:id", wrapper.FacilityRoomsV1Detail)
-	router.PUT(options.BaseURL+"/v1/facility/rooms/:id", wrapper.FacilityRoomsV1Update)
-	router.GET(options.BaseURL+"/v1/facility/rooms/:id/reservations", wrapper.FacilityReservationsV1List)
-	router.GET(options.BaseURL+"/v1/faculty/faculties", wrapper.FacultyFacultiesV1List)
-	router.POST(options.BaseURL+"/v1/faculty/faculties", wrapper.FacultyFacultiesV1Create)
-	router.DELETE(options.BaseURL+"/v1/faculty/faculties/:id", wrapper.FacultyFacultiesV1Delete)
-	router.GET(options.BaseURL+"/v1/faculty/faculties/:id", wrapper.FacultyFacultiesV1Detail)
-	router.PUT(options.BaseURL+"/v1/faculty/faculties/:id", wrapper.FacultyFacultiesV1Update)
-	router.GET(options.BaseURL+"/v1/subject/subjects", wrapper.SubjectSubjectsV1List)
-	router.POST(options.BaseURL+"/v1/subject/subjects", wrapper.SubjectSubjectsV1Upsert)
-	router.DELETE(options.BaseURL+"/v1/subject/subjects/:id", wrapper.SubjectSubjectsV1Delete)
-	router.GET(options.BaseURL+"/v1/subject/subjects/:id", wrapper.SubjectSubjectsV1Detail)
-	router.GET(options.BaseURL+"/v1/timetable/itmes", wrapper.TimetableItemsV1List)
-	router.POST(options.BaseURL+"/v1/timetable/itmes", wrapper.TimetableItemsV1Create)
-	router.DELETE(options.BaseURL+"/v1/timetable/itmes/:id", wrapper.TimetableItemsV1Delete)
-	router.GET(options.BaseURL+"/v1/user/users/:id", wrapper.UserUsersV1Detail)
+	router.GET(options.BaseURL+"/v1/announcements", wrapper.AnnouncementsV1List)
+	router.POST(options.BaseURL+"/v1/announcements", wrapper.AnnouncementsV1Create)
+	router.DELETE(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Delete)
+	router.GET(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Detail)
+	router.PUT(options.BaseURL+"/v1/announcements/:id", wrapper.AnnouncementsV1Update)
+	router.GET(options.BaseURL+"/v1/courseRegistrations", wrapper.CourseRegistrationsV1List)
+	router.POST(options.BaseURL+"/v1/courseRegistrations", wrapper.CourseRegistrationsV1Create)
+	router.DELETE(options.BaseURL+"/v1/courseRegistrations/:id", wrapper.CourseRegistrationsV1Delete)
+	router.GET(options.BaseURL+"/v1/faculties", wrapper.FacultiesV1List)
+	router.POST(options.BaseURL+"/v1/faculties", wrapper.FacultiesV1Create)
+	router.DELETE(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Delete)
+	router.GET(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Detail)
+	router.PUT(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Update)
+	router.GET(options.BaseURL+"/v1/rooms", wrapper.RoomsV1List)
+	router.POST(options.BaseURL+"/v1/rooms", wrapper.RoomsV1Create)
+	router.DELETE(options.BaseURL+"/v1/rooms/:id", wrapper.RoomsV1Delete)
+	router.GET(options.BaseURL+"/v1/rooms/:id", wrapper.RoomsV1Detail)
+	router.PUT(options.BaseURL+"/v1/rooms/:id", wrapper.RoomsV1Update)
+	router.GET(options.BaseURL+"/v1/rooms/:id/reservations", wrapper.ReservationsV1List)
+	router.GET(options.BaseURL+"/v1/subjects", wrapper.SubjectsV1List)
+	router.POST(options.BaseURL+"/v1/subjects", wrapper.SubjectsV1Upsert)
+	router.DELETE(options.BaseURL+"/v1/subjects/:id", wrapper.SubjectsV1Delete)
+	router.GET(options.BaseURL+"/v1/subjects/:id", wrapper.SubjectsV1Detail)
+	router.GET(options.BaseURL+"/v1/timetableItmes", wrapper.TimetableItemsV1List)
+	router.POST(options.BaseURL+"/v1/timetableItmes", wrapper.TimetableItemsV1Create)
+	router.DELETE(options.BaseURL+"/v1/timetableItmes/:id", wrapper.TimetableItemsV1Delete)
+	router.GET(options.BaseURL+"/v1/users/:id", wrapper.UsersV1Detail)
 }
 
-type AnnouncementAnnouncementsV1ListRequestObject struct {
+type AnnouncementsV1ListRequestObject struct {
 }
 
-type AnnouncementAnnouncementsV1ListResponseObject interface {
-	VisitAnnouncementAnnouncementsV1ListResponse(w http.ResponseWriter) error
+type AnnouncementsV1ListResponseObject interface {
+	VisitAnnouncementsV1ListResponse(w http.ResponseWriter) error
 }
 
-type AnnouncementAnnouncementsV1List200JSONResponse struct {
+type AnnouncementsV1List200JSONResponse struct {
 	Announcements []AnnouncementServiceAnnouncement `json:"announcements"`
 }
 
-func (response AnnouncementAnnouncementsV1List200JSONResponse) VisitAnnouncementAnnouncementsV1ListResponse(w http.ResponseWriter) error {
+func (response AnnouncementsV1List200JSONResponse) VisitAnnouncementsV1ListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type AnnouncementAnnouncementsV1CreateRequestObject struct {
-	Body *AnnouncementAnnouncementsV1CreateJSONRequestBody
+type AnnouncementsV1CreateRequestObject struct {
+	Body *AnnouncementsV1CreateJSONRequestBody
 }
 
-type AnnouncementAnnouncementsV1CreateResponseObject interface {
-	VisitAnnouncementAnnouncementsV1CreateResponse(w http.ResponseWriter) error
+type AnnouncementsV1CreateResponseObject interface {
+	VisitAnnouncementsV1CreateResponse(w http.ResponseWriter) error
 }
 
-type AnnouncementAnnouncementsV1Create201JSONResponse struct {
+type AnnouncementsV1Create201JSONResponse struct {
 	Announcement AnnouncementServiceAnnouncement `json:"announcement"`
 }
 
-func (response AnnouncementAnnouncementsV1Create201JSONResponse) VisitAnnouncementAnnouncementsV1CreateResponse(w http.ResponseWriter) error {
+func (response AnnouncementsV1Create201JSONResponse) VisitAnnouncementsV1CreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type AnnouncementAnnouncementsV1DeleteRequestObject struct {
+type AnnouncementsV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
 
-type AnnouncementAnnouncementsV1DeleteResponseObject interface {
-	VisitAnnouncementAnnouncementsV1DeleteResponse(w http.ResponseWriter) error
+type AnnouncementsV1DeleteResponseObject interface {
+	VisitAnnouncementsV1DeleteResponse(w http.ResponseWriter) error
 }
 
-type AnnouncementAnnouncementsV1Delete204Response struct {
+type AnnouncementsV1Delete204Response struct {
 }
 
-func (response AnnouncementAnnouncementsV1Delete204Response) VisitAnnouncementAnnouncementsV1DeleteResponse(w http.ResponseWriter) error {
+func (response AnnouncementsV1Delete204Response) VisitAnnouncementsV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type AnnouncementAnnouncementsV1DetailRequestObject struct {
+type AnnouncementsV1DetailRequestObject struct {
 	Id string `json:"id"`
 }
 
-type AnnouncementAnnouncementsV1DetailResponseObject interface {
-	VisitAnnouncementAnnouncementsV1DetailResponse(w http.ResponseWriter) error
+type AnnouncementsV1DetailResponseObject interface {
+	VisitAnnouncementsV1DetailResponse(w http.ResponseWriter) error
 }
 
-type AnnouncementAnnouncementsV1Detail200JSONResponse struct {
+type AnnouncementsV1Detail200JSONResponse struct {
 	Announcement AnnouncementServiceAnnouncement `json:"announcement"`
 }
 
-func (response AnnouncementAnnouncementsV1Detail200JSONResponse) VisitAnnouncementAnnouncementsV1DetailResponse(w http.ResponseWriter) error {
+func (response AnnouncementsV1Detail200JSONResponse) VisitAnnouncementsV1DetailResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type AnnouncementAnnouncementsV1UpdateRequestObject struct {
+type AnnouncementsV1UpdateRequestObject struct {
 	Id   string `json:"id"`
-	Body *AnnouncementAnnouncementsV1UpdateJSONRequestBody
+	Body *AnnouncementsV1UpdateJSONRequestBody
 }
 
-type AnnouncementAnnouncementsV1UpdateResponseObject interface {
-	VisitAnnouncementAnnouncementsV1UpdateResponse(w http.ResponseWriter) error
+type AnnouncementsV1UpdateResponseObject interface {
+	VisitAnnouncementsV1UpdateResponse(w http.ResponseWriter) error
 }
 
-type AnnouncementAnnouncementsV1Update200JSONResponse struct {
+type AnnouncementsV1Update200JSONResponse struct {
 	Announcement AnnouncementServiceAnnouncement `json:"announcement"`
 }
 
-func (response AnnouncementAnnouncementsV1Update200JSONResponse) VisitAnnouncementAnnouncementsV1UpdateResponse(w http.ResponseWriter) error {
+func (response AnnouncementsV1Update200JSONResponse) VisitAnnouncementsV1UpdateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
@@ -1363,7 +1356,7 @@ type CourseRegistrationsV1ListResponseObject interface {
 }
 
 type CourseRegistrationsV1List200JSONResponse struct {
-	Registrations []CourseServiceRegistration `json:"registrations"`
+	Registrations []AcademicServiceCourseRegistration `json:"registrations"`
 }
 
 func (response CourseRegistrationsV1List200JSONResponse) VisitCourseRegistrationsV1ListResponse(w http.ResponseWriter) error {
@@ -1382,7 +1375,7 @@ type CourseRegistrationsV1CreateResponseObject interface {
 }
 
 type CourseRegistrationsV1Create201JSONResponse struct {
-	Registration CourseServiceRegistration `json:"registration"`
+	Registration AcademicServiceCourseRegistration `json:"registration"`
 }
 
 func (response CourseRegistrationsV1Create201JSONResponse) VisitCourseRegistrationsV1CreateResponse(w http.ResponseWriter) error {
@@ -1408,281 +1401,281 @@ func (response CourseRegistrationsV1Delete204Response) VisitCourseRegistrationsV
 	return nil
 }
 
-type FacilityRoomsV1ListRequestObject struct {
-	Params FacilityRoomsV1ListParams
+type FacultiesV1ListRequestObject struct {
 }
 
-type FacilityRoomsV1ListResponseObject interface {
-	VisitFacilityRoomsV1ListResponse(w http.ResponseWriter) error
+type FacultiesV1ListResponseObject interface {
+	VisitFacultiesV1ListResponse(w http.ResponseWriter) error
 }
 
-type FacilityRoomsV1List200JSONResponse struct {
-	Rooms []FacilityServiceRoom `json:"rooms"`
+type FacultiesV1List200JSONResponse struct {
+	Faculties []AcademicServiceFaculty `json:"faculties"`
 }
 
-func (response FacilityRoomsV1List200JSONResponse) VisitFacilityRoomsV1ListResponse(w http.ResponseWriter) error {
+func (response FacultiesV1List200JSONResponse) VisitFacultiesV1ListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type FacilityRoomsV1CreateRequestObject struct {
-	Body *FacilityRoomsV1CreateJSONRequestBody
+type FacultiesV1CreateRequestObject struct {
+	Body *FacultiesV1CreateJSONRequestBody
 }
 
-type FacilityRoomsV1CreateResponseObject interface {
-	VisitFacilityRoomsV1CreateResponse(w http.ResponseWriter) error
+type FacultiesV1CreateResponseObject interface {
+	VisitFacultiesV1CreateResponse(w http.ResponseWriter) error
 }
 
-type FacilityRoomsV1Create201JSONResponse struct {
-	Room FacilityServiceRoom `json:"room"`
+type FacultiesV1Create201JSONResponse struct {
+	// Faculty 教員
+	Faculty AcademicServiceFaculty `json:"faculty"`
 }
 
-func (response FacilityRoomsV1Create201JSONResponse) VisitFacilityRoomsV1CreateResponse(w http.ResponseWriter) error {
+func (response FacultiesV1Create201JSONResponse) VisitFacultiesV1CreateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type FacilityRoomsV1DeleteRequestObject struct {
+type FacultiesV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
 
-type FacilityRoomsV1DeleteResponseObject interface {
-	VisitFacilityRoomsV1DeleteResponse(w http.ResponseWriter) error
+type FacultiesV1DeleteResponseObject interface {
+	VisitFacultiesV1DeleteResponse(w http.ResponseWriter) error
 }
 
-type FacilityRoomsV1Delete204Response struct {
+type FacultiesV1Delete204Response struct {
 }
 
-func (response FacilityRoomsV1Delete204Response) VisitFacilityRoomsV1DeleteResponse(w http.ResponseWriter) error {
+func (response FacultiesV1Delete204Response) VisitFacultiesV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type FacilityRoomsV1DetailRequestObject struct {
+type FacultiesV1DetailRequestObject struct {
 	Id string `json:"id"`
 }
 
-type FacilityRoomsV1DetailResponseObject interface {
-	VisitFacilityRoomsV1DetailResponse(w http.ResponseWriter) error
+type FacultiesV1DetailResponseObject interface {
+	VisitFacultiesV1DetailResponse(w http.ResponseWriter) error
 }
 
-type FacilityRoomsV1Detail200JSONResponse struct {
-	Room FacilityServiceRoom `json:"room"`
+type FacultiesV1Detail200JSONResponse struct {
+	// Faculty 教員
+	Faculty AcademicServiceFaculty `json:"faculty"`
 }
 
-func (response FacilityRoomsV1Detail200JSONResponse) VisitFacilityRoomsV1DetailResponse(w http.ResponseWriter) error {
+func (response FacultiesV1Detail200JSONResponse) VisitFacultiesV1DetailResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type FacilityRoomsV1UpdateRequestObject struct {
+type FacultiesV1UpdateRequestObject struct {
 	Id   string `json:"id"`
-	Body *FacilityRoomsV1UpdateJSONRequestBody
+	Body *FacultiesV1UpdateJSONRequestBody
 }
 
-type FacilityRoomsV1UpdateResponseObject interface {
-	VisitFacilityRoomsV1UpdateResponse(w http.ResponseWriter) error
+type FacultiesV1UpdateResponseObject interface {
+	VisitFacultiesV1UpdateResponse(w http.ResponseWriter) error
 }
 
-type FacilityRoomsV1Update200JSONResponse struct {
-	Room FacilityServiceRoom `json:"room"`
+type FacultiesV1Update200JSONResponse struct {
+	// Faculty 教員
+	Faculty AcademicServiceFaculty `json:"faculty"`
 }
 
-func (response FacilityRoomsV1Update200JSONResponse) VisitFacilityRoomsV1UpdateResponse(w http.ResponseWriter) error {
+func (response FacultiesV1Update200JSONResponse) VisitFacultiesV1UpdateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type FacilityReservationsV1ListRequestObject struct {
+type RoomsV1ListRequestObject struct {
+	Params RoomsV1ListParams
+}
+
+type RoomsV1ListResponseObject interface {
+	VisitRoomsV1ListResponse(w http.ResponseWriter) error
+}
+
+type RoomsV1List200JSONResponse struct {
+	Rooms []AcademicServiceRoom `json:"rooms"`
+}
+
+func (response RoomsV1List200JSONResponse) VisitRoomsV1ListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RoomsV1CreateRequestObject struct {
+	Body *RoomsV1CreateJSONRequestBody
+}
+
+type RoomsV1CreateResponseObject interface {
+	VisitRoomsV1CreateResponse(w http.ResponseWriter) error
+}
+
+type RoomsV1Create201JSONResponse struct {
+	Room AcademicServiceRoom `json:"room"`
+}
+
+func (response RoomsV1Create201JSONResponse) VisitRoomsV1CreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RoomsV1DeleteRequestObject struct {
+	Id string `json:"id"`
+}
+
+type RoomsV1DeleteResponseObject interface {
+	VisitRoomsV1DeleteResponse(w http.ResponseWriter) error
+}
+
+type RoomsV1Delete204Response struct {
+}
+
+func (response RoomsV1Delete204Response) VisitRoomsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type RoomsV1DetailRequestObject struct {
+	Id string `json:"id"`
+}
+
+type RoomsV1DetailResponseObject interface {
+	VisitRoomsV1DetailResponse(w http.ResponseWriter) error
+}
+
+type RoomsV1Detail200JSONResponse struct {
+	Room AcademicServiceRoom `json:"room"`
+}
+
+func (response RoomsV1Detail200JSONResponse) VisitRoomsV1DetailResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RoomsV1UpdateRequestObject struct {
+	Id   string `json:"id"`
+	Body *RoomsV1UpdateJSONRequestBody
+}
+
+type RoomsV1UpdateResponseObject interface {
+	VisitRoomsV1UpdateResponse(w http.ResponseWriter) error
+}
+
+type RoomsV1Update200JSONResponse struct {
+	Room AcademicServiceRoom `json:"room"`
+}
+
+func (response RoomsV1Update200JSONResponse) VisitRoomsV1UpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ReservationsV1ListRequestObject struct {
 	Id     string `json:"id"`
-	Params FacilityReservationsV1ListParams
+	Params ReservationsV1ListParams
 }
 
-type FacilityReservationsV1ListResponseObject interface {
-	VisitFacilityReservationsV1ListResponse(w http.ResponseWriter) error
+type ReservationsV1ListResponseObject interface {
+	VisitReservationsV1ListResponse(w http.ResponseWriter) error
 }
 
-type FacilityReservationsV1List200JSONResponse struct {
-	Reservations []FacilityServiceReservation `json:"reservations"`
+type ReservationsV1List200JSONResponse struct {
+	Reservations []AcademicServiceReservation `json:"reservations"`
 }
 
-func (response FacilityReservationsV1List200JSONResponse) VisitFacilityReservationsV1ListResponse(w http.ResponseWriter) error {
+func (response ReservationsV1List200JSONResponse) VisitReservationsV1ListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type FacultyFacultiesV1ListRequestObject struct {
+type SubjectsV1ListRequestObject struct {
+	Params SubjectsV1ListParams
 }
 
-type FacultyFacultiesV1ListResponseObject interface {
-	VisitFacultyFacultiesV1ListResponse(w http.ResponseWriter) error
+type SubjectsV1ListResponseObject interface {
+	VisitSubjectsV1ListResponse(w http.ResponseWriter) error
 }
 
-type FacultyFacultiesV1List200JSONResponse struct {
-	Faculties []FacultyServiceFaculty `json:"faculties"`
+type SubjectsV1List200JSONResponse struct {
+	Subjects []AcademicServiceSubjectSummary `json:"subjects"`
 }
 
-func (response FacultyFacultiesV1List200JSONResponse) VisitFacultyFacultiesV1ListResponse(w http.ResponseWriter) error {
+func (response SubjectsV1List200JSONResponse) VisitSubjectsV1ListResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type FacultyFacultiesV1CreateRequestObject struct {
-	Body *FacultyFacultiesV1CreateJSONRequestBody
+type SubjectsV1UpsertRequestObject struct {
+	Body *SubjectsV1UpsertJSONRequestBody
 }
 
-type FacultyFacultiesV1CreateResponseObject interface {
-	VisitFacultyFacultiesV1CreateResponse(w http.ResponseWriter) error
+type SubjectsV1UpsertResponseObject interface {
+	VisitSubjectsV1UpsertResponse(w http.ResponseWriter) error
 }
 
-type FacultyFacultiesV1Create201JSONResponse struct {
-	// Faculty 教員
-	Faculty FacultyServiceFaculty `json:"faculty"`
+type SubjectsV1Upsert200JSONResponse struct {
+	Subject AcademicServiceSubject `json:"subject"`
 }
 
-func (response FacultyFacultiesV1Create201JSONResponse) VisitFacultyFacultiesV1CreateResponse(w http.ResponseWriter) error {
+func (response SubjectsV1Upsert200JSONResponse) VisitSubjectsV1UpsertResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
+	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type FacultyFacultiesV1DeleteRequestObject struct {
+type SubjectsV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
 
-type FacultyFacultiesV1DeleteResponseObject interface {
-	VisitFacultyFacultiesV1DeleteResponse(w http.ResponseWriter) error
+type SubjectsV1DeleteResponseObject interface {
+	VisitSubjectsV1DeleteResponse(w http.ResponseWriter) error
 }
 
-type FacultyFacultiesV1Delete204Response struct {
+type SubjectsV1Delete204Response struct {
 }
 
-func (response FacultyFacultiesV1Delete204Response) VisitFacultyFacultiesV1DeleteResponse(w http.ResponseWriter) error {
+func (response SubjectsV1Delete204Response) VisitSubjectsV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type FacultyFacultiesV1DetailRequestObject struct {
+type SubjectsV1DetailRequestObject struct {
 	Id string `json:"id"`
 }
 
-type FacultyFacultiesV1DetailResponseObject interface {
-	VisitFacultyFacultiesV1DetailResponse(w http.ResponseWriter) error
+type SubjectsV1DetailResponseObject interface {
+	VisitSubjectsV1DetailResponse(w http.ResponseWriter) error
 }
 
-type FacultyFacultiesV1Detail200JSONResponse struct {
-	// Faculty 教員
-	Faculty FacultyServiceFaculty `json:"faculty"`
+type SubjectsV1Detail200JSONResponse struct {
+	Subject AcademicServiceSubject `json:"subject"`
 }
 
-func (response FacultyFacultiesV1Detail200JSONResponse) VisitFacultyFacultiesV1DetailResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type FacultyFacultiesV1UpdateRequestObject struct {
-	Id   string `json:"id"`
-	Body *FacultyFacultiesV1UpdateJSONRequestBody
-}
-
-type FacultyFacultiesV1UpdateResponseObject interface {
-	VisitFacultyFacultiesV1UpdateResponse(w http.ResponseWriter) error
-}
-
-type FacultyFacultiesV1Update200JSONResponse struct {
-	// Faculty 教員
-	Faculty FacultyServiceFaculty `json:"faculty"`
-}
-
-func (response FacultyFacultiesV1Update200JSONResponse) VisitFacultyFacultiesV1UpdateResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SubjectSubjectsV1ListRequestObject struct {
-	Params SubjectSubjectsV1ListParams
-}
-
-type SubjectSubjectsV1ListResponseObject interface {
-	VisitSubjectSubjectsV1ListResponse(w http.ResponseWriter) error
-}
-
-type SubjectSubjectsV1List200JSONResponse struct {
-	Subjects []SubjectServiceSubjectSummary `json:"subjects"`
-}
-
-func (response SubjectSubjectsV1List200JSONResponse) VisitSubjectSubjectsV1ListResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SubjectSubjectsV1UpsertRequestObject struct {
-	Body *SubjectSubjectsV1UpsertJSONRequestBody
-}
-
-type SubjectSubjectsV1UpsertResponseObject interface {
-	VisitSubjectSubjectsV1UpsertResponse(w http.ResponseWriter) error
-}
-
-type SubjectSubjectsV1Upsert200JSONResponse struct {
-	Subject SubjectServiceSubject `json:"subject"`
-}
-
-func (response SubjectSubjectsV1Upsert200JSONResponse) VisitSubjectSubjectsV1UpsertResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SubjectSubjectsV1DeleteRequestObject struct {
-	Id string `json:"id"`
-}
-
-type SubjectSubjectsV1DeleteResponseObject interface {
-	VisitSubjectSubjectsV1DeleteResponse(w http.ResponseWriter) error
-}
-
-type SubjectSubjectsV1Delete204Response struct {
-}
-
-func (response SubjectSubjectsV1Delete204Response) VisitSubjectSubjectsV1DeleteResponse(w http.ResponseWriter) error {
-	w.WriteHeader(204)
-	return nil
-}
-
-type SubjectSubjectsV1DetailRequestObject struct {
-	Id string `json:"id"`
-}
-
-type SubjectSubjectsV1DetailResponseObject interface {
-	VisitSubjectSubjectsV1DetailResponse(w http.ResponseWriter) error
-}
-
-type SubjectSubjectsV1Detail200JSONResponse struct {
-	Subject SubjectServiceSubject `json:"subject"`
-}
-
-func (response SubjectSubjectsV1Detail200JSONResponse) VisitSubjectSubjectsV1DetailResponse(w http.ResponseWriter) error {
+func (response SubjectsV1Detail200JSONResponse) VisitSubjectsV1DetailResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
@@ -1698,7 +1691,7 @@ type TimetableItemsV1ListResponseObject interface {
 }
 
 type TimetableItemsV1List200JSONResponse struct {
-	Items []TimetableServiceItem `json:"items"`
+	Items []AcademicServiceTimetableItem `json:"items"`
 }
 
 func (response TimetableItemsV1List200JSONResponse) VisitTimetableItemsV1ListResponse(w http.ResponseWriter) error {
@@ -1717,7 +1710,7 @@ type TimetableItemsV1CreateResponseObject interface {
 }
 
 type TimetableItemsV1Create201JSONResponse struct {
-	Item TimetableServiceItem `json:"item"`
+	Item AcademicServiceTimetableItem `json:"item"`
 }
 
 func (response TimetableItemsV1Create201JSONResponse) VisitTimetableItemsV1CreateResponse(w http.ResponseWriter) error {
@@ -1743,19 +1736,19 @@ func (response TimetableItemsV1Delete204Response) VisitTimetableItemsV1DeleteRes
 	return nil
 }
 
-type UserUsersV1DetailRequestObject struct {
+type UsersV1DetailRequestObject struct {
 	Id string `json:"id"`
 }
 
-type UserUsersV1DetailResponseObject interface {
-	VisitUserUsersV1DetailResponse(w http.ResponseWriter) error
+type UsersV1DetailResponseObject interface {
+	VisitUsersV1DetailResponse(w http.ResponseWriter) error
 }
 
-type UserUsersV1Detail200JSONResponse struct {
+type UsersV1Detail200JSONResponse struct {
 	User UserServiceUser `json:"user"`
 }
 
-func (response UserUsersV1Detail200JSONResponse) VisitUserUsersV1DetailResponse(w http.ResponseWriter) error {
+func (response UsersV1Detail200JSONResponse) VisitUsersV1DetailResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
@@ -1765,86 +1758,86 @@ func (response UserUsersV1Detail200JSONResponse) VisitUserUsersV1DetailResponse(
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 
-	// (GET /v1/announcement/announcements)
-	AnnouncementAnnouncementsV1List(ctx context.Context, request AnnouncementAnnouncementsV1ListRequestObject) (AnnouncementAnnouncementsV1ListResponseObject, error)
+	// (GET /v1/announcements)
+	AnnouncementsV1List(ctx context.Context, request AnnouncementsV1ListRequestObject) (AnnouncementsV1ListResponseObject, error)
 
-	// (POST /v1/announcement/announcements)
-	AnnouncementAnnouncementsV1Create(ctx context.Context, request AnnouncementAnnouncementsV1CreateRequestObject) (AnnouncementAnnouncementsV1CreateResponseObject, error)
+	// (POST /v1/announcements)
+	AnnouncementsV1Create(ctx context.Context, request AnnouncementsV1CreateRequestObject) (AnnouncementsV1CreateResponseObject, error)
 
-	// (DELETE /v1/announcement/announcements/{id})
-	AnnouncementAnnouncementsV1Delete(ctx context.Context, request AnnouncementAnnouncementsV1DeleteRequestObject) (AnnouncementAnnouncementsV1DeleteResponseObject, error)
+	// (DELETE /v1/announcements/{id})
+	AnnouncementsV1Delete(ctx context.Context, request AnnouncementsV1DeleteRequestObject) (AnnouncementsV1DeleteResponseObject, error)
 
-	// (GET /v1/announcement/announcements/{id})
-	AnnouncementAnnouncementsV1Detail(ctx context.Context, request AnnouncementAnnouncementsV1DetailRequestObject) (AnnouncementAnnouncementsV1DetailResponseObject, error)
+	// (GET /v1/announcements/{id})
+	AnnouncementsV1Detail(ctx context.Context, request AnnouncementsV1DetailRequestObject) (AnnouncementsV1DetailResponseObject, error)
 
-	// (PUT /v1/announcement/announcements/{id})
-	AnnouncementAnnouncementsV1Update(ctx context.Context, request AnnouncementAnnouncementsV1UpdateRequestObject) (AnnouncementAnnouncementsV1UpdateResponseObject, error)
+	// (PUT /v1/announcements/{id})
+	AnnouncementsV1Update(ctx context.Context, request AnnouncementsV1UpdateRequestObject) (AnnouncementsV1UpdateResponseObject, error)
 
-	// (GET /v1/course/registrations)
+	// (GET /v1/courseRegistrations)
 	CourseRegistrationsV1List(ctx context.Context, request CourseRegistrationsV1ListRequestObject) (CourseRegistrationsV1ListResponseObject, error)
 
-	// (POST /v1/course/registrations)
+	// (POST /v1/courseRegistrations)
 	CourseRegistrationsV1Create(ctx context.Context, request CourseRegistrationsV1CreateRequestObject) (CourseRegistrationsV1CreateResponseObject, error)
 
-	// (DELETE /v1/course/registrations/{id})
+	// (DELETE /v1/courseRegistrations/{id})
 	CourseRegistrationsV1Delete(ctx context.Context, request CourseRegistrationsV1DeleteRequestObject) (CourseRegistrationsV1DeleteResponseObject, error)
 
-	// (GET /v1/facility/rooms)
-	FacilityRoomsV1List(ctx context.Context, request FacilityRoomsV1ListRequestObject) (FacilityRoomsV1ListResponseObject, error)
+	// (GET /v1/faculties)
+	FacultiesV1List(ctx context.Context, request FacultiesV1ListRequestObject) (FacultiesV1ListResponseObject, error)
 
-	// (POST /v1/facility/rooms)
-	FacilityRoomsV1Create(ctx context.Context, request FacilityRoomsV1CreateRequestObject) (FacilityRoomsV1CreateResponseObject, error)
+	// (POST /v1/faculties)
+	FacultiesV1Create(ctx context.Context, request FacultiesV1CreateRequestObject) (FacultiesV1CreateResponseObject, error)
 
-	// (DELETE /v1/facility/rooms/{id})
-	FacilityRoomsV1Delete(ctx context.Context, request FacilityRoomsV1DeleteRequestObject) (FacilityRoomsV1DeleteResponseObject, error)
+	// (DELETE /v1/faculties/{id})
+	FacultiesV1Delete(ctx context.Context, request FacultiesV1DeleteRequestObject) (FacultiesV1DeleteResponseObject, error)
 
-	// (GET /v1/facility/rooms/{id})
-	FacilityRoomsV1Detail(ctx context.Context, request FacilityRoomsV1DetailRequestObject) (FacilityRoomsV1DetailResponseObject, error)
+	// (GET /v1/faculties/{id})
+	FacultiesV1Detail(ctx context.Context, request FacultiesV1DetailRequestObject) (FacultiesV1DetailResponseObject, error)
 
-	// (PUT /v1/facility/rooms/{id})
-	FacilityRoomsV1Update(ctx context.Context, request FacilityRoomsV1UpdateRequestObject) (FacilityRoomsV1UpdateResponseObject, error)
+	// (PUT /v1/faculties/{id})
+	FacultiesV1Update(ctx context.Context, request FacultiesV1UpdateRequestObject) (FacultiesV1UpdateResponseObject, error)
 
-	// (GET /v1/facility/rooms/{id}/reservations)
-	FacilityReservationsV1List(ctx context.Context, request FacilityReservationsV1ListRequestObject) (FacilityReservationsV1ListResponseObject, error)
+	// (GET /v1/rooms)
+	RoomsV1List(ctx context.Context, request RoomsV1ListRequestObject) (RoomsV1ListResponseObject, error)
 
-	// (GET /v1/faculty/faculties)
-	FacultyFacultiesV1List(ctx context.Context, request FacultyFacultiesV1ListRequestObject) (FacultyFacultiesV1ListResponseObject, error)
+	// (POST /v1/rooms)
+	RoomsV1Create(ctx context.Context, request RoomsV1CreateRequestObject) (RoomsV1CreateResponseObject, error)
 
-	// (POST /v1/faculty/faculties)
-	FacultyFacultiesV1Create(ctx context.Context, request FacultyFacultiesV1CreateRequestObject) (FacultyFacultiesV1CreateResponseObject, error)
+	// (DELETE /v1/rooms/{id})
+	RoomsV1Delete(ctx context.Context, request RoomsV1DeleteRequestObject) (RoomsV1DeleteResponseObject, error)
 
-	// (DELETE /v1/faculty/faculties/{id})
-	FacultyFacultiesV1Delete(ctx context.Context, request FacultyFacultiesV1DeleteRequestObject) (FacultyFacultiesV1DeleteResponseObject, error)
+	// (GET /v1/rooms/{id})
+	RoomsV1Detail(ctx context.Context, request RoomsV1DetailRequestObject) (RoomsV1DetailResponseObject, error)
 
-	// (GET /v1/faculty/faculties/{id})
-	FacultyFacultiesV1Detail(ctx context.Context, request FacultyFacultiesV1DetailRequestObject) (FacultyFacultiesV1DetailResponseObject, error)
+	// (PUT /v1/rooms/{id})
+	RoomsV1Update(ctx context.Context, request RoomsV1UpdateRequestObject) (RoomsV1UpdateResponseObject, error)
 
-	// (PUT /v1/faculty/faculties/{id})
-	FacultyFacultiesV1Update(ctx context.Context, request FacultyFacultiesV1UpdateRequestObject) (FacultyFacultiesV1UpdateResponseObject, error)
+	// (GET /v1/rooms/{id}/reservations)
+	ReservationsV1List(ctx context.Context, request ReservationsV1ListRequestObject) (ReservationsV1ListResponseObject, error)
 
-	// (GET /v1/subject/subjects)
-	SubjectSubjectsV1List(ctx context.Context, request SubjectSubjectsV1ListRequestObject) (SubjectSubjectsV1ListResponseObject, error)
+	// (GET /v1/subjects)
+	SubjectsV1List(ctx context.Context, request SubjectsV1ListRequestObject) (SubjectsV1ListResponseObject, error)
 
-	// (POST /v1/subject/subjects)
-	SubjectSubjectsV1Upsert(ctx context.Context, request SubjectSubjectsV1UpsertRequestObject) (SubjectSubjectsV1UpsertResponseObject, error)
+	// (POST /v1/subjects)
+	SubjectsV1Upsert(ctx context.Context, request SubjectsV1UpsertRequestObject) (SubjectsV1UpsertResponseObject, error)
 
-	// (DELETE /v1/subject/subjects/{id})
-	SubjectSubjectsV1Delete(ctx context.Context, request SubjectSubjectsV1DeleteRequestObject) (SubjectSubjectsV1DeleteResponseObject, error)
+	// (DELETE /v1/subjects/{id})
+	SubjectsV1Delete(ctx context.Context, request SubjectsV1DeleteRequestObject) (SubjectsV1DeleteResponseObject, error)
 
-	// (GET /v1/subject/subjects/{id})
-	SubjectSubjectsV1Detail(ctx context.Context, request SubjectSubjectsV1DetailRequestObject) (SubjectSubjectsV1DetailResponseObject, error)
+	// (GET /v1/subjects/{id})
+	SubjectsV1Detail(ctx context.Context, request SubjectsV1DetailRequestObject) (SubjectsV1DetailResponseObject, error)
 
-	// (GET /v1/timetable/itmes)
+	// (GET /v1/timetableItmes)
 	TimetableItemsV1List(ctx context.Context, request TimetableItemsV1ListRequestObject) (TimetableItemsV1ListResponseObject, error)
 
-	// (POST /v1/timetable/itmes)
+	// (POST /v1/timetableItmes)
 	TimetableItemsV1Create(ctx context.Context, request TimetableItemsV1CreateRequestObject) (TimetableItemsV1CreateResponseObject, error)
 
-	// (DELETE /v1/timetable/itmes/{id})
+	// (DELETE /v1/timetableItmes/{id})
 	TimetableItemsV1Delete(ctx context.Context, request TimetableItemsV1DeleteRequestObject) (TimetableItemsV1DeleteResponseObject, error)
 
-	// (GET /v1/user/users/{id})
-	UserUsersV1Detail(ctx context.Context, request UserUsersV1DetailRequestObject) (UserUsersV1DetailResponseObject, error)
+	// (GET /v1/users/{id})
+	UsersV1Detail(ctx context.Context, request UsersV1DetailRequestObject) (UsersV1DetailResponseObject, error)
 }
 
 type StrictHandlerFunc = strictgin.StrictGinHandlerFunc
@@ -1859,15 +1852,15 @@ type strictHandler struct {
 	middlewares []StrictMiddlewareFunc
 }
 
-// AnnouncementAnnouncementsV1List operation middleware
-func (sh *strictHandler) AnnouncementAnnouncementsV1List(ctx *gin.Context) {
-	var request AnnouncementAnnouncementsV1ListRequestObject
+// AnnouncementsV1List operation middleware
+func (sh *strictHandler) AnnouncementsV1List(ctx *gin.Context) {
+	var request AnnouncementsV1ListRequestObject
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AnnouncementAnnouncementsV1List(ctx, request.(AnnouncementAnnouncementsV1ListRequestObject))
+		return sh.ssi.AnnouncementsV1List(ctx, request.(AnnouncementsV1ListRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AnnouncementAnnouncementsV1List")
+		handler = middleware(handler, "AnnouncementsV1List")
 	}
 
 	response, err := handler(ctx, request)
@@ -1875,8 +1868,8 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1List(ctx *gin.Context) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(AnnouncementAnnouncementsV1ListResponseObject); ok {
-		if err := validResponse.VisitAnnouncementAnnouncementsV1ListResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(AnnouncementsV1ListResponseObject); ok {
+		if err := validResponse.VisitAnnouncementsV1ListResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -1884,11 +1877,11 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1List(ctx *gin.Context) {
 	}
 }
 
-// AnnouncementAnnouncementsV1Create operation middleware
-func (sh *strictHandler) AnnouncementAnnouncementsV1Create(ctx *gin.Context) {
-	var request AnnouncementAnnouncementsV1CreateRequestObject
+// AnnouncementsV1Create operation middleware
+func (sh *strictHandler) AnnouncementsV1Create(ctx *gin.Context) {
+	var request AnnouncementsV1CreateRequestObject
 
-	var body AnnouncementAnnouncementsV1CreateJSONRequestBody
+	var body AnnouncementsV1CreateJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.Status(http.StatusBadRequest)
 		ctx.Error(err)
@@ -1897,10 +1890,10 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Create(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AnnouncementAnnouncementsV1Create(ctx, request.(AnnouncementAnnouncementsV1CreateRequestObject))
+		return sh.ssi.AnnouncementsV1Create(ctx, request.(AnnouncementsV1CreateRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AnnouncementAnnouncementsV1Create")
+		handler = middleware(handler, "AnnouncementsV1Create")
 	}
 
 	response, err := handler(ctx, request)
@@ -1908,8 +1901,8 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Create(ctx *gin.Context) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(AnnouncementAnnouncementsV1CreateResponseObject); ok {
-		if err := validResponse.VisitAnnouncementAnnouncementsV1CreateResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(AnnouncementsV1CreateResponseObject); ok {
+		if err := validResponse.VisitAnnouncementsV1CreateResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -1917,17 +1910,17 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Create(ctx *gin.Context) {
 	}
 }
 
-// AnnouncementAnnouncementsV1Delete operation middleware
-func (sh *strictHandler) AnnouncementAnnouncementsV1Delete(ctx *gin.Context, id string) {
-	var request AnnouncementAnnouncementsV1DeleteRequestObject
+// AnnouncementsV1Delete operation middleware
+func (sh *strictHandler) AnnouncementsV1Delete(ctx *gin.Context, id string) {
+	var request AnnouncementsV1DeleteRequestObject
 
 	request.Id = id
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AnnouncementAnnouncementsV1Delete(ctx, request.(AnnouncementAnnouncementsV1DeleteRequestObject))
+		return sh.ssi.AnnouncementsV1Delete(ctx, request.(AnnouncementsV1DeleteRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AnnouncementAnnouncementsV1Delete")
+		handler = middleware(handler, "AnnouncementsV1Delete")
 	}
 
 	response, err := handler(ctx, request)
@@ -1935,8 +1928,8 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Delete(ctx *gin.Context, id 
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(AnnouncementAnnouncementsV1DeleteResponseObject); ok {
-		if err := validResponse.VisitAnnouncementAnnouncementsV1DeleteResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(AnnouncementsV1DeleteResponseObject); ok {
+		if err := validResponse.VisitAnnouncementsV1DeleteResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -1944,17 +1937,17 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Delete(ctx *gin.Context, id 
 	}
 }
 
-// AnnouncementAnnouncementsV1Detail operation middleware
-func (sh *strictHandler) AnnouncementAnnouncementsV1Detail(ctx *gin.Context, id string) {
-	var request AnnouncementAnnouncementsV1DetailRequestObject
+// AnnouncementsV1Detail operation middleware
+func (sh *strictHandler) AnnouncementsV1Detail(ctx *gin.Context, id string) {
+	var request AnnouncementsV1DetailRequestObject
 
 	request.Id = id
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AnnouncementAnnouncementsV1Detail(ctx, request.(AnnouncementAnnouncementsV1DetailRequestObject))
+		return sh.ssi.AnnouncementsV1Detail(ctx, request.(AnnouncementsV1DetailRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AnnouncementAnnouncementsV1Detail")
+		handler = middleware(handler, "AnnouncementsV1Detail")
 	}
 
 	response, err := handler(ctx, request)
@@ -1962,8 +1955,8 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Detail(ctx *gin.Context, id 
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(AnnouncementAnnouncementsV1DetailResponseObject); ok {
-		if err := validResponse.VisitAnnouncementAnnouncementsV1DetailResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(AnnouncementsV1DetailResponseObject); ok {
+		if err := validResponse.VisitAnnouncementsV1DetailResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -1971,13 +1964,13 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Detail(ctx *gin.Context, id 
 	}
 }
 
-// AnnouncementAnnouncementsV1Update operation middleware
-func (sh *strictHandler) AnnouncementAnnouncementsV1Update(ctx *gin.Context, id string) {
-	var request AnnouncementAnnouncementsV1UpdateRequestObject
+// AnnouncementsV1Update operation middleware
+func (sh *strictHandler) AnnouncementsV1Update(ctx *gin.Context, id string) {
+	var request AnnouncementsV1UpdateRequestObject
 
 	request.Id = id
 
-	var body AnnouncementAnnouncementsV1UpdateJSONRequestBody
+	var body AnnouncementsV1UpdateJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.Status(http.StatusBadRequest)
 		ctx.Error(err)
@@ -1986,10 +1979,10 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Update(ctx *gin.Context, id 
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.AnnouncementAnnouncementsV1Update(ctx, request.(AnnouncementAnnouncementsV1UpdateRequestObject))
+		return sh.ssi.AnnouncementsV1Update(ctx, request.(AnnouncementsV1UpdateRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "AnnouncementAnnouncementsV1Update")
+		handler = middleware(handler, "AnnouncementsV1Update")
 	}
 
 	response, err := handler(ctx, request)
@@ -1997,8 +1990,8 @@ func (sh *strictHandler) AnnouncementAnnouncementsV1Update(ctx *gin.Context, id 
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(AnnouncementAnnouncementsV1UpdateResponseObject); ok {
-		if err := validResponse.VisitAnnouncementAnnouncementsV1UpdateResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(AnnouncementsV1UpdateResponseObject); ok {
+		if err := validResponse.VisitAnnouncementsV1UpdateResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2093,17 +2086,164 @@ func (sh *strictHandler) CourseRegistrationsV1Delete(ctx *gin.Context, id string
 	}
 }
 
-// FacilityRoomsV1List operation middleware
-func (sh *strictHandler) FacilityRoomsV1List(ctx *gin.Context, params FacilityRoomsV1ListParams) {
-	var request FacilityRoomsV1ListRequestObject
+// FacultiesV1List operation middleware
+func (sh *strictHandler) FacultiesV1List(ctx *gin.Context) {
+	var request FacultiesV1ListRequestObject
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.FacultiesV1List(ctx, request.(FacultiesV1ListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "FacultiesV1List")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(FacultiesV1ListResponseObject); ok {
+		if err := validResponse.VisitFacultiesV1ListResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// FacultiesV1Create operation middleware
+func (sh *strictHandler) FacultiesV1Create(ctx *gin.Context) {
+	var request FacultiesV1CreateRequestObject
+
+	var body FacultiesV1CreateJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.FacultiesV1Create(ctx, request.(FacultiesV1CreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "FacultiesV1Create")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(FacultiesV1CreateResponseObject); ok {
+		if err := validResponse.VisitFacultiesV1CreateResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// FacultiesV1Delete operation middleware
+func (sh *strictHandler) FacultiesV1Delete(ctx *gin.Context, id string) {
+	var request FacultiesV1DeleteRequestObject
+
+	request.Id = id
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.FacultiesV1Delete(ctx, request.(FacultiesV1DeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "FacultiesV1Delete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(FacultiesV1DeleteResponseObject); ok {
+		if err := validResponse.VisitFacultiesV1DeleteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// FacultiesV1Detail operation middleware
+func (sh *strictHandler) FacultiesV1Detail(ctx *gin.Context, id string) {
+	var request FacultiesV1DetailRequestObject
+
+	request.Id = id
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.FacultiesV1Detail(ctx, request.(FacultiesV1DetailRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "FacultiesV1Detail")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(FacultiesV1DetailResponseObject); ok {
+		if err := validResponse.VisitFacultiesV1DetailResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// FacultiesV1Update operation middleware
+func (sh *strictHandler) FacultiesV1Update(ctx *gin.Context, id string) {
+	var request FacultiesV1UpdateRequestObject
+
+	request.Id = id
+
+	var body FacultiesV1UpdateJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.FacultiesV1Update(ctx, request.(FacultiesV1UpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "FacultiesV1Update")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(FacultiesV1UpdateResponseObject); ok {
+		if err := validResponse.VisitFacultiesV1UpdateResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RoomsV1List operation middleware
+func (sh *strictHandler) RoomsV1List(ctx *gin.Context, params RoomsV1ListParams) {
+	var request RoomsV1ListRequestObject
 
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacilityRoomsV1List(ctx, request.(FacilityRoomsV1ListRequestObject))
+		return sh.ssi.RoomsV1List(ctx, request.(RoomsV1ListRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacilityRoomsV1List")
+		handler = middleware(handler, "RoomsV1List")
 	}
 
 	response, err := handler(ctx, request)
@@ -2111,8 +2251,8 @@ func (sh *strictHandler) FacilityRoomsV1List(ctx *gin.Context, params FacilityRo
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacilityRoomsV1ListResponseObject); ok {
-		if err := validResponse.VisitFacilityRoomsV1ListResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(RoomsV1ListResponseObject); ok {
+		if err := validResponse.VisitRoomsV1ListResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2120,11 +2260,11 @@ func (sh *strictHandler) FacilityRoomsV1List(ctx *gin.Context, params FacilityRo
 	}
 }
 
-// FacilityRoomsV1Create operation middleware
-func (sh *strictHandler) FacilityRoomsV1Create(ctx *gin.Context) {
-	var request FacilityRoomsV1CreateRequestObject
+// RoomsV1Create operation middleware
+func (sh *strictHandler) RoomsV1Create(ctx *gin.Context) {
+	var request RoomsV1CreateRequestObject
 
-	var body FacilityRoomsV1CreateJSONRequestBody
+	var body RoomsV1CreateJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.Status(http.StatusBadRequest)
 		ctx.Error(err)
@@ -2133,10 +2273,10 @@ func (sh *strictHandler) FacilityRoomsV1Create(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacilityRoomsV1Create(ctx, request.(FacilityRoomsV1CreateRequestObject))
+		return sh.ssi.RoomsV1Create(ctx, request.(RoomsV1CreateRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacilityRoomsV1Create")
+		handler = middleware(handler, "RoomsV1Create")
 	}
 
 	response, err := handler(ctx, request)
@@ -2144,8 +2284,8 @@ func (sh *strictHandler) FacilityRoomsV1Create(ctx *gin.Context) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacilityRoomsV1CreateResponseObject); ok {
-		if err := validResponse.VisitFacilityRoomsV1CreateResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(RoomsV1CreateResponseObject); ok {
+		if err := validResponse.VisitRoomsV1CreateResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2153,17 +2293,17 @@ func (sh *strictHandler) FacilityRoomsV1Create(ctx *gin.Context) {
 	}
 }
 
-// FacilityRoomsV1Delete operation middleware
-func (sh *strictHandler) FacilityRoomsV1Delete(ctx *gin.Context, id string) {
-	var request FacilityRoomsV1DeleteRequestObject
+// RoomsV1Delete operation middleware
+func (sh *strictHandler) RoomsV1Delete(ctx *gin.Context, id string) {
+	var request RoomsV1DeleteRequestObject
 
 	request.Id = id
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacilityRoomsV1Delete(ctx, request.(FacilityRoomsV1DeleteRequestObject))
+		return sh.ssi.RoomsV1Delete(ctx, request.(RoomsV1DeleteRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacilityRoomsV1Delete")
+		handler = middleware(handler, "RoomsV1Delete")
 	}
 
 	response, err := handler(ctx, request)
@@ -2171,8 +2311,8 @@ func (sh *strictHandler) FacilityRoomsV1Delete(ctx *gin.Context, id string) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacilityRoomsV1DeleteResponseObject); ok {
-		if err := validResponse.VisitFacilityRoomsV1DeleteResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(RoomsV1DeleteResponseObject); ok {
+		if err := validResponse.VisitRoomsV1DeleteResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2180,17 +2320,17 @@ func (sh *strictHandler) FacilityRoomsV1Delete(ctx *gin.Context, id string) {
 	}
 }
 
-// FacilityRoomsV1Detail operation middleware
-func (sh *strictHandler) FacilityRoomsV1Detail(ctx *gin.Context, id string) {
-	var request FacilityRoomsV1DetailRequestObject
+// RoomsV1Detail operation middleware
+func (sh *strictHandler) RoomsV1Detail(ctx *gin.Context, id string) {
+	var request RoomsV1DetailRequestObject
 
 	request.Id = id
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacilityRoomsV1Detail(ctx, request.(FacilityRoomsV1DetailRequestObject))
+		return sh.ssi.RoomsV1Detail(ctx, request.(RoomsV1DetailRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacilityRoomsV1Detail")
+		handler = middleware(handler, "RoomsV1Detail")
 	}
 
 	response, err := handler(ctx, request)
@@ -2198,8 +2338,8 @@ func (sh *strictHandler) FacilityRoomsV1Detail(ctx *gin.Context, id string) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacilityRoomsV1DetailResponseObject); ok {
-		if err := validResponse.VisitFacilityRoomsV1DetailResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(RoomsV1DetailResponseObject); ok {
+		if err := validResponse.VisitRoomsV1DetailResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2207,13 +2347,13 @@ func (sh *strictHandler) FacilityRoomsV1Detail(ctx *gin.Context, id string) {
 	}
 }
 
-// FacilityRoomsV1Update operation middleware
-func (sh *strictHandler) FacilityRoomsV1Update(ctx *gin.Context, id string) {
-	var request FacilityRoomsV1UpdateRequestObject
+// RoomsV1Update operation middleware
+func (sh *strictHandler) RoomsV1Update(ctx *gin.Context, id string) {
+	var request RoomsV1UpdateRequestObject
 
 	request.Id = id
 
-	var body FacilityRoomsV1UpdateJSONRequestBody
+	var body RoomsV1UpdateJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.Status(http.StatusBadRequest)
 		ctx.Error(err)
@@ -2222,10 +2362,10 @@ func (sh *strictHandler) FacilityRoomsV1Update(ctx *gin.Context, id string) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacilityRoomsV1Update(ctx, request.(FacilityRoomsV1UpdateRequestObject))
+		return sh.ssi.RoomsV1Update(ctx, request.(RoomsV1UpdateRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacilityRoomsV1Update")
+		handler = middleware(handler, "RoomsV1Update")
 	}
 
 	response, err := handler(ctx, request)
@@ -2233,8 +2373,8 @@ func (sh *strictHandler) FacilityRoomsV1Update(ctx *gin.Context, id string) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacilityRoomsV1UpdateResponseObject); ok {
-		if err := validResponse.VisitFacilityRoomsV1UpdateResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(RoomsV1UpdateResponseObject); ok {
+		if err := validResponse.VisitRoomsV1UpdateResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2242,18 +2382,18 @@ func (sh *strictHandler) FacilityRoomsV1Update(ctx *gin.Context, id string) {
 	}
 }
 
-// FacilityReservationsV1List operation middleware
-func (sh *strictHandler) FacilityReservationsV1List(ctx *gin.Context, id string, params FacilityReservationsV1ListParams) {
-	var request FacilityReservationsV1ListRequestObject
+// ReservationsV1List operation middleware
+func (sh *strictHandler) ReservationsV1List(ctx *gin.Context, id string, params ReservationsV1ListParams) {
+	var request ReservationsV1ListRequestObject
 
 	request.Id = id
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacilityReservationsV1List(ctx, request.(FacilityReservationsV1ListRequestObject))
+		return sh.ssi.ReservationsV1List(ctx, request.(ReservationsV1ListRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacilityReservationsV1List")
+		handler = middleware(handler, "ReservationsV1List")
 	}
 
 	response, err := handler(ctx, request)
@@ -2261,8 +2401,8 @@ func (sh *strictHandler) FacilityReservationsV1List(ctx *gin.Context, id string,
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacilityReservationsV1ListResponseObject); ok {
-		if err := validResponse.VisitFacilityReservationsV1ListResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(ReservationsV1ListResponseObject); ok {
+		if err := validResponse.VisitReservationsV1ListResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2270,164 +2410,17 @@ func (sh *strictHandler) FacilityReservationsV1List(ctx *gin.Context, id string,
 	}
 }
 
-// FacultyFacultiesV1List operation middleware
-func (sh *strictHandler) FacultyFacultiesV1List(ctx *gin.Context) {
-	var request FacultyFacultiesV1ListRequestObject
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacultyFacultiesV1List(ctx, request.(FacultyFacultiesV1ListRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacultyFacultiesV1List")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacultyFacultiesV1ListResponseObject); ok {
-		if err := validResponse.VisitFacultyFacultiesV1ListResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// FacultyFacultiesV1Create operation middleware
-func (sh *strictHandler) FacultyFacultiesV1Create(ctx *gin.Context) {
-	var request FacultyFacultiesV1CreateRequestObject
-
-	var body FacultyFacultiesV1CreateJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacultyFacultiesV1Create(ctx, request.(FacultyFacultiesV1CreateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacultyFacultiesV1Create")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacultyFacultiesV1CreateResponseObject); ok {
-		if err := validResponse.VisitFacultyFacultiesV1CreateResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// FacultyFacultiesV1Delete operation middleware
-func (sh *strictHandler) FacultyFacultiesV1Delete(ctx *gin.Context, id string) {
-	var request FacultyFacultiesV1DeleteRequestObject
-
-	request.Id = id
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacultyFacultiesV1Delete(ctx, request.(FacultyFacultiesV1DeleteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacultyFacultiesV1Delete")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacultyFacultiesV1DeleteResponseObject); ok {
-		if err := validResponse.VisitFacultyFacultiesV1DeleteResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// FacultyFacultiesV1Detail operation middleware
-func (sh *strictHandler) FacultyFacultiesV1Detail(ctx *gin.Context, id string) {
-	var request FacultyFacultiesV1DetailRequestObject
-
-	request.Id = id
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacultyFacultiesV1Detail(ctx, request.(FacultyFacultiesV1DetailRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacultyFacultiesV1Detail")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacultyFacultiesV1DetailResponseObject); ok {
-		if err := validResponse.VisitFacultyFacultiesV1DetailResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// FacultyFacultiesV1Update operation middleware
-func (sh *strictHandler) FacultyFacultiesV1Update(ctx *gin.Context, id string) {
-	var request FacultyFacultiesV1UpdateRequestObject
-
-	request.Id = id
-
-	var body FacultyFacultiesV1UpdateJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.FacultyFacultiesV1Update(ctx, request.(FacultyFacultiesV1UpdateRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "FacultyFacultiesV1Update")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(FacultyFacultiesV1UpdateResponseObject); ok {
-		if err := validResponse.VisitFacultyFacultiesV1UpdateResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// SubjectSubjectsV1List operation middleware
-func (sh *strictHandler) SubjectSubjectsV1List(ctx *gin.Context, params SubjectSubjectsV1ListParams) {
-	var request SubjectSubjectsV1ListRequestObject
+// SubjectsV1List operation middleware
+func (sh *strictHandler) SubjectsV1List(ctx *gin.Context, params SubjectsV1ListParams) {
+	var request SubjectsV1ListRequestObject
 
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectSubjectsV1List(ctx, request.(SubjectSubjectsV1ListRequestObject))
+		return sh.ssi.SubjectsV1List(ctx, request.(SubjectsV1ListRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectSubjectsV1List")
+		handler = middleware(handler, "SubjectsV1List")
 	}
 
 	response, err := handler(ctx, request)
@@ -2435,8 +2428,8 @@ func (sh *strictHandler) SubjectSubjectsV1List(ctx *gin.Context, params SubjectS
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectSubjectsV1ListResponseObject); ok {
-		if err := validResponse.VisitSubjectSubjectsV1ListResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(SubjectsV1ListResponseObject); ok {
+		if err := validResponse.VisitSubjectsV1ListResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2444,11 +2437,11 @@ func (sh *strictHandler) SubjectSubjectsV1List(ctx *gin.Context, params SubjectS
 	}
 }
 
-// SubjectSubjectsV1Upsert operation middleware
-func (sh *strictHandler) SubjectSubjectsV1Upsert(ctx *gin.Context) {
-	var request SubjectSubjectsV1UpsertRequestObject
+// SubjectsV1Upsert operation middleware
+func (sh *strictHandler) SubjectsV1Upsert(ctx *gin.Context) {
+	var request SubjectsV1UpsertRequestObject
 
-	var body SubjectSubjectsV1UpsertJSONRequestBody
+	var body SubjectsV1UpsertJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.Status(http.StatusBadRequest)
 		ctx.Error(err)
@@ -2457,10 +2450,10 @@ func (sh *strictHandler) SubjectSubjectsV1Upsert(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectSubjectsV1Upsert(ctx, request.(SubjectSubjectsV1UpsertRequestObject))
+		return sh.ssi.SubjectsV1Upsert(ctx, request.(SubjectsV1UpsertRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectSubjectsV1Upsert")
+		handler = middleware(handler, "SubjectsV1Upsert")
 	}
 
 	response, err := handler(ctx, request)
@@ -2468,8 +2461,8 @@ func (sh *strictHandler) SubjectSubjectsV1Upsert(ctx *gin.Context) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectSubjectsV1UpsertResponseObject); ok {
-		if err := validResponse.VisitSubjectSubjectsV1UpsertResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(SubjectsV1UpsertResponseObject); ok {
+		if err := validResponse.VisitSubjectsV1UpsertResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2477,17 +2470,17 @@ func (sh *strictHandler) SubjectSubjectsV1Upsert(ctx *gin.Context) {
 	}
 }
 
-// SubjectSubjectsV1Delete operation middleware
-func (sh *strictHandler) SubjectSubjectsV1Delete(ctx *gin.Context, id string) {
-	var request SubjectSubjectsV1DeleteRequestObject
+// SubjectsV1Delete operation middleware
+func (sh *strictHandler) SubjectsV1Delete(ctx *gin.Context, id string) {
+	var request SubjectsV1DeleteRequestObject
 
 	request.Id = id
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectSubjectsV1Delete(ctx, request.(SubjectSubjectsV1DeleteRequestObject))
+		return sh.ssi.SubjectsV1Delete(ctx, request.(SubjectsV1DeleteRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectSubjectsV1Delete")
+		handler = middleware(handler, "SubjectsV1Delete")
 	}
 
 	response, err := handler(ctx, request)
@@ -2495,8 +2488,8 @@ func (sh *strictHandler) SubjectSubjectsV1Delete(ctx *gin.Context, id string) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectSubjectsV1DeleteResponseObject); ok {
-		if err := validResponse.VisitSubjectSubjectsV1DeleteResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(SubjectsV1DeleteResponseObject); ok {
+		if err := validResponse.VisitSubjectsV1DeleteResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2504,17 +2497,17 @@ func (sh *strictHandler) SubjectSubjectsV1Delete(ctx *gin.Context, id string) {
 	}
 }
 
-// SubjectSubjectsV1Detail operation middleware
-func (sh *strictHandler) SubjectSubjectsV1Detail(ctx *gin.Context, id string) {
-	var request SubjectSubjectsV1DetailRequestObject
+// SubjectsV1Detail operation middleware
+func (sh *strictHandler) SubjectsV1Detail(ctx *gin.Context, id string) {
+	var request SubjectsV1DetailRequestObject
 
 	request.Id = id
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SubjectSubjectsV1Detail(ctx, request.(SubjectSubjectsV1DetailRequestObject))
+		return sh.ssi.SubjectsV1Detail(ctx, request.(SubjectsV1DetailRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SubjectSubjectsV1Detail")
+		handler = middleware(handler, "SubjectsV1Detail")
 	}
 
 	response, err := handler(ctx, request)
@@ -2522,8 +2515,8 @@ func (sh *strictHandler) SubjectSubjectsV1Detail(ctx *gin.Context, id string) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SubjectSubjectsV1DetailResponseObject); ok {
-		if err := validResponse.VisitSubjectSubjectsV1DetailResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(SubjectsV1DetailResponseObject); ok {
+		if err := validResponse.VisitSubjectsV1DetailResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2618,17 +2611,17 @@ func (sh *strictHandler) TimetableItemsV1Delete(ctx *gin.Context, id string) {
 	}
 }
 
-// UserUsersV1Detail operation middleware
-func (sh *strictHandler) UserUsersV1Detail(ctx *gin.Context, id string) {
-	var request UserUsersV1DetailRequestObject
+// UsersV1Detail operation middleware
+func (sh *strictHandler) UsersV1Detail(ctx *gin.Context, id string) {
+	var request UsersV1DetailRequestObject
 
 	request.Id = id
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.UserUsersV1Detail(ctx, request.(UserUsersV1DetailRequestObject))
+		return sh.ssi.UsersV1Detail(ctx, request.(UsersV1DetailRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "UserUsersV1Detail")
+		handler = middleware(handler, "UsersV1Detail")
 	}
 
 	response, err := handler(ctx, request)
@@ -2636,8 +2629,8 @@ func (sh *strictHandler) UserUsersV1Detail(ctx *gin.Context, id string) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(UserUsersV1DetailResponseObject); ok {
-		if err := validResponse.VisitUserUsersV1DetailResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(UsersV1DetailResponseObject); ok {
+		if err := validResponse.VisitUsersV1DetailResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
