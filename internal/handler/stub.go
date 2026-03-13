@@ -23,33 +23,33 @@ func (h *Handler) CourseRegistrationsV1Delete(c *gin.Context, id string) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
-// FacilityRoomsV1List 教室一覧を取得する
-func (h *Handler) FacilityRoomsV1List(c *gin.Context, params api.FacilityRoomsV1ListParams) {
+// RoomsV1List 教室一覧を取得する
+func (h *Handler) RoomsV1List(c *gin.Context, params api.RoomsV1ListParams) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
-// FacilityRoomsV1Create 教室を作成する
-func (h *Handler) FacilityRoomsV1Create(c *gin.Context) {
+// RoomsV1Create 教室を作成する
+func (h *Handler) RoomsV1Create(c *gin.Context) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
-// FacilityRoomsV1Detail 教室を詳細取得する
-func (h *Handler) FacilityRoomsV1Detail(c *gin.Context, id string) {
+// RoomsV1Detail 教室を詳細取得する
+func (h *Handler) RoomsV1Detail(c *gin.Context, id string) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
-// FacilityRoomsV1Update 教室を更新する
-func (h *Handler) FacilityRoomsV1Update(c *gin.Context, id string) {
+// RoomsV1Update 教室を更新する
+func (h *Handler) RoomsV1Update(c *gin.Context, id string) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
-// FacilityRoomsV1Delete 教室を削除する
-func (h *Handler) FacilityRoomsV1Delete(c *gin.Context, id string) {
+// RoomsV1Delete 教室を削除する
+func (h *Handler) RoomsV1Delete(c *gin.Context, id string) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
-// FacilityReservationsV1List 教室の予約一覧を取得する
-func (h *Handler) FacilityReservationsV1List(c *gin.Context, id string, params api.FacilityReservationsV1ListParams) {
+// ReservationsV1List 教室の予約一覧を取得する
+func (h *Handler) ReservationsV1List(c *gin.Context, id string, params api.ReservationsV1ListParams) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
@@ -68,7 +68,7 @@ func (h *Handler) TimetableItemsV1Delete(c *gin.Context, id string) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
-// UserUsersV1Detail ユーザーを取得する
-func (h *Handler) UserUsersV1Detail(c *gin.Context, id string) {
+// UsersV1Detail ユーザーを取得する
+func (h *Handler) UsersV1Detail(c *gin.Context, id string) {
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
