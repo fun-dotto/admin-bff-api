@@ -123,9 +123,9 @@ const (
 
 // AcademicServiceCourseRegistration defines model for AcademicService.CourseRegistration.
 type AcademicServiceCourseRegistration struct {
-	Id        string `json:"id"`
-	SubjectId string `json:"subjectId"`
-	UserId    string `json:"userId"`
+	Id      string                        `json:"id"`
+	Subject AcademicServiceSubjectSummary `json:"subject"`
+	UserId  string                        `json:"userId"`
 }
 
 // AcademicServiceCourseRegistrationRequest defines model for AcademicService.CourseRegistrationRequest.
@@ -190,8 +190,9 @@ type AcademicServiceSubject struct {
 
 // AcademicServiceSubjectFaculty defines model for AcademicService.SubjectFaculty.
 type AcademicServiceSubjectFaculty struct {
-	FacultyId string `json:"facultyId"`
-	IsPrimary bool   `json:"isPrimary"`
+	// Faculty 教員
+	Faculty   AcademicServiceFaculty `json:"faculty"`
+	IsPrimary bool                   `json:"isPrimary"`
 }
 
 // AcademicServiceSubjectRequest defines model for AcademicService.SubjectRequest.
@@ -226,18 +227,16 @@ type AcademicServiceSubjectTargetClass struct {
 
 // AcademicServiceTimetableItem defines model for AcademicService.TimetableItem.
 type AcademicServiceTimetableItem struct {
-	DayOfWeek DottoFoundationV1DayOfWeek `json:"dayOfWeek"`
-	Id        string                     `json:"id"`
-	Period    DottoFoundationV1Period    `json:"period"`
-	RoomId    string                     `json:"roomId"`
-	SubjectId string                     `json:"subjectId"`
+	DayOfWeek DottoFoundationV1DayOfWeek    `json:"dayOfWeek"`
+	Id        string                        `json:"id"`
+	Period    DottoFoundationV1Period       `json:"period"`
+	Subject   AcademicServiceSubjectSummary `json:"subject"`
 }
 
 // AcademicServiceTimetableItemRequest defines model for AcademicService.TimetableItemRequest.
 type AcademicServiceTimetableItemRequest struct {
 	DayOfWeek DottoFoundationV1DayOfWeek `json:"dayOfWeek"`
 	Period    DottoFoundationV1Period    `json:"period"`
-	RoomId    string                     `json:"roomId"`
 	SubjectId string                     `json:"subjectId"`
 }
 
