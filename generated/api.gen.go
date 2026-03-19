@@ -15,6 +15,10 @@ import (
 	strictgin "github.com/oapi-codegen/runtime/strictmiddleware/gin"
 )
 
+const (
+	BearerAuthScopes = "BearerAuth.Scopes"
+)
+
 // Defines values for DottoFoundationV1Class.
 const (
 	A DottoFoundationV1Class = "A"
@@ -497,6 +501,8 @@ type MiddlewareFunc func(c *gin.Context)
 // AnnouncementsV1List operation middleware
 func (siw *ServerInterfaceWrapper) AnnouncementsV1List(c *gin.Context) {
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -509,6 +515,8 @@ func (siw *ServerInterfaceWrapper) AnnouncementsV1List(c *gin.Context) {
 
 // AnnouncementsV1Create operation middleware
 func (siw *ServerInterfaceWrapper) AnnouncementsV1Create(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -534,6 +542,8 @@ func (siw *ServerInterfaceWrapper) AnnouncementsV1Delete(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -557,6 +567,8 @@ func (siw *ServerInterfaceWrapper) AnnouncementsV1Detail(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -582,6 +594,8 @@ func (siw *ServerInterfaceWrapper) AnnouncementsV1Update(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -596,6 +610,8 @@ func (siw *ServerInterfaceWrapper) AnnouncementsV1Update(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) CourseRegistrationsV1List(c *gin.Context) {
 
 	var err error
+
+	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params CourseRegistrationsV1ListParams
@@ -651,6 +667,8 @@ func (siw *ServerInterfaceWrapper) CourseRegistrationsV1List(c *gin.Context) {
 // CourseRegistrationsV1Create operation middleware
 func (siw *ServerInterfaceWrapper) CourseRegistrationsV1Create(c *gin.Context) {
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -675,6 +693,8 @@ func (siw *ServerInterfaceWrapper) CourseRegistrationsV1Delete(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -688,6 +708,8 @@ func (siw *ServerInterfaceWrapper) CourseRegistrationsV1Delete(c *gin.Context) {
 // FacultiesV1List operation middleware
 func (siw *ServerInterfaceWrapper) FacultiesV1List(c *gin.Context) {
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -700,6 +722,8 @@ func (siw *ServerInterfaceWrapper) FacultiesV1List(c *gin.Context) {
 
 // FacultiesV1Create operation middleware
 func (siw *ServerInterfaceWrapper) FacultiesV1Create(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -725,6 +749,8 @@ func (siw *ServerInterfaceWrapper) FacultiesV1Delete(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -748,6 +774,8 @@ func (siw *ServerInterfaceWrapper) FacultiesV1Detail(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -773,6 +801,8 @@ func (siw *ServerInterfaceWrapper) FacultiesV1Update(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -787,6 +817,8 @@ func (siw *ServerInterfaceWrapper) FacultiesV1Update(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) RoomsV1List(c *gin.Context) {
 
 	var err error
+
+	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params RoomsV1ListParams
@@ -812,6 +844,8 @@ func (siw *ServerInterfaceWrapper) RoomsV1List(c *gin.Context) {
 // RoomsV1Create operation middleware
 func (siw *ServerInterfaceWrapper) RoomsV1Create(c *gin.Context) {
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -835,6 +869,8 @@ func (siw *ServerInterfaceWrapper) RoomsV1Delete(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -860,6 +896,8 @@ func (siw *ServerInterfaceWrapper) RoomsV1Detail(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -884,6 +922,8 @@ func (siw *ServerInterfaceWrapper) RoomsV1Update(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -907,6 +947,8 @@ func (siw *ServerInterfaceWrapper) ReservationsV1List(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ReservationsV1ListParams
@@ -941,6 +983,8 @@ func (siw *ServerInterfaceWrapper) ReservationsV1List(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) SubjectsV1List(c *gin.Context) {
 
 	var err error
+
+	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params SubjectsV1ListParams
@@ -1030,6 +1074,8 @@ func (siw *ServerInterfaceWrapper) SubjectsV1List(c *gin.Context) {
 // SubjectsV1Upsert operation middleware
 func (siw *ServerInterfaceWrapper) SubjectsV1Upsert(c *gin.Context) {
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1053,6 +1099,8 @@ func (siw *ServerInterfaceWrapper) SubjectsV1Delete(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -1078,6 +1126,8 @@ func (siw *ServerInterfaceWrapper) SubjectsV1Detail(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1092,6 +1142,8 @@ func (siw *ServerInterfaceWrapper) SubjectsV1Detail(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) TimetableItemsV1List(c *gin.Context) {
 
 	var err error
+
+	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params TimetableItemsV1ListParams
@@ -1140,6 +1192,8 @@ func (siw *ServerInterfaceWrapper) TimetableItemsV1List(c *gin.Context) {
 // TimetableItemsV1Create operation middleware
 func (siw *ServerInterfaceWrapper) TimetableItemsV1Create(c *gin.Context) {
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1164,6 +1218,8 @@ func (siw *ServerInterfaceWrapper) TimetableItemsV1Delete(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1187,6 +1243,8 @@ func (siw *ServerInterfaceWrapper) UsersV1Detail(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -1272,6 +1330,14 @@ func (response AnnouncementsV1List200JSONResponse) VisitAnnouncementsV1ListRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
+type AnnouncementsV1List401Response struct {
+}
+
+func (response AnnouncementsV1List401Response) VisitAnnouncementsV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type AnnouncementsV1CreateRequestObject struct {
 	Body *AnnouncementsV1CreateJSONRequestBody
 }
@@ -1291,6 +1357,14 @@ func (response AnnouncementsV1Create201JSONResponse) VisitAnnouncementsV1CreateR
 	return json.NewEncoder(w).Encode(response)
 }
 
+type AnnouncementsV1Create401Response struct {
+}
+
+func (response AnnouncementsV1Create401Response) VisitAnnouncementsV1CreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type AnnouncementsV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
@@ -1304,6 +1378,22 @@ type AnnouncementsV1Delete204Response struct {
 
 func (response AnnouncementsV1Delete204Response) VisitAnnouncementsV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
+	return nil
+}
+
+type AnnouncementsV1Delete401Response struct {
+}
+
+func (response AnnouncementsV1Delete401Response) VisitAnnouncementsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AnnouncementsV1Delete404Response struct {
+}
+
+func (response AnnouncementsV1Delete404Response) VisitAnnouncementsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
 	return nil
 }
 
@@ -1326,6 +1416,22 @@ func (response AnnouncementsV1Detail200JSONResponse) VisitAnnouncementsV1DetailR
 	return json.NewEncoder(w).Encode(response)
 }
 
+type AnnouncementsV1Detail401Response struct {
+}
+
+func (response AnnouncementsV1Detail401Response) VisitAnnouncementsV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AnnouncementsV1Detail404Response struct {
+}
+
+func (response AnnouncementsV1Detail404Response) VisitAnnouncementsV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
 type AnnouncementsV1UpdateRequestObject struct {
 	Id   string `json:"id"`
 	Body *AnnouncementsV1UpdateJSONRequestBody
@@ -1344,6 +1450,22 @@ func (response AnnouncementsV1Update200JSONResponse) VisitAnnouncementsV1UpdateR
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+type AnnouncementsV1Update401Response struct {
+}
+
+func (response AnnouncementsV1Update401Response) VisitAnnouncementsV1UpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AnnouncementsV1Update404Response struct {
+}
+
+func (response AnnouncementsV1Update404Response) VisitAnnouncementsV1UpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
 }
 
 type CourseRegistrationsV1ListRequestObject struct {
@@ -1365,6 +1487,14 @@ func (response CourseRegistrationsV1List200JSONResponse) VisitCourseRegistration
 	return json.NewEncoder(w).Encode(response)
 }
 
+type CourseRegistrationsV1List401Response struct {
+}
+
+func (response CourseRegistrationsV1List401Response) VisitCourseRegistrationsV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type CourseRegistrationsV1CreateRequestObject struct {
 	Body *CourseRegistrationsV1CreateJSONRequestBody
 }
@@ -1384,6 +1514,14 @@ func (response CourseRegistrationsV1Create201JSONResponse) VisitCourseRegistrati
 	return json.NewEncoder(w).Encode(response)
 }
 
+type CourseRegistrationsV1Create401Response struct {
+}
+
+func (response CourseRegistrationsV1Create401Response) VisitCourseRegistrationsV1CreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type CourseRegistrationsV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
@@ -1397,6 +1535,22 @@ type CourseRegistrationsV1Delete204Response struct {
 
 func (response CourseRegistrationsV1Delete204Response) VisitCourseRegistrationsV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
+	return nil
+}
+
+type CourseRegistrationsV1Delete401Response struct {
+}
+
+func (response CourseRegistrationsV1Delete401Response) VisitCourseRegistrationsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type CourseRegistrationsV1Delete404Response struct {
+}
+
+func (response CourseRegistrationsV1Delete404Response) VisitCourseRegistrationsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
 	return nil
 }
 
@@ -1416,6 +1570,14 @@ func (response FacultiesV1List200JSONResponse) VisitFacultiesV1ListResponse(w ht
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+type FacultiesV1List401Response struct {
+}
+
+func (response FacultiesV1List401Response) VisitFacultiesV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
 }
 
 type FacultiesV1CreateRequestObject struct {
@@ -1438,6 +1600,14 @@ func (response FacultiesV1Create201JSONResponse) VisitFacultiesV1CreateResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
+type FacultiesV1Create401Response struct {
+}
+
+func (response FacultiesV1Create401Response) VisitFacultiesV1CreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type FacultiesV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
@@ -1451,6 +1621,22 @@ type FacultiesV1Delete204Response struct {
 
 func (response FacultiesV1Delete204Response) VisitFacultiesV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
+	return nil
+}
+
+type FacultiesV1Delete401Response struct {
+}
+
+func (response FacultiesV1Delete401Response) VisitFacultiesV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type FacultiesV1Delete404Response struct {
+}
+
+func (response FacultiesV1Delete404Response) VisitFacultiesV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
 	return nil
 }
 
@@ -1474,6 +1660,22 @@ func (response FacultiesV1Detail200JSONResponse) VisitFacultiesV1DetailResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
+type FacultiesV1Detail401Response struct {
+}
+
+func (response FacultiesV1Detail401Response) VisitFacultiesV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type FacultiesV1Detail404Response struct {
+}
+
+func (response FacultiesV1Detail404Response) VisitFacultiesV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
 type FacultiesV1UpdateRequestObject struct {
 	Id   string `json:"id"`
 	Body *FacultiesV1UpdateJSONRequestBody
@@ -1495,6 +1697,22 @@ func (response FacultiesV1Update200JSONResponse) VisitFacultiesV1UpdateResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
+type FacultiesV1Update401Response struct {
+}
+
+func (response FacultiesV1Update401Response) VisitFacultiesV1UpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type FacultiesV1Update404Response struct {
+}
+
+func (response FacultiesV1Update404Response) VisitFacultiesV1UpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
 type RoomsV1ListRequestObject struct {
 	Params RoomsV1ListParams
 }
@@ -1512,6 +1730,14 @@ func (response RoomsV1List200JSONResponse) VisitRoomsV1ListResponse(w http.Respo
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+type RoomsV1List401Response struct {
+}
+
+func (response RoomsV1List401Response) VisitRoomsV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
 }
 
 type RoomsV1CreateRequestObject struct {
@@ -1533,6 +1759,14 @@ func (response RoomsV1Create201JSONResponse) VisitRoomsV1CreateResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
+type RoomsV1Create401Response struct {
+}
+
+func (response RoomsV1Create401Response) VisitRoomsV1CreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type RoomsV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
@@ -1546,6 +1780,22 @@ type RoomsV1Delete204Response struct {
 
 func (response RoomsV1Delete204Response) VisitRoomsV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
+	return nil
+}
+
+type RoomsV1Delete401Response struct {
+}
+
+func (response RoomsV1Delete401Response) VisitRoomsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RoomsV1Delete404Response struct {
+}
+
+func (response RoomsV1Delete404Response) VisitRoomsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
 	return nil
 }
 
@@ -1568,6 +1818,22 @@ func (response RoomsV1Detail200JSONResponse) VisitRoomsV1DetailResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
+type RoomsV1Detail401Response struct {
+}
+
+func (response RoomsV1Detail401Response) VisitRoomsV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RoomsV1Detail404Response struct {
+}
+
+func (response RoomsV1Detail404Response) VisitRoomsV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
 type RoomsV1UpdateRequestObject struct {
 	Id   string `json:"id"`
 	Body *RoomsV1UpdateJSONRequestBody
@@ -1586,6 +1852,22 @@ func (response RoomsV1Update200JSONResponse) VisitRoomsV1UpdateResponse(w http.R
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+type RoomsV1Update401Response struct {
+}
+
+func (response RoomsV1Update401Response) VisitRoomsV1UpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RoomsV1Update404Response struct {
+}
+
+func (response RoomsV1Update404Response) VisitRoomsV1UpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
 }
 
 type ReservationsV1ListRequestObject struct {
@@ -1608,6 +1890,14 @@ func (response ReservationsV1List200JSONResponse) VisitReservationsV1ListRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type ReservationsV1List401Response struct {
+}
+
+func (response ReservationsV1List401Response) VisitReservationsV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type SubjectsV1ListRequestObject struct {
 	Params SubjectsV1ListParams
 }
@@ -1625,6 +1915,14 @@ func (response SubjectsV1List200JSONResponse) VisitSubjectsV1ListResponse(w http
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+type SubjectsV1List401Response struct {
+}
+
+func (response SubjectsV1List401Response) VisitSubjectsV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
 }
 
 type SubjectsV1UpsertRequestObject struct {
@@ -1646,6 +1944,14 @@ func (response SubjectsV1Upsert200JSONResponse) VisitSubjectsV1UpsertResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
+type SubjectsV1Upsert401Response struct {
+}
+
+func (response SubjectsV1Upsert401Response) VisitSubjectsV1UpsertResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type SubjectsV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
@@ -1659,6 +1965,22 @@ type SubjectsV1Delete204Response struct {
 
 func (response SubjectsV1Delete204Response) VisitSubjectsV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
+	return nil
+}
+
+type SubjectsV1Delete401Response struct {
+}
+
+func (response SubjectsV1Delete401Response) VisitSubjectsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type SubjectsV1Delete404Response struct {
+}
+
+func (response SubjectsV1Delete404Response) VisitSubjectsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
 	return nil
 }
 
@@ -1681,6 +2003,22 @@ func (response SubjectsV1Detail200JSONResponse) VisitSubjectsV1DetailResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
+type SubjectsV1Detail401Response struct {
+}
+
+func (response SubjectsV1Detail401Response) VisitSubjectsV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type SubjectsV1Detail404Response struct {
+}
+
+func (response SubjectsV1Detail404Response) VisitSubjectsV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
 type TimetableItemsV1ListRequestObject struct {
 	Params TimetableItemsV1ListParams
 }
@@ -1698,6 +2036,14 @@ func (response TimetableItemsV1List200JSONResponse) VisitTimetableItemsV1ListRes
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+type TimetableItemsV1List401Response struct {
+}
+
+func (response TimetableItemsV1List401Response) VisitTimetableItemsV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
 }
 
 type TimetableItemsV1CreateRequestObject struct {
@@ -1719,6 +2065,14 @@ func (response TimetableItemsV1Create201JSONResponse) VisitTimetableItemsV1Creat
 	return json.NewEncoder(w).Encode(response)
 }
 
+type TimetableItemsV1Create401Response struct {
+}
+
+func (response TimetableItemsV1Create401Response) VisitTimetableItemsV1CreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
 type TimetableItemsV1DeleteRequestObject struct {
 	Id string `json:"id"`
 }
@@ -1732,6 +2086,22 @@ type TimetableItemsV1Delete204Response struct {
 
 func (response TimetableItemsV1Delete204Response) VisitTimetableItemsV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
+	return nil
+}
+
+type TimetableItemsV1Delete401Response struct {
+}
+
+func (response TimetableItemsV1Delete401Response) VisitTimetableItemsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type TimetableItemsV1Delete404Response struct {
+}
+
+func (response TimetableItemsV1Delete404Response) VisitTimetableItemsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
 	return nil
 }
 
@@ -1752,6 +2122,22 @@ func (response UsersV1Detail200JSONResponse) VisitUsersV1DetailResponse(w http.R
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+type UsersV1Detail401Response struct {
+}
+
+func (response UsersV1Detail401Response) VisitUsersV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type UsersV1Detail404Response struct {
+}
+
+func (response UsersV1Detail404Response) VisitUsersV1DetailResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
 }
 
 // StrictServerInterface represents all server handlers.
