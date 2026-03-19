@@ -30,6 +30,8 @@ paths:
                       $ref: '#/components/schemas/AnnouncementService.Announcement'
                 required:
                   - announcements
+        '401':
+          description: Access is unauthorized.
       tags:
         - Announcements
     post:
@@ -48,6 +50,8 @@ paths:
                     $ref: '#/components/schemas/AnnouncementService.Announcement'
                 required:
                   - announcement
+        '401':
+          description: Access is unauthorized.
       tags:
         - Announcements
       requestBody:
@@ -80,6 +84,10 @@ paths:
                     $ref: '#/components/schemas/AnnouncementService.Announcement'
                 required:
                   - announcement
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Announcements
     put:
@@ -104,6 +112,10 @@ paths:
                     $ref: '#/components/schemas/AnnouncementService.Announcement'
                 required:
                   - announcement
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Announcements
       requestBody:
@@ -126,6 +138,10 @@ paths:
       responses:
         '204':
           description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Announcements
   /v1/courseRegistrations:
@@ -168,6 +184,8 @@ paths:
                       $ref: '#/components/schemas/AcademicService.CourseRegistration'
                 required:
                   - registrations
+        '401':
+          description: Access is unauthorized.
       tags:
         - CourseRegistrations
     post:
@@ -186,6 +204,8 @@ paths:
                     $ref: '#/components/schemas/AcademicService.CourseRegistration'
                 required:
                   - registration
+        '401':
+          description: Access is unauthorized.
       tags:
         - CourseRegistrations
       requestBody:
@@ -209,6 +229,10 @@ paths:
       responses:
         '204':
           description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - CourseRegistrations
   /v1/faculties:
@@ -230,6 +254,8 @@ paths:
                       $ref: '#/components/schemas/AcademicService.Faculty'
                 required:
                   - faculties
+        '401':
+          description: Access is unauthorized.
       tags:
         - Faculties
     post:
@@ -248,6 +274,8 @@ paths:
                     $ref: '#/components/schemas/AcademicService.Faculty'
                 required:
                   - faculty
+        '401':
+          description: Access is unauthorized.
       tags:
         - Faculties
       requestBody:
@@ -280,6 +308,10 @@ paths:
                     $ref: '#/components/schemas/AcademicService.Faculty'
                 required:
                   - faculty
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Faculties
     put:
@@ -304,6 +336,10 @@ paths:
                     $ref: '#/components/schemas/AcademicService.Faculty'
                 required:
                   - faculty
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Faculties
       requestBody:
@@ -326,6 +362,10 @@ paths:
       responses:
         '204':
           description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Faculties
   /v1/rooms:
@@ -355,6 +395,8 @@ paths:
                       $ref: '#/components/schemas/AcademicService.Room'
                 required:
                   - rooms
+        '401':
+          description: Access is unauthorized.
       tags:
         - Rooms
     post:
@@ -373,6 +415,8 @@ paths:
                     $ref: '#/components/schemas/AcademicService.Room'
                 required:
                   - room
+        '401':
+          description: Access is unauthorized.
       tags:
         - Rooms
       requestBody:
@@ -405,6 +449,10 @@ paths:
                     $ref: '#/components/schemas/AcademicService.Room'
                 required:
                   - room
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Rooms
     put:
@@ -429,6 +477,10 @@ paths:
                     $ref: '#/components/schemas/AcademicService.Room'
                 required:
                   - room
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Rooms
       requestBody:
@@ -451,6 +503,10 @@ paths:
       responses:
         '204':
           description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Rooms
   /v1/rooms/{id}/reservations:
@@ -494,6 +550,8 @@ paths:
                       $ref: '#/components/schemas/AcademicService.Reservation'
                 required:
                   - reservations
+        '401':
+          description: Access is unauthorized.
       tags:
         - Reservations
   /v1/subjects:
@@ -595,6 +653,8 @@ paths:
                       $ref: '#/components/schemas/AcademicService.SubjectSummary'
                 required:
                   - subjects
+        '401':
+          description: Access is unauthorized.
       tags:
         - Subjects
     post:
@@ -613,6 +673,8 @@ paths:
                     $ref: '#/components/schemas/AcademicService.Subject'
                 required:
                   - subject
+        '401':
+          description: Access is unauthorized.
       tags:
         - Subjects
       requestBody:
@@ -645,6 +707,10 @@ paths:
                     $ref: '#/components/schemas/AcademicService.Subject'
                 required:
                   - subject
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Subjects
     delete:
@@ -660,6 +726,10 @@ paths:
       responses:
         '204':
           description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Subjects
   /v1/timetableItmes:
@@ -704,6 +774,8 @@ paths:
                       $ref: '#/components/schemas/AcademicService.TimetableItem'
                 required:
                   - items
+        '401':
+          description: Access is unauthorized.
       tags:
         - TimetableItems
     post:
@@ -722,6 +794,8 @@ paths:
                     $ref: '#/components/schemas/AcademicService.TimetableItem'
                 required:
                   - item
+        '401':
+          description: Access is unauthorized.
       tags:
         - TimetableItems
       requestBody:
@@ -745,6 +819,10 @@ paths:
       responses:
         '204':
           description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - TimetableItems
   /v1/users/{id}:
@@ -770,8 +848,14 @@ paths:
                     $ref: '#/components/schemas/UserService.User'
                 required:
                   - user
+        '401':
+          description: Access is unauthorized.
+        '404':
+          description: The server cannot find the requested resource.
       tags:
         - Users
+security:
+  - BearerAuth: []
 components:
   schemas:
     AcademicService.CourseRegistration:
@@ -1144,6 +1228,10 @@ components:
           $ref: '#/components/schemas/DottoFoundationV1.Course'
         class:
           $ref: '#/components/schemas/DottoFoundationV1.Class'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: Bearer
 servers:
   - url: http://localhost:8080
     description: Local
