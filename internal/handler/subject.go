@@ -17,15 +17,15 @@ func (h *Handler) SubjectsV1List(c *gin.Context, params api.SubjectsV1ListParams
 	}
 
 	clientParams := &academic_api.SubjectsV1ListParams{
-		Q:                       params.Q,
-		Grade:                   convertSlicePtr[api.DottoFoundationV1Grade, academic_api.DottoFoundationV1Grade](params.Grade),
-		Courses:                 convertSlicePtr[api.DottoFoundationV1Course, academic_api.DottoFoundationV1Course](params.Courses),
-		Class:                   convertSlicePtr[api.DottoFoundationV1Class, academic_api.DottoFoundationV1Class](params.Class),
-		Classification:          convertSlicePtr[api.DottoFoundationV1SubjectClassification, academic_api.DottoFoundationV1SubjectClassification](params.Classification),
-		Year:                    params.Year,
-		Semester:                convertSlicePtr[api.DottoFoundationV1CourseSemester, academic_api.DottoFoundationV1CourseSemester](params.Semester),
-		RequirementType:         convertSlicePtr[api.DottoFoundationV1SubjectRequirementType, academic_api.DottoFoundationV1SubjectRequirementType](params.RequirementType),
-		CulturalSubjectCategory: convertSlicePtr[api.DottoFoundationV1CulturalSubjectCategory, academic_api.DottoFoundationV1CulturalSubjectCategory](params.CulturalSubjectCategory),
+		Q:                         params.Q,
+		Grades:                    convertSlicePtr[api.DottoFoundationV1Grade, academic_api.DottoFoundationV1Grade](params.Grades),
+		Courses:                   convertSlicePtr[api.DottoFoundationV1Course, academic_api.DottoFoundationV1Course](params.Courses),
+		Classes:                   convertSlicePtr[api.DottoFoundationV1Class, academic_api.DottoFoundationV1Class](params.Classes),
+		Classifications:           convertSlicePtr[api.DottoFoundationV1SubjectClassification, academic_api.DottoFoundationV1SubjectClassification](params.Classifications),
+		Year:                      params.Year,
+		Semesters:                 convertSlicePtr[api.DottoFoundationV1CourseSemester, academic_api.DottoFoundationV1CourseSemester](params.Semesters),
+		RequirementTypes:          convertSlicePtr[api.DottoFoundationV1SubjectRequirementType, academic_api.DottoFoundationV1SubjectRequirementType](params.RequirementTypes),
+		CulturalSubjectCategories: convertSlicePtr[api.DottoFoundationV1CulturalSubjectCategory, academic_api.DottoFoundationV1CulturalSubjectCategory](params.CulturalSubjectCategories),
 	}
 
 	response, err := h.academicClient.SubjectsV1ListWithResponse(c.Request.Context(), clientParams)

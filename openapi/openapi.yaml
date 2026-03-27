@@ -5,9 +5,10 @@ info:
 tags:
   - name: Announcements
   - name: CourseRegistrations
+  - name: Faculties
+  - name: PersonalCalendarItems
   - name: Rooms
   - name: Reservations
-  - name: Faculties
   - name: Subjects
   - name: TimetableItems
   - name: Users
@@ -163,12 +164,14 @@ paths:
           schema:
             type: integer
           explode: false
-        - name: semester
+        - name: semesters
           in: query
           required: true
           description: 開講時期
           schema:
-            $ref: '#/components/schemas/DottoFoundationV1.CourseSemester'
+            type: array
+            items:
+              $ref: '#/components/schemas/DottoFoundationV1.CourseSemester'
           explode: false
       responses:
         '200':
@@ -368,6 +371,44 @@ paths:
           description: The server cannot find the requested resource.
       tags:
         - Faculties
+  /v1/personalCalendarItems:
+    get:
+      operationId: PersonalCalendarItemsV1_list
+      description: 個人カレンダーアイテム一覧を取得する
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: ユーザーID
+          schema:
+            type: string
+          explode: false
+        - name: dates
+          in: query
+          required: true
+          description: 日付のリスト; 指定した日付の個人カレンダーアイテムのみを取得する
+          schema:
+            type: array
+            items:
+              type: string
+              format: date-time
+          explode: false
+      responses:
+        '200':
+          description: 個人カレンダーアイテムのリスト; 時間割、履修情報、休講補講、振替授業日情報から構築される
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  personalCalendarItems:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AcademicService.PersonalCalendarItem'
+                required:
+                  - personalCalendarItems
+      tags:
+        - PersonalCalendarItems
   /v1/rooms:
     get:
       operationId: RoomsV1_list
@@ -569,7 +610,7 @@ paths:
           schema:
             type: string
           explode: false
-        - name: grade
+        - name: grades
           in: query
           required: false
           description: 学年
@@ -587,7 +628,7 @@ paths:
             items:
               $ref: '#/components/schemas/DottoFoundationV1.Course'
           explode: false
-        - name: class
+        - name: classes
           in: query
           required: false
           description: クラス; 大学院の学年を選択した場合は選択できない
@@ -596,7 +637,7 @@ paths:
             items:
               $ref: '#/components/schemas/DottoFoundationV1.Class'
           explode: false
-        - name: classification
+        - name: classifications
           in: query
           required: false
           description: '学部: 専門・教養; 大学院: 専門・研究指導'
@@ -612,7 +653,7 @@ paths:
           schema:
             type: integer
           explode: false
-        - name: semester
+        - name: semesters
           in: query
           required: false
           description: 開講時期
@@ -621,7 +662,7 @@ paths:
             items:
               $ref: '#/components/schemas/DottoFoundationV1.CourseSemester'
           explode: false
-        - name: requirementType
+        - name: requirementTypes
           in: query
           required: false
           description: 必修・選択・選択必修
@@ -630,7 +671,7 @@ paths:
             items:
               $ref: '#/components/schemas/DottoFoundationV1.SubjectRequirementType'
           explode: false
-        - name: culturalSubjectCategory
+        - name: culturalSubjectCategories
           in: query
           required: false
           description: 教養科目カテゴリ
@@ -744,12 +785,14 @@ paths:
           schema:
             type: integer
           explode: false
-        - name: semester
+        - name: semesters
           in: query
           required: true
           description: 開講時期
           schema:
-            $ref: '#/components/schemas/DottoFoundationV1.CourseSemester'
+            type: array
+            items:
+              $ref: '#/components/schemas/DottoFoundationV1.CourseSemester'
           explode: false
         - name: dayOfWeek
           in: query
@@ -894,7 +937,6 @@ components:
           type: string
         email:
           type: string
-      description: 教員
     AcademicService.FacultyRequest:
       type: object
       required:
@@ -905,6 +947,20 @@ components:
           type: string
         email:
           type: string
+    AcademicService.PersonalCalendarItem:
+      type: object
+      required:
+        - date
+        - slot
+        - timetableItem
+      properties:
+        date:
+          type: string
+          format: date-time
+        slot:
+          $ref: '#/components/schemas/DottoFoundationV1.TimetableSlot'
+        timetableItem:
+          $ref: '#/components/schemas/AcademicService.TimetableItem'
     AcademicService.Reservation:
       type: object
       required:
@@ -1042,30 +1098,29 @@ components:
       required:
         - id
         - subject
-        - dayOfWeek
-        - period
+        - rooms
       properties:
         id:
           type: string
         subject:
           $ref: '#/components/schemas/AcademicService.SubjectSummary'
-        dayOfWeek:
-          $ref: '#/components/schemas/DottoFoundationV1.DayOfWeek'
-        period:
-          $ref: '#/components/schemas/DottoFoundationV1.Period'
+        slot:
+          allOf:
+            - $ref: '#/components/schemas/DottoFoundationV1.TimetableSlot'
+          description: 集中講義など、時間割に含まれていない場合はnull
+        rooms:
+          type: array
+          items:
+            $ref: '#/components/schemas/AcademicService.Room'
     AcademicService.TimetableItemRequest:
       type: object
       required:
         - subjectId
-        - dayOfWeek
-        - period
       properties:
         subjectId:
           type: string
-        dayOfWeek:
-          $ref: '#/components/schemas/DottoFoundationV1.DayOfWeek'
-        period:
-          $ref: '#/components/schemas/DottoFoundationV1.Period'
+        slot:
+          $ref: '#/components/schemas/DottoFoundationV1.TimetableSlot'
     AnnouncementService.Announcement:
       type: object
       required:
@@ -1208,6 +1263,16 @@ components:
         - Optional
         - OptionalRequired
       description: 必修・選択
+    DottoFoundationV1.TimetableSlot:
+      type: object
+      required:
+        - dayOfWeek
+        - period
+      properties:
+        dayOfWeek:
+          $ref: '#/components/schemas/DottoFoundationV1.DayOfWeek'
+        period:
+          $ref: '#/components/schemas/DottoFoundationV1.Period'
     UserService.User:
       type: object
       required:
