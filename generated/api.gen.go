@@ -247,6 +247,7 @@ type AcademicServiceTimetableItem struct {
 
 // AcademicServiceTimetableItemRequest defines model for AcademicService.TimetableItemRequest.
 type AcademicServiceTimetableItemRequest struct {
+	RoomIds   []string                        `json:"roomIds"`
 	Slot      *DottoFoundationV1TimetableSlot `json:"slot,omitempty"`
 	SubjectId string                          `json:"subjectId"`
 }
@@ -394,9 +395,6 @@ type TimetableItemsV1ListParams struct {
 
 	// Semesters 開講時期
 	Semesters []DottoFoundationV1CourseSemester `form:"semesters" json:"semesters"`
-
-	// DayOfWeek 曜日; 複数指定時はORでフィルタリングされる; 指定しない場合は全ての曜日が選択される
-	DayOfWeek *[]DottoFoundationV1DayOfWeek `form:"dayOfWeek,omitempty" json:"dayOfWeek,omitempty"`
 }
 
 // AnnouncementsV1CreateJSONRequestBody defines body for AnnouncementsV1Create for application/json ContentType.
@@ -1243,14 +1241,6 @@ func (siw *ServerInterfaceWrapper) TimetableItemsV1List(c *gin.Context) {
 	err = runtime.BindQueryParameter("form", false, true, "semesters", c.Request.URL.Query(), &params.Semesters)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter semesters: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Optional query parameter "dayOfWeek" -------------
-
-	err = runtime.BindQueryParameter("form", false, false, "dayOfWeek", c.Request.URL.Query(), &params.DayOfWeek)
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter dayOfWeek: %w", err), http.StatusBadRequest)
 		return
 	}
 
