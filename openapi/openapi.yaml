@@ -794,15 +794,6 @@ paths:
             items:
               $ref: '#/components/schemas/DottoFoundationV1.CourseSemester'
           explode: false
-        - name: dayOfWeek
-          in: query
-          required: false
-          description: 曜日; 複数指定時はORでフィルタリングされる; 指定しない場合は全ての曜日が選択される
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/DottoFoundationV1.DayOfWeek'
-          explode: false
       responses:
         '200':
           description: 時間割のリスト
@@ -1116,11 +1107,16 @@ components:
       type: object
       required:
         - subjectId
+        - roomIds
       properties:
         subjectId:
           type: string
         slot:
           $ref: '#/components/schemas/DottoFoundationV1.TimetableSlot'
+        roomIds:
+          type: array
+          items:
+            type: string
     AnnouncementService.Announcement:
       type: object
       required:
