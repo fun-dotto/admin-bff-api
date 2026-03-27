@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +13,7 @@ import (
 	api "github.com/fun-dotto/admin-bff-api/generated"
 	"github.com/fun-dotto/admin-bff-api/generated/external/academic_api"
 	"github.com/fun-dotto/admin-bff-api/generated/external/announcement_api"
+	"github.com/fun-dotto/admin-bff-api/generated/external/user_api"
 	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -124,6 +126,89 @@ func TestPersonalCalendarItemsV1List_ProxiesAcademicAPI(t *testing.T) {
 	}
 }
 
+func TestCourseRegistrationsV1Create_ProxiesAcademicAPI(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	var gotMethod string
+	var gotPath string
+	var gotBody academic_api.CourseRegistrationRequest
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotMethod = r.Method
+		gotPath = r.URL.Path
+
+		if err := json.NewDecoder(r.Body).Decode(&gotBody); err != nil {
+			t.Fatalf("decode request body: %v", err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_, _ = w.Write([]byte(`{"courseRegistration":{"id":"reg-1","userId":"user-1","subject":{"id":"subject-1","name":"Algorithms","faculties":[]}}}`))
+	}))
+	defer server.Close()
+
+	h := newTestHandler(t, server.URL)
+	rec := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(rec)
+	c.Request = httptest.NewRequest(
+		http.MethodPost,
+		"/v1/courseRegistrations",
+		bytes.NewBufferString(`{"subjectId":"subject-1","userId":"user-1"}`),
+	)
+	c.Request.Header.Set("Content-Type", "application/json")
+	setAdminClaim(c)
+
+	h.CourseRegistrationsV1Create(c)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusCreated)
+	}
+	if gotMethod != http.MethodPost || gotPath != "/v1/courseRegistrations" {
+		t.Fatalf("method/path = %s %s", gotMethod, gotPath)
+	}
+	if gotBody.SubjectId != "subject-1" || gotBody.UserId != "user-1" {
+		t.Fatalf("unexpected upstream request body: %+v", gotBody)
+	}
+}
+
+func TestUsersV1Detail_ProxiesUserAPI(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	var gotPath string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"user":{"id":"user-1","name":"Jane Doe","email":"jane@example.com"}}`))
+	}))
+	defer server.Close()
+
+	h := newTestHandler(t, server.URL)
+	rec := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(rec)
+	c.Request = httptest.NewRequest(http.MethodGet, "/v1/users/user-1", nil)
+	setAdminClaim(c)
+
+	h.UsersV1Detail(c, "user-1")
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if gotPath != "/v1/users/user-1" {
+		t.Fatalf("path = %q, want %q", gotPath, "/v1/users/user-1")
+	}
+
+	var body struct {
+		User struct {
+			Id string `json:"id"`
+		} `json:"user"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
+		t.Fatalf("unmarshal response: %v", err)
+	}
+	if body.User.Id != "user-1" {
+		t.Fatalf("unexpected response body: %s", rec.Body.String())
+	}
+}
+
 func newTestHandler(t *testing.T, baseURL string) *Handler {
 	t.Helper()
 
@@ -135,8 +220,12 @@ func newTestHandler(t *testing.T, baseURL string) *Handler {
 	if err != nil {
 		t.Fatalf("new announcement client: %v", err)
 	}
+	userClient, err := user_api.NewClientWithResponses(baseURL)
+	if err != nil {
+		t.Fatalf("new user client: %v", err)
+	}
 
-	return NewHandler(academicClient, announcementClient)
+	return NewHandler(academicClient, announcementClient, userClient)
 }
 
 func setAdminClaim(c *gin.Context) {
