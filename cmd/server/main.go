@@ -10,9 +10,10 @@ import (
 	"github.com/fun-dotto/admin-bff-api/internal/infrastructure"
 	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	oapimiddleware "github.com/oapi-codegen/gin-middleware"
+	"github.com/oapi-codegen/gin-middleware"
 )
 
 func main() {
@@ -39,8 +40,18 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(oapimiddleware.OapiRequestValidator(spec))
-	router.Use(middleware.FirebaseAuth(authClient))
+	router.Use(ginmiddleware.OapiRequestValidatorWithOptions(spec, &ginmiddleware.Options{
+		ErrorHandler: func(c *gin.Context, message string, statusCode int) {
+			if authStatusCode, authMessage, ok := middleware.GetAuthenticationError(c); ok {
+				c.AbortWithStatusJSON(authStatusCode, gin.H{"error": authMessage})
+				return
+			}
+			c.AbortWithStatusJSON(statusCode, gin.H{"error": message})
+		},
+		Options: openapi3filter.Options{
+			AuthenticationFunc: middleware.FirebaseAuthenticationFunc(authClient),
+		},
+	}))
 
 	clients, err := infrastructure.NewExternalClients(ctx)
 	if err != nil {
