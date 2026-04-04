@@ -62,32 +62,6 @@ func (h *Handler) SubjectsV1Detail(c *gin.Context, id string) {
 	c.JSON(http.StatusOK, response.JSON200)
 }
 
-// SubjectsV1Upsert 科目を作成または更新する
-func (h *Handler) SubjectsV1Upsert(c *gin.Context) {
-	if !middleware.RequireAnyClaim(c, "admin", "developer") {
-		return
-	}
-
-	var req academic_api.SubjectRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	response, err := h.academicClient.SubjectsV1UpsertWithResponse(c.Request.Context(), req)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if response.JSON200 == nil {
-		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
-		return
-	}
-
-	c.JSON(http.StatusOK, response.JSON200)
-}
-
 // SubjectsV1Delete 科目を削除する
 func (h *Handler) SubjectsV1Delete(c *gin.Context, id string) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {

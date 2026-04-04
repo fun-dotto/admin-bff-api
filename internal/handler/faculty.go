@@ -5,17 +5,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	api "github.com/fun-dotto/admin-bff-api/generated"
 	"github.com/fun-dotto/admin-bff-api/generated/external/academic_api"
 	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 )
 
 // FacultiesV1List 教員一覧を取得する
-func (h *Handler) FacultiesV1List(c *gin.Context) {
+func (h *Handler) FacultiesV1List(c *gin.Context, params api.FacultiesV1ListParams) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
 		return
 	}
 
-	response, err := h.academicClient.FacultiesV1ListWithResponse(c.Request.Context(), &academic_api.FacultiesV1ListParams{})
+	response, err := h.academicClient.FacultiesV1ListWithResponse(c.Request.Context(), &academic_api.FacultiesV1ListParams{
+		Q: params.Q,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

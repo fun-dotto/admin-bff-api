@@ -5,17 +5,23 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	api "github.com/fun-dotto/admin-bff-api/generated"
 	"github.com/fun-dotto/admin-bff-api/generated/external/user_api"
 	"github.com/fun-dotto/admin-bff-api/internal/middleware"
 )
 
-// UsersV1List ユーザー一覧を取得する
-func (h *Handler) UsersV1List(c *gin.Context) {
+// FCMTokenV1List FCMトークン一覧を取得する
+func (h *Handler) FCMTokenV1List(c *gin.Context, params api.FCMTokenV1ListParams) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
 		return
 	}
 
-	response, err := h.userClient.UsersV1ListWithResponse(c.Request.Context())
+	response, err := h.userClient.FCMTokenV1ListWithResponse(c.Request.Context(), &user_api.FCMTokenV1ListParams{
+		UserIds:       params.UserIds,
+		Tokens:        params.Tokens,
+		UpdatedAtFrom: params.UpdatedAtFrom,
+		UpdatedAtTo:   params.UpdatedAtTo,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -29,39 +35,19 @@ func (h *Handler) UsersV1List(c *gin.Context) {
 	c.JSON(http.StatusOK, response.JSON200)
 }
 
-// UsersV1Detail ユーザーを取得する
-func (h *Handler) UsersV1Detail(c *gin.Context, id string) {
+// FCMTokenV1Upsert FCMトークンを作成または更新する
+func (h *Handler) FCMTokenV1Upsert(c *gin.Context) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
 		return
 	}
 
-	response, err := h.userClient.UsersV1DetailWithResponse(c.Request.Context(), id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if response.JSON200 == nil {
-		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
-		return
-	}
-
-	c.JSON(http.StatusOK, response.JSON200)
-}
-
-// UsersV1Upsert ユーザーを作成または更新する
-func (h *Handler) UsersV1Upsert(c *gin.Context, id string) {
-	if !middleware.RequireAnyClaim(c, "admin", "developer") {
-		return
-	}
-
-	var req user_api.UserRequest
+	var req user_api.FCMTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	response, err := h.userClient.UsersV1UpsertWithResponse(c.Request.Context(), id, req)
+	response, err := h.userClient.FCMTokenV1UpsertWithResponse(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
