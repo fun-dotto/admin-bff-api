@@ -167,18 +167,18 @@ paths:
         - name: from
           in: query
           required: false
-          description: 検索対象開始日時
+          description: 検索対象開始日付
           schema:
             type: string
-            format: date-time
+            format: date
           explode: false
         - name: until
           in: query
           required: false
-          description: 検索対象終了日時
+          description: 検索対象終了日付
           schema:
             type: string
-            format: date-time
+            format: date
           explode: false
       responses:
         '200':
@@ -603,18 +603,18 @@ paths:
         - name: from
           in: query
           required: false
-          description: 検索対象開始日時
+          description: 検索対象開始日付
           schema:
             type: string
-            format: date-time
+            format: date
           explode: false
         - name: until
           in: query
           required: false
-          description: 検索対象終了日時
+          description: 検索対象終了日付
           schema:
             type: string
-            format: date-time
+            format: date
           explode: false
       responses:
         '200':
@@ -725,7 +725,7 @@ paths:
           description: 対象の日付
           schema:
             type: string
-            format: date-time
+            format: date
           explode: false
       responses:
         '204':
@@ -754,7 +754,7 @@ paths:
             type: array
             items:
               type: string
-              format: date-time
+              format: date
           explode: false
       responses:
         '200':
@@ -916,18 +916,18 @@ paths:
         - name: from
           in: query
           required: false
-          description: 検索対象開始日時
+          description: 検索対象開始日付
           schema:
             type: string
-            format: date-time
+            format: date
           explode: false
         - name: until
           in: query
           required: false
-          description: 検索対象終了日時
+          description: 検索対象終了日付
           schema:
             type: string
-            format: date-time
+            format: date
           explode: false
       responses:
         '200':
@@ -1505,7 +1505,7 @@ components:
           $ref: '#/components/schemas/AcademicService.Subject'
         date:
           type: string
-          format: date-time
+          format: date
         period:
           $ref: '#/components/schemas/DottoFoundationV1.Period'
         comment:
@@ -1523,7 +1523,7 @@ components:
           type: string
         date:
           type: string
-          format: date-time
+          format: date
         period:
           $ref: '#/components/schemas/DottoFoundationV1.Period'
         comment:
@@ -1589,7 +1589,7 @@ components:
           $ref: '#/components/schemas/AcademicService.Subject'
         date:
           type: string
-          format: date-time
+          format: date
         period:
           $ref: '#/components/schemas/DottoFoundationV1.Period'
         comment:
@@ -1607,7 +1607,7 @@ components:
           type: string
         date:
           type: string
-          format: date-time
+          format: date
         period:
           $ref: '#/components/schemas/DottoFoundationV1.Period'
         comment:
@@ -1623,7 +1623,7 @@ components:
       properties:
         date:
           type: string
-          format: date-time
+          format: date
         period:
           $ref: '#/components/schemas/DottoFoundationV1.Period'
         subject:
@@ -1722,7 +1722,7 @@ components:
           $ref: '#/components/schemas/AcademicService.Subject'
         date:
           type: string
-          format: date-time
+          format: date
         period:
           $ref: '#/components/schemas/DottoFoundationV1.Period'
         originalRoom:
@@ -1743,7 +1743,7 @@ components:
           type: string
         date:
           type: string
-          format: date-time
+          format: date
         period:
           $ref: '#/components/schemas/DottoFoundationV1.Period'
         originalRoomId:
