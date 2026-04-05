@@ -9,12 +9,13 @@ import (
 
 	api "github.com/fun-dotto/admin-bff-api/generated"
 	"github.com/gin-gonic/gin"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 func TestPersonalCalendarItemsV1List_ProxiesAcademicAPI(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	wantDate := time.Date(2026, 3, 26, 9, 0, 0, 0, time.UTC)
+	wantDate := openapi_types.Date{Time: time.Date(2026, 3, 26, 0, 0, 0, 0, time.UTC)}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		if got := query.Get("userId"); got != "user-1" {
@@ -25,7 +26,7 @@ func TestPersonalCalendarItemsV1List_ProxiesAcademicAPI(t *testing.T) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"personalCalendarItems":[{"date":"2026-03-26T09:00:00Z","slot":{"dayOfWeek":"Thursday","period":"first"},"timetableItem":{"id":"item-1","subject":{"id":"subject-1","name":"Algorithms"},"slot":{"dayOfWeek":"Thursday","period":"first"},"rooms":[]}}]}`))
+		_, _ = w.Write([]byte(`{"personalCalendarItems":[{"date":"2026-03-26","slot":{"dayOfWeek":"Thursday","period":"first"},"timetableItem":{"id":"item-1","subject":{"id":"subject-1","name":"Algorithms"},"slot":{"dayOfWeek":"Thursday","period":"first"},"rooms":[]}}]}`))
 	}))
 	defer server.Close()
 
@@ -37,7 +38,7 @@ func TestPersonalCalendarItemsV1List_ProxiesAcademicAPI(t *testing.T) {
 
 	h.PersonalCalendarItemsV1List(c, api.PersonalCalendarItemsV1ListParams{
 		UserId: "user-1",
-		Dates:  []time.Time{wantDate},
+		Dates:  []openapi_types.Date{wantDate},
 	})
 
 	if rec.Code != http.StatusOK {
@@ -52,7 +53,7 @@ func TestPersonalCalendarItemsV1List_ProxiesAcademicAPI(t *testing.T) {
 	if err := json.Unmarshal(rec.Body.Bytes(), &body); err != nil {
 		t.Fatalf("unmarshal response: %v", err)
 	}
-	if len(body.PersonalCalendarItems) != 1 || body.PersonalCalendarItems[0].Date != "2026-03-26T09:00:00Z" {
+	if len(body.PersonalCalendarItems) != 1 || body.PersonalCalendarItems[0].Date != "2026-03-26" {
 		t.Fatalf("unexpected response body: %s", rec.Body.String())
 	}
 }
