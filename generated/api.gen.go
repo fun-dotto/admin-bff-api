@@ -920,7 +920,7 @@ func (siw *ServerInterfaceWrapper) CancelledClassesV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "from" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "from", c.Request.URL.Query(), &params.From)
+	err = runtime.BindQueryParameter("form", true, false, "from", c.Request.URL.Query(), &params.From)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter from: %w", err), http.StatusBadRequest)
 		return
@@ -928,7 +928,7 @@ func (siw *ServerInterfaceWrapper) CancelledClassesV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "until" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "until", c.Request.URL.Query(), &params.Until)
+	err = runtime.BindQueryParameter("form", true, false, "until", c.Request.URL.Query(), &params.Until)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter until: %w", err), http.StatusBadRequest)
 		return
@@ -1248,7 +1248,7 @@ func (siw *ServerInterfaceWrapper) FCMTokenV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "updatedAtFrom" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "updatedAtFrom", c.Request.URL.Query(), &params.UpdatedAtFrom)
+	err = runtime.BindQueryParameter("form", true, false, "updatedAtFrom", c.Request.URL.Query(), &params.UpdatedAtFrom)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter updatedAtFrom: %w", err), http.StatusBadRequest)
 		return
@@ -1256,7 +1256,7 @@ func (siw *ServerInterfaceWrapper) FCMTokenV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "updatedAtTo" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "updatedAtTo", c.Request.URL.Query(), &params.UpdatedAtTo)
+	err = runtime.BindQueryParameter("form", true, false, "updatedAtTo", c.Request.URL.Query(), &params.UpdatedAtTo)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter updatedAtTo: %w", err), http.StatusBadRequest)
 		return
@@ -1307,7 +1307,7 @@ func (siw *ServerInterfaceWrapper) MakeupClassesV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "from" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "from", c.Request.URL.Query(), &params.From)
+	err = runtime.BindQueryParameter("form", true, false, "from", c.Request.URL.Query(), &params.From)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter from: %w", err), http.StatusBadRequest)
 		return
@@ -1315,7 +1315,7 @@ func (siw *ServerInterfaceWrapper) MakeupClassesV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "until" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "until", c.Request.URL.Query(), &params.Until)
+	err = runtime.BindQueryParameter("form", true, false, "until", c.Request.URL.Query(), &params.Until)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter until: %w", err), http.StatusBadRequest)
 		return
@@ -1414,7 +1414,7 @@ func (siw *ServerInterfaceWrapper) NotifyIrregularitiesV1Notify(c *gin.Context) 
 		return
 	}
 
-	err = runtime.BindQueryParameter("form", false, true, "date", c.Request.URL.Query(), &params.Date)
+	err = runtime.BindQueryParameter("form", true, true, "date", c.Request.URL.Query(), &params.Date)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter date: %w", err), http.StatusBadRequest)
 		return
@@ -1500,7 +1500,7 @@ func (siw *ServerInterfaceWrapper) ReservationsV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "from" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "from", c.Request.URL.Query(), &params.From)
+	err = runtime.BindQueryParameter("form", true, false, "from", c.Request.URL.Query(), &params.From)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter from: %w", err), http.StatusBadRequest)
 		return
@@ -1508,7 +1508,7 @@ func (siw *ServerInterfaceWrapper) ReservationsV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "until" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "until", c.Request.URL.Query(), &params.Until)
+	err = runtime.BindQueryParameter("form", true, false, "until", c.Request.URL.Query(), &params.Until)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter until: %w", err), http.StatusBadRequest)
 		return
@@ -1611,7 +1611,7 @@ func (siw *ServerInterfaceWrapper) RoomChangesV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "from" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "from", c.Request.URL.Query(), &params.From)
+	err = runtime.BindQueryParameter("form", true, false, "from", c.Request.URL.Query(), &params.From)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter from: %w", err), http.StatusBadRequest)
 		return
@@ -1619,7 +1619,7 @@ func (siw *ServerInterfaceWrapper) RoomChangesV1List(c *gin.Context) {
 
 	// ------------- Optional query parameter "until" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "until", c.Request.URL.Query(), &params.Until)
+	err = runtime.BindQueryParameter("form", true, false, "until", c.Request.URL.Query(), &params.Until)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter until: %w", err), http.StatusBadRequest)
 		return
