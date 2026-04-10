@@ -2166,6 +2166,7 @@ components:
             アプリを開くのみの場合はnull
         notifyAt:
           type: string
+          format: date-time
           description: 通知予定日時
         isNotified:
           type: boolean
@@ -2191,6 +2192,7 @@ components:
           type: string
         notifyAt:
           type: string
+          format: date-time
         targetUserIds:
           type: array
           items:
