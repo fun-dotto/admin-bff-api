@@ -414,6 +414,35 @@ type UserServiceFCMTokenRequest struct {
 	UserId string `json:"userId"`
 }
 
+// UserServiceNotification defines model for UserService.Notification.
+type UserServiceNotification struct {
+	Id string `json:"id"`
+
+	// IsNotified 通知が送信されたかどうか
+	IsNotified bool   `json:"isNotified"`
+	Message    string `json:"message"`
+
+	// NotifyAt 通知予定日時
+	NotifyAt time.Time `json:"notifyAt"`
+
+	// TargetUserIds 対象ユーザーIDのリスト
+	TargetUserIds []string `json:"targetUserIds"`
+	Title         string   `json:"title"`
+
+	// Url 通知をタップした時に開くURL
+	// アプリを開くのみの場合はnull
+	Url *string `json:"url,omitempty"`
+}
+
+// UserServiceNotificationRequest defines model for UserService.NotificationRequest.
+type UserServiceNotificationRequest struct {
+	Message       string    `json:"message"`
+	NotifyAt      time.Time `json:"notifyAt"`
+	TargetUserIds []string  `json:"targetUserIds"`
+	Title         string    `json:"title"`
+	Url           *string   `json:"url,omitempty"`
+}
+
 // UserServiceUser defines model for UserService.User.
 type UserServiceUser struct {
 	// Class クラス
@@ -506,13 +535,16 @@ type MakeupClassesV1ListParams struct {
 	Until *openapi_types.Date `form:"until,omitempty" json:"until,omitempty"`
 }
 
-// NotifyIrregularitiesV1NotifyParams defines parameters for NotifyIrregularitiesV1Notify.
-type NotifyIrregularitiesV1NotifyParams struct {
-	// UserIds ユーザーIDのリスト; 指定しない場合は全ユーザーに通知する
-	UserIds *[]string `form:"userIds,omitempty" json:"userIds,omitempty"`
+// NotificationV1ListParams defines parameters for NotificationV1List.
+type NotificationV1ListParams struct {
+	// NotifyAtFrom 通知予定日時の開始日時 (notifyAt >= notifyAtFrom)
+	NotifyAtFrom *time.Time `form:"notifyAtFrom,omitempty" json:"notifyAtFrom,omitempty"`
 
-	// Date 対象の日付
-	Date openapi_types.Date `form:"date" json:"date"`
+	// NotifyAtTo 通知予定日時の終了日時 (notifyAt <= notifyAtTo)
+	NotifyAtTo *time.Time `form:"notifyAtTo,omitempty" json:"notifyAtTo,omitempty"`
+
+	// IsNotified 通知済みかどうか (true: 通知済みの通知のみ、false: 通知未済みの通知のみ、指定なし: 全ての通知)
+	IsNotified *bool `form:"isNotified,omitempty" json:"isNotified,omitempty"`
 }
 
 // PersonalCalendarItemsV1ListParams defines parameters for PersonalCalendarItemsV1List.
@@ -620,6 +652,12 @@ type FCMTokenV1UpsertJSONRequestBody = UserServiceFCMTokenRequest
 // MakeupClassesV1CreateJSONRequestBody defines body for MakeupClassesV1Create for application/json ContentType.
 type MakeupClassesV1CreateJSONRequestBody = AcademicServiceMakeupClassRequest
 
+// NotificationV1CreateJSONRequestBody defines body for NotificationV1Create for application/json ContentType.
+type NotificationV1CreateJSONRequestBody = UserServiceNotificationRequest
+
+// NotificationV1UpdateJSONRequestBody defines body for NotificationV1Update for application/json ContentType.
+type NotificationV1UpdateJSONRequestBody = UserServiceNotificationRequest
+
 // ReservationsV1CreateJSONRequestBody defines body for ReservationsV1Create for application/json ContentType.
 type ReservationsV1CreateJSONRequestBody = AcademicServiceReservationRequest
 
@@ -710,8 +748,17 @@ type ServerInterface interface {
 	// (DELETE /v1/makeupClasses/{id})
 	MakeupClassesV1Delete(c *gin.Context, id string)
 
-	// (POST /v1/notifyIrregularities)
-	NotifyIrregularitiesV1Notify(c *gin.Context, params NotifyIrregularitiesV1NotifyParams)
+	// (GET /v1/notifications)
+	NotificationV1List(c *gin.Context, params NotificationV1ListParams)
+
+	// (POST /v1/notifications)
+	NotificationV1Create(c *gin.Context)
+
+	// (DELETE /v1/notifications/{id})
+	NotificationV1Delete(c *gin.Context, id string)
+
+	// (PUT /v1/notifications/{id})
+	NotificationV1Update(c *gin.Context, id string)
 
 	// (GET /v1/personalCalendarItems)
 	PersonalCalendarItemsV1List(c *gin.Context, params PersonalCalendarItemsV1ListParams)
@@ -1387,36 +1434,37 @@ func (siw *ServerInterfaceWrapper) MakeupClassesV1Delete(c *gin.Context) {
 	siw.Handler.MakeupClassesV1Delete(c, id)
 }
 
-// NotifyIrregularitiesV1Notify operation middleware
-func (siw *ServerInterfaceWrapper) NotifyIrregularitiesV1Notify(c *gin.Context) {
+// NotificationV1List operation middleware
+func (siw *ServerInterfaceWrapper) NotificationV1List(c *gin.Context) {
 
 	var err error
 
 	c.Set(BearerAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params NotifyIrregularitiesV1NotifyParams
+	var params NotificationV1ListParams
 
-	// ------------- Optional query parameter "userIds" -------------
+	// ------------- Optional query parameter "notifyAtFrom" -------------
 
-	err = runtime.BindQueryParameter("form", false, false, "userIds", c.Request.URL.Query(), &params.UserIds)
+	err = runtime.BindQueryParameter("form", true, false, "notifyAtFrom", c.Request.URL.Query(), &params.NotifyAtFrom)
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userIds: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter notifyAtFrom: %w", err), http.StatusBadRequest)
 		return
 	}
 
-	// ------------- Required query parameter "date" -------------
+	// ------------- Optional query parameter "notifyAtTo" -------------
 
-	if paramValue := c.Query("date"); paramValue != "" {
-
-	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Query argument date is required, but not found"), http.StatusBadRequest)
+	err = runtime.BindQueryParameter("form", true, false, "notifyAtTo", c.Request.URL.Query(), &params.NotifyAtTo)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter notifyAtTo: %w", err), http.StatusBadRequest)
 		return
 	}
 
-	err = runtime.BindQueryParameter("form", true, true, "date", c.Request.URL.Query(), &params.Date)
+	// ------------- Optional query parameter "isNotified" -------------
+
+	err = runtime.BindQueryParameter("form", false, false, "isNotified", c.Request.URL.Query(), &params.IsNotified)
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter date: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter isNotified: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1427,7 +1475,74 @@ func (siw *ServerInterfaceWrapper) NotifyIrregularitiesV1Notify(c *gin.Context) 
 		}
 	}
 
-	siw.Handler.NotifyIrregularitiesV1Notify(c, params)
+	siw.Handler.NotificationV1List(c, params)
+}
+
+// NotificationV1Create operation middleware
+func (siw *ServerInterfaceWrapper) NotificationV1Create(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.NotificationV1Create(c)
+}
+
+// NotificationV1Delete operation middleware
+func (siw *ServerInterfaceWrapper) NotificationV1Delete(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.NotificationV1Delete(c, id)
+}
+
+// NotificationV1Update operation middleware
+func (siw *ServerInterfaceWrapper) NotificationV1Update(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.NotificationV1Update(c, id)
 }
 
 // PersonalCalendarItemsV1List operation middleware
@@ -2165,7 +2280,10 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/v1/makeupClasses", wrapper.MakeupClassesV1Create)
 	router.PUT(options.BaseURL+"/v1/makeupClasses", wrapper.MakeupClassesV1Fetch)
 	router.DELETE(options.BaseURL+"/v1/makeupClasses/:id", wrapper.MakeupClassesV1Delete)
-	router.POST(options.BaseURL+"/v1/notifyIrregularities", wrapper.NotifyIrregularitiesV1Notify)
+	router.GET(options.BaseURL+"/v1/notifications", wrapper.NotificationV1List)
+	router.POST(options.BaseURL+"/v1/notifications", wrapper.NotificationV1Create)
+	router.DELETE(options.BaseURL+"/v1/notifications/:id", wrapper.NotificationV1Delete)
+	router.PUT(options.BaseURL+"/v1/notifications/:id", wrapper.NotificationV1Update)
 	router.GET(options.BaseURL+"/v1/personalCalendarItems", wrapper.PersonalCalendarItemsV1List)
 	router.GET(options.BaseURL+"/v1/reservations", wrapper.ReservationsV1List)
 	router.POST(options.BaseURL+"/v1/reservations", wrapper.ReservationsV1Create)
@@ -2870,27 +2988,93 @@ func (response MakeupClassesV1Delete404Response) VisitMakeupClassesV1DeleteRespo
 	return nil
 }
 
-type NotifyIrregularitiesV1NotifyRequestObject struct {
-	Params NotifyIrregularitiesV1NotifyParams
+type NotificationV1ListRequestObject struct {
+	Params NotificationV1ListParams
 }
 
-type NotifyIrregularitiesV1NotifyResponseObject interface {
-	VisitNotifyIrregularitiesV1NotifyResponse(w http.ResponseWriter) error
+type NotificationV1ListResponseObject interface {
+	VisitNotificationV1ListResponse(w http.ResponseWriter) error
 }
 
-type NotifyIrregularitiesV1Notify204Response struct {
+type NotificationV1List200JSONResponse struct {
+	Notifications []UserServiceNotification `json:"notifications"`
 }
 
-func (response NotifyIrregularitiesV1Notify204Response) VisitNotifyIrregularitiesV1NotifyResponse(w http.ResponseWriter) error {
+func (response NotificationV1List200JSONResponse) VisitNotificationV1ListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NotificationV1CreateRequestObject struct {
+	Body *NotificationV1CreateJSONRequestBody
+}
+
+type NotificationV1CreateResponseObject interface {
+	VisitNotificationV1CreateResponse(w http.ResponseWriter) error
+}
+
+type NotificationV1Create201JSONResponse struct {
+	Notification UserServiceNotification `json:"notification"`
+}
+
+func (response NotificationV1Create201JSONResponse) VisitNotificationV1CreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NotificationV1DeleteRequestObject struct {
+	Id string `json:"id"`
+}
+
+type NotificationV1DeleteResponseObject interface {
+	VisitNotificationV1DeleteResponse(w http.ResponseWriter) error
+}
+
+type NotificationV1Delete204Response struct {
+}
+
+func (response NotificationV1Delete204Response) VisitNotificationV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type NotifyIrregularitiesV1Notify401Response struct {
+type NotificationV1Delete404Response struct {
 }
 
-func (response NotifyIrregularitiesV1Notify401Response) VisitNotifyIrregularitiesV1NotifyResponse(w http.ResponseWriter) error {
-	w.WriteHeader(401)
+func (response NotificationV1Delete404Response) VisitNotificationV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type NotificationV1UpdateRequestObject struct {
+	Id   string `json:"id"`
+	Body *NotificationV1UpdateJSONRequestBody
+}
+
+type NotificationV1UpdateResponseObject interface {
+	VisitNotificationV1UpdateResponse(w http.ResponseWriter) error
+}
+
+type NotificationV1Update200JSONResponse struct {
+	Notification UserServiceNotification `json:"notification"`
+}
+
+func (response NotificationV1Update200JSONResponse) VisitNotificationV1UpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type NotificationV1Update404Response struct {
+}
+
+func (response NotificationV1Update404Response) VisitNotificationV1UpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
 	return nil
 }
 
@@ -3653,8 +3837,17 @@ type StrictServerInterface interface {
 	// (DELETE /v1/makeupClasses/{id})
 	MakeupClassesV1Delete(ctx context.Context, request MakeupClassesV1DeleteRequestObject) (MakeupClassesV1DeleteResponseObject, error)
 
-	// (POST /v1/notifyIrregularities)
-	NotifyIrregularitiesV1Notify(ctx context.Context, request NotifyIrregularitiesV1NotifyRequestObject) (NotifyIrregularitiesV1NotifyResponseObject, error)
+	// (GET /v1/notifications)
+	NotificationV1List(ctx context.Context, request NotificationV1ListRequestObject) (NotificationV1ListResponseObject, error)
+
+	// (POST /v1/notifications)
+	NotificationV1Create(ctx context.Context, request NotificationV1CreateRequestObject) (NotificationV1CreateResponseObject, error)
+
+	// (DELETE /v1/notifications/{id})
+	NotificationV1Delete(ctx context.Context, request NotificationV1DeleteRequestObject) (NotificationV1DeleteResponseObject, error)
+
+	// (PUT /v1/notifications/{id})
+	NotificationV1Update(ctx context.Context, request NotificationV1UpdateRequestObject) (NotificationV1UpdateResponseObject, error)
 
 	// (GET /v1/personalCalendarItems)
 	PersonalCalendarItemsV1List(ctx context.Context, request PersonalCalendarItemsV1ListRequestObject) (PersonalCalendarItemsV1ListResponseObject, error)
@@ -4405,17 +4598,17 @@ func (sh *strictHandler) MakeupClassesV1Delete(ctx *gin.Context, id string) {
 	}
 }
 
-// NotifyIrregularitiesV1Notify operation middleware
-func (sh *strictHandler) NotifyIrregularitiesV1Notify(ctx *gin.Context, params NotifyIrregularitiesV1NotifyParams) {
-	var request NotifyIrregularitiesV1NotifyRequestObject
+// NotificationV1List operation middleware
+func (sh *strictHandler) NotificationV1List(ctx *gin.Context, params NotificationV1ListParams) {
+	var request NotificationV1ListRequestObject
 
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.NotifyIrregularitiesV1Notify(ctx, request.(NotifyIrregularitiesV1NotifyRequestObject))
+		return sh.ssi.NotificationV1List(ctx, request.(NotificationV1ListRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "NotifyIrregularitiesV1Notify")
+		handler = middleware(handler, "NotificationV1List")
 	}
 
 	response, err := handler(ctx, request)
@@ -4423,8 +4616,103 @@ func (sh *strictHandler) NotifyIrregularitiesV1Notify(ctx *gin.Context, params N
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(NotifyIrregularitiesV1NotifyResponseObject); ok {
-		if err := validResponse.VisitNotifyIrregularitiesV1NotifyResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(NotificationV1ListResponseObject); ok {
+		if err := validResponse.VisitNotificationV1ListResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// NotificationV1Create operation middleware
+func (sh *strictHandler) NotificationV1Create(ctx *gin.Context) {
+	var request NotificationV1CreateRequestObject
+
+	var body NotificationV1CreateJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NotificationV1Create(ctx, request.(NotificationV1CreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NotificationV1Create")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(NotificationV1CreateResponseObject); ok {
+		if err := validResponse.VisitNotificationV1CreateResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// NotificationV1Delete operation middleware
+func (sh *strictHandler) NotificationV1Delete(ctx *gin.Context, id string) {
+	var request NotificationV1DeleteRequestObject
+
+	request.Id = id
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NotificationV1Delete(ctx, request.(NotificationV1DeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NotificationV1Delete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(NotificationV1DeleteResponseObject); ok {
+		if err := validResponse.VisitNotificationV1DeleteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// NotificationV1Update operation middleware
+func (sh *strictHandler) NotificationV1Update(ctx *gin.Context, id string) {
+	var request NotificationV1UpdateRequestObject
+
+	request.Id = id
+
+	var body NotificationV1UpdateJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.NotificationV1Update(ctx, request.(NotificationV1UpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "NotificationV1Update")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(NotificationV1UpdateResponseObject); ok {
+		if err := validResponse.VisitNotificationV1UpdateResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
