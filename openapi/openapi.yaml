@@ -17,6 +17,7 @@ tags:
   - name: TimetableItems
   - name: Users
   - name: FCM Tokens
+  - name: MenuItems
 paths:
   /v1/announcements:
     get:
@@ -697,6 +698,37 @@ paths:
           description: The server cannot find the requested resource.
       tags:
         - MakeupClasses
+  /v1/menuItems:
+    get:
+      operationId: MenuItemsV1_list
+      description: メニューを取得する
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: メニューを取得する日付
+          schema:
+            type: string
+            format: date
+          explode: false
+      responses:
+        '200':
+          description: メニューのリスト
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  menuItems:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FunchService.MenuItem'
+                required:
+                  - menuItems
+        '401':
+          description: Access is unauthorized.
+      tags:
+        - MenuItems
   /v1/notifications:
     get:
       operationId: NotificationV1_list
@@ -2111,6 +2143,60 @@ components:
           $ref: '#/components/schemas/DottoFoundationV1.DayOfWeek'
         period:
           $ref: '#/components/schemas/DottoFoundationV1.Period'
+    FunchService.Category:
+      type: string
+      enum:
+        - SetAndSingle
+        - BowlAndCurry
+        - Noodle
+        - Side
+        - Dessert
+    FunchService.MenuItem:
+      type: object
+      required:
+        - id
+        - date
+        - name
+        - imageUrl
+        - category
+        - prices
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+        category:
+          $ref: '#/components/schemas/FunchService.Category'
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunchService.Price'
+    FunchService.Price:
+      type: object
+      required:
+        - size
+        - price
+      properties:
+        size:
+          allOf:
+            - $ref: '#/components/schemas/FunchService.Size'
+          description: サイズ
+        price:
+          type: integer
+          format: int32
+          description: 価格
+    FunchService.Size:
+      type: string
+      enum:
+        - Small
+        - Medium
+        - Large
     UserService.FCMToken:
       type: object
       required:
