@@ -135,6 +135,22 @@ const (
 	Required         DottoFoundationV1SubjectRequirementType = "Required"
 )
 
+// Defines values for FunchServiceCategory.
+const (
+	BowlAndCurry FunchServiceCategory = "BowlAndCurry"
+	Dessert      FunchServiceCategory = "Dessert"
+	Noodle       FunchServiceCategory = "Noodle"
+	SetAndSingle FunchServiceCategory = "SetAndSingle"
+	Side         FunchServiceCategory = "Side"
+)
+
+// Defines values for FunchServiceSize.
+const (
+	Large  FunchServiceSize = "Large"
+	Medium FunchServiceSize = "Medium"
+	Small  FunchServiceSize = "Small"
+)
+
 // AcademicServiceCancelledClass 休講
 type AcademicServiceCancelledClass struct {
 	Comment string                  `json:"comment"`
@@ -176,6 +192,21 @@ type AcademicServiceFaculty struct {
 type AcademicServiceFacultyRequest struct {
 	Email string `json:"email"`
 	Name  string `json:"name"`
+}
+
+// AcademicServiceFacultyRoom defines model for AcademicService.FacultyRoom.
+type AcademicServiceFacultyRoom struct {
+	Faculty AcademicServiceFaculty `json:"faculty"`
+	Id      string                 `json:"id"`
+	Room    AcademicServiceRoom    `json:"room"`
+	Year    int                    `json:"year"`
+}
+
+// AcademicServiceFacultyRoomRequest defines model for AcademicService.FacultyRoomRequest.
+type AcademicServiceFacultyRoomRequest struct {
+	FacultyId string `json:"facultyId"`
+	RoomId    string `json:"roomId"`
+	Year      int    `json:"year"`
 }
 
 // AcademicServiceMakeupClass 補講
@@ -227,7 +258,8 @@ type AcademicServiceReservationRequest struct {
 type AcademicServiceRoom struct {
 	// Faculty 教員
 	//
-	// 教員室でない場合は省略
+	// 空室の教員室や教員室でない場合は省略
+	// 基準は現在の年度
 	Faculty *AcademicServiceFaculty `json:"faculty,omitempty"`
 
 	// Floor フロア
@@ -238,11 +270,6 @@ type AcademicServiceRoom struct {
 
 	// Name 部屋名
 	Name string `json:"name"`
-
-	// Number 部屋番号
-	//
-	// 部屋番号が存在しない場合は空文字
-	Number string `json:"number"`
 }
 
 // AcademicServiceRoomChange 教室変更
@@ -266,9 +293,8 @@ type AcademicServiceRoomChangeRequest struct {
 
 // AcademicServiceRoomRequest defines model for AcademicService.RoomRequest.
 type AcademicServiceRoomRequest struct {
-	FacultyId *string                `json:"facultyId,omitempty"`
-	Floor     DottoFoundationV1Floor `json:"floor"`
-	Name      string                 `json:"name"`
+	Floor DottoFoundationV1Floor `json:"floor"`
+	Name  string                 `json:"name"`
 }
 
 // AcademicServiceSubject defines model for AcademicService.Subject.
@@ -393,6 +419,31 @@ type DottoFoundationV1TimetableSlot struct {
 	Period    DottoFoundationV1Period    `json:"period"`
 }
 
+// FunchServiceCategory defines model for FunchService.Category.
+type FunchServiceCategory string
+
+// FunchServiceMenuItem defines model for FunchService.MenuItem.
+type FunchServiceMenuItem struct {
+	Category FunchServiceCategory `json:"category"`
+	Date     openapi_types.Date   `json:"date"`
+	Id       string               `json:"id"`
+	ImageUrl string               `json:"imageUrl"`
+	Name     string               `json:"name"`
+	Prices   []FunchServicePrice  `json:"prices"`
+}
+
+// FunchServicePrice defines model for FunchService.Price.
+type FunchServicePrice struct {
+	// Price 価格
+	Price int32 `json:"price"`
+
+	// Size サイズ
+	Size FunchServiceSize `json:"size"`
+}
+
+// FunchServiceSize defines model for FunchService.Size.
+type FunchServiceSize string
+
 // UserServiceFCMToken defines model for UserService.FCMToken.
 type UserServiceFCMToken struct {
 	// CreatedAt 作成日時
@@ -508,6 +559,12 @@ type FacultiesV1ListParams struct {
 	Q *string `form:"q,omitempty" json:"q,omitempty"`
 }
 
+// FacultyRoomsV1ListParams defines parameters for FacultyRoomsV1List.
+type FacultyRoomsV1ListParams struct {
+	// Year 年度; 指定しない場合は今年度が選択される
+	Year *int `form:"year,omitempty" json:"year,omitempty"`
+}
+
 // FCMTokenV1ListParams defines parameters for FCMTokenV1List.
 type FCMTokenV1ListParams struct {
 	// UserIds ユーザーIDの一覧
@@ -533,6 +590,12 @@ type MakeupClassesV1ListParams struct {
 
 	// Until 検索対象終了日付
 	Until *openapi_types.Date `form:"until,omitempty" json:"until,omitempty"`
+}
+
+// MenuItemsV1ListParams defines parameters for MenuItemsV1List.
+type MenuItemsV1ListParams struct {
+	// Date メニューを取得する日付
+	Date openapi_types.Date `form:"date" json:"date"`
 }
 
 // NotificationV1ListParams defines parameters for NotificationV1List.
@@ -646,6 +709,9 @@ type FacultiesV1CreateJSONRequestBody = AcademicServiceFacultyRequest
 // FacultiesV1UpdateJSONRequestBody defines body for FacultiesV1Update for application/json ContentType.
 type FacultiesV1UpdateJSONRequestBody = AcademicServiceFacultyRequest
 
+// FacultyRoomsV1CreateJSONRequestBody defines body for FacultyRoomsV1Create for application/json ContentType.
+type FacultyRoomsV1CreateJSONRequestBody = AcademicServiceFacultyRoomRequest
+
 // FCMTokenV1UpsertJSONRequestBody defines body for FCMTokenV1Upsert for application/json ContentType.
 type FCMTokenV1UpsertJSONRequestBody = UserServiceFCMTokenRequest
 
@@ -730,6 +796,15 @@ type ServerInterface interface {
 	// (PUT /v1/faculties/{id})
 	FacultiesV1Update(c *gin.Context, id string)
 
+	// (GET /v1/facultyRooms)
+	FacultyRoomsV1List(c *gin.Context, params FacultyRoomsV1ListParams)
+
+	// (POST /v1/facultyRooms)
+	FacultyRoomsV1Create(c *gin.Context)
+
+	// (DELETE /v1/facultyRooms/{id})
+	FacultyRoomsV1Delete(c *gin.Context, id string)
+
 	// (GET /v1/fcmTokens)
 	FCMTokenV1List(c *gin.Context, params FCMTokenV1ListParams)
 
@@ -747,6 +822,9 @@ type ServerInterface interface {
 
 	// (DELETE /v1/makeupClasses/{id})
 	MakeupClassesV1Delete(c *gin.Context, id string)
+
+	// (GET /v1/menuItems)
+	MenuItemsV1List(c *gin.Context, params MenuItemsV1ListParams)
 
 	// (GET /v1/notifications)
 	NotificationV1List(c *gin.Context, params NotificationV1ListParams)
@@ -1267,6 +1345,75 @@ func (siw *ServerInterfaceWrapper) FacultiesV1Update(c *gin.Context) {
 	siw.Handler.FacultiesV1Update(c, id)
 }
 
+// FacultyRoomsV1List operation middleware
+func (siw *ServerInterfaceWrapper) FacultyRoomsV1List(c *gin.Context) {
+
+	var err error
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params FacultyRoomsV1ListParams
+
+	// ------------- Optional query parameter "year" -------------
+
+	err = runtime.BindQueryParameter("form", false, false, "year", c.Request.URL.Query(), &params.Year)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter year: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FacultyRoomsV1List(c, params)
+}
+
+// FacultyRoomsV1Create operation middleware
+func (siw *ServerInterfaceWrapper) FacultyRoomsV1Create(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FacultyRoomsV1Create(c)
+}
+
+// FacultyRoomsV1Delete operation middleware
+func (siw *ServerInterfaceWrapper) FacultyRoomsV1Delete(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.FacultyRoomsV1Delete(c, id)
+}
+
 // FCMTokenV1List operation middleware
 func (siw *ServerInterfaceWrapper) FCMTokenV1List(c *gin.Context) {
 
@@ -1432,6 +1579,41 @@ func (siw *ServerInterfaceWrapper) MakeupClassesV1Delete(c *gin.Context) {
 	}
 
 	siw.Handler.MakeupClassesV1Delete(c, id)
+}
+
+// MenuItemsV1List operation middleware
+func (siw *ServerInterfaceWrapper) MenuItemsV1List(c *gin.Context) {
+
+	var err error
+
+	c.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params MenuItemsV1ListParams
+
+	// ------------- Required query parameter "date" -------------
+
+	if paramValue := c.Query("date"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument date is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", false, true, "date", c.Request.URL.Query(), &params.Date)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter date: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.MenuItemsV1List(c, params)
 }
 
 // NotificationV1List operation middleware
@@ -2274,12 +2456,16 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Delete)
 	router.GET(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Detail)
 	router.PUT(options.BaseURL+"/v1/faculties/:id", wrapper.FacultiesV1Update)
+	router.GET(options.BaseURL+"/v1/facultyRooms", wrapper.FacultyRoomsV1List)
+	router.POST(options.BaseURL+"/v1/facultyRooms", wrapper.FacultyRoomsV1Create)
+	router.DELETE(options.BaseURL+"/v1/facultyRooms/:id", wrapper.FacultyRoomsV1Delete)
 	router.GET(options.BaseURL+"/v1/fcmTokens", wrapper.FCMTokenV1List)
 	router.POST(options.BaseURL+"/v1/fcmTokens", wrapper.FCMTokenV1Upsert)
 	router.GET(options.BaseURL+"/v1/makeupClasses", wrapper.MakeupClassesV1List)
 	router.POST(options.BaseURL+"/v1/makeupClasses", wrapper.MakeupClassesV1Create)
 	router.PUT(options.BaseURL+"/v1/makeupClasses", wrapper.MakeupClassesV1Fetch)
 	router.DELETE(options.BaseURL+"/v1/makeupClasses/:id", wrapper.MakeupClassesV1Delete)
+	router.GET(options.BaseURL+"/v1/menuItems", wrapper.MenuItemsV1List)
 	router.GET(options.BaseURL+"/v1/notifications", wrapper.NotificationV1List)
 	router.POST(options.BaseURL+"/v1/notifications", wrapper.NotificationV1Create)
 	router.DELETE(options.BaseURL+"/v1/notifications/:id", wrapper.NotificationV1Delete)
@@ -2821,6 +3007,92 @@ func (response FacultiesV1Update404Response) VisitFacultiesV1UpdateResponse(w ht
 	return nil
 }
 
+type FacultyRoomsV1ListRequestObject struct {
+	Params FacultyRoomsV1ListParams
+}
+
+type FacultyRoomsV1ListResponseObject interface {
+	VisitFacultyRoomsV1ListResponse(w http.ResponseWriter) error
+}
+
+type FacultyRoomsV1List200JSONResponse struct {
+	FacultyRooms []AcademicServiceFacultyRoom `json:"facultyRooms"`
+}
+
+func (response FacultyRoomsV1List200JSONResponse) VisitFacultyRoomsV1ListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type FacultyRoomsV1List401Response struct {
+}
+
+func (response FacultyRoomsV1List401Response) VisitFacultyRoomsV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type FacultyRoomsV1CreateRequestObject struct {
+	Body *FacultyRoomsV1CreateJSONRequestBody
+}
+
+type FacultyRoomsV1CreateResponseObject interface {
+	VisitFacultyRoomsV1CreateResponse(w http.ResponseWriter) error
+}
+
+type FacultyRoomsV1Create201JSONResponse struct {
+	FacultyRoom AcademicServiceFacultyRoom `json:"facultyRoom"`
+}
+
+func (response FacultyRoomsV1Create201JSONResponse) VisitFacultyRoomsV1CreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type FacultyRoomsV1Create401Response struct {
+}
+
+func (response FacultyRoomsV1Create401Response) VisitFacultyRoomsV1CreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type FacultyRoomsV1DeleteRequestObject struct {
+	Id string `json:"id"`
+}
+
+type FacultyRoomsV1DeleteResponseObject interface {
+	VisitFacultyRoomsV1DeleteResponse(w http.ResponseWriter) error
+}
+
+type FacultyRoomsV1Delete204Response struct {
+}
+
+func (response FacultyRoomsV1Delete204Response) VisitFacultyRoomsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type FacultyRoomsV1Delete401Response struct {
+}
+
+func (response FacultyRoomsV1Delete401Response) VisitFacultyRoomsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type FacultyRoomsV1Delete404Response struct {
+}
+
+func (response FacultyRoomsV1Delete404Response) VisitFacultyRoomsV1DeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
 type FCMTokenV1ListRequestObject struct {
 	Params FCMTokenV1ListParams
 }
@@ -2985,6 +3257,33 @@ type MakeupClassesV1Delete404Response struct {
 
 func (response MakeupClassesV1Delete404Response) VisitMakeupClassesV1DeleteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
+	return nil
+}
+
+type MenuItemsV1ListRequestObject struct {
+	Params MenuItemsV1ListParams
+}
+
+type MenuItemsV1ListResponseObject interface {
+	VisitMenuItemsV1ListResponse(w http.ResponseWriter) error
+}
+
+type MenuItemsV1List200JSONResponse struct {
+	MenuItems []FunchServiceMenuItem `json:"menuItems"`
+}
+
+func (response MenuItemsV1List200JSONResponse) VisitMenuItemsV1ListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type MenuItemsV1List401Response struct {
+}
+
+func (response MenuItemsV1List401Response) VisitMenuItemsV1ListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
 	return nil
 }
 
@@ -3819,6 +4118,15 @@ type StrictServerInterface interface {
 	// (PUT /v1/faculties/{id})
 	FacultiesV1Update(ctx context.Context, request FacultiesV1UpdateRequestObject) (FacultiesV1UpdateResponseObject, error)
 
+	// (GET /v1/facultyRooms)
+	FacultyRoomsV1List(ctx context.Context, request FacultyRoomsV1ListRequestObject) (FacultyRoomsV1ListResponseObject, error)
+
+	// (POST /v1/facultyRooms)
+	FacultyRoomsV1Create(ctx context.Context, request FacultyRoomsV1CreateRequestObject) (FacultyRoomsV1CreateResponseObject, error)
+
+	// (DELETE /v1/facultyRooms/{id})
+	FacultyRoomsV1Delete(ctx context.Context, request FacultyRoomsV1DeleteRequestObject) (FacultyRoomsV1DeleteResponseObject, error)
+
 	// (GET /v1/fcmTokens)
 	FCMTokenV1List(ctx context.Context, request FCMTokenV1ListRequestObject) (FCMTokenV1ListResponseObject, error)
 
@@ -3836,6 +4144,9 @@ type StrictServerInterface interface {
 
 	// (DELETE /v1/makeupClasses/{id})
 	MakeupClassesV1Delete(ctx context.Context, request MakeupClassesV1DeleteRequestObject) (MakeupClassesV1DeleteResponseObject, error)
+
+	// (GET /v1/menuItems)
+	MenuItemsV1List(ctx context.Context, request MenuItemsV1ListRequestObject) (MenuItemsV1ListResponseObject, error)
 
 	// (GET /v1/notifications)
 	NotificationV1List(ctx context.Context, request NotificationV1ListRequestObject) (NotificationV1ListResponseObject, error)
@@ -4426,6 +4737,93 @@ func (sh *strictHandler) FacultiesV1Update(ctx *gin.Context, id string) {
 	}
 }
 
+// FacultyRoomsV1List operation middleware
+func (sh *strictHandler) FacultyRoomsV1List(ctx *gin.Context, params FacultyRoomsV1ListParams) {
+	var request FacultyRoomsV1ListRequestObject
+
+	request.Params = params
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.FacultyRoomsV1List(ctx, request.(FacultyRoomsV1ListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "FacultyRoomsV1List")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(FacultyRoomsV1ListResponseObject); ok {
+		if err := validResponse.VisitFacultyRoomsV1ListResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// FacultyRoomsV1Create operation middleware
+func (sh *strictHandler) FacultyRoomsV1Create(ctx *gin.Context) {
+	var request FacultyRoomsV1CreateRequestObject
+
+	var body FacultyRoomsV1CreateJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.FacultyRoomsV1Create(ctx, request.(FacultyRoomsV1CreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "FacultyRoomsV1Create")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(FacultyRoomsV1CreateResponseObject); ok {
+		if err := validResponse.VisitFacultyRoomsV1CreateResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// FacultyRoomsV1Delete operation middleware
+func (sh *strictHandler) FacultyRoomsV1Delete(ctx *gin.Context, id string) {
+	var request FacultyRoomsV1DeleteRequestObject
+
+	request.Id = id
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.FacultyRoomsV1Delete(ctx, request.(FacultyRoomsV1DeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "FacultyRoomsV1Delete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(FacultyRoomsV1DeleteResponseObject); ok {
+		if err := validResponse.VisitFacultyRoomsV1DeleteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // FCMTokenV1List operation middleware
 func (sh *strictHandler) FCMTokenV1List(ctx *gin.Context, params FCMTokenV1ListParams) {
 	var request FCMTokenV1ListRequestObject
@@ -4591,6 +4989,33 @@ func (sh *strictHandler) MakeupClassesV1Delete(ctx *gin.Context, id string) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(MakeupClassesV1DeleteResponseObject); ok {
 		if err := validResponse.VisitMakeupClassesV1DeleteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// MenuItemsV1List operation middleware
+func (sh *strictHandler) MenuItemsV1List(ctx *gin.Context, params MenuItemsV1ListParams) {
+	var request MenuItemsV1ListRequestObject
+
+	request.Params = params
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.MenuItemsV1List(ctx, request.(MenuItemsV1ListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "MenuItemsV1List")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(MenuItemsV1ListResponseObject); ok {
+		if err := validResponse.VisitMenuItemsV1ListResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
