@@ -498,6 +498,8 @@ paths:
           description: Access is unauthorized.
         '404':
           description: The server cannot find the requested resource.
+        '409':
+          description: The request conflicts with the current state of the server.
       tags:
         - Faculties
   /v1/facultyRooms:
@@ -532,7 +534,10 @@ paths:
         - FacultyRooms
     post:
       operationId: FacultyRoomsV1_create
-      description: 教員室を追加する
+      description: |-
+        教員室を追加する
+
+        同一年度で同じ教員または同じ教室が既に登録されている場合は409を返す。
       parameters: []
       responses:
         '201':
@@ -548,6 +553,8 @@ paths:
                   - facultyRoom
         '401':
           description: Access is unauthorized.
+        '409':
+          description: The request conflicts with the current state of the server.
       tags:
         - FacultyRooms
       requestBody:
@@ -1352,6 +1359,8 @@ paths:
           description: Access is unauthorized.
         '404':
           description: The server cannot find the requested resource.
+        '409':
+          description: The request conflicts with the current state of the server.
       tags:
         - Rooms
   /v1/subjects:
@@ -1503,6 +1512,8 @@ paths:
           description: Access is unauthorized.
         '404':
           description: The server cannot find the requested resource.
+        '409':
+          description: The request conflicts with the current state of the server.
       tags:
         - Subjects
   /v1/timetableItmes:
