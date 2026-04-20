@@ -86,6 +86,15 @@ func (h *Handler) NotificationV1Update(c *gin.Context, id string) {
 	c.JSON(http.StatusOK, response.JSON200)
 }
 
+// NotificationV1Dispatch 通知を即時配信する
+func (h *Handler) NotificationV1Dispatch(c *gin.Context) {
+	if !middleware.RequireAnyClaim(c, "admin", "developer") {
+		return
+	}
+
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+}
+
 // NotificationV1Delete 通知を削除する
 func (h *Handler) NotificationV1Delete(c *gin.Context, id string) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
