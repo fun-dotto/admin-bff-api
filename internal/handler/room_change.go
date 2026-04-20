@@ -60,26 +60,6 @@ func (h *Handler) RoomChangesV1Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, response.JSON201)
 }
 
-// RoomChangesV1Fetch 教務システムから教室変更を取得する
-func (h *Handler) RoomChangesV1Fetch(c *gin.Context) {
-	if !middleware.RequireAnyClaim(c, "admin", "developer") {
-		return
-	}
-
-	response, err := h.academicClient.RoomChangesV1FetchWithResponse(c.Request.Context())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if response.JSON200 == nil {
-		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
-		return
-	}
-
-	c.JSON(http.StatusOK, response.JSON200)
-}
-
 // RoomChangesV1Delete 教室変更を削除する
 func (h *Handler) RoomChangesV1Delete(c *gin.Context, id string) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {

@@ -225,28 +225,6 @@ paths:
             schema:
               $ref: '#/components/schemas/AcademicService.CancelledClassRequest'
         description: 作成する休講の情報
-    put:
-      operationId: CancelledClassesV1_fetch
-      description: 教務システムから休講を取得する
-      parameters: []
-      responses:
-        '200':
-          description: 新たに取得された休講
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  cancelledClasses:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AcademicService.CancelledClass'
-                required:
-                  - cancelledClasses
-        '401':
-          description: Access is unauthorized.
-      tags:
-        - CancelledClasses
   /v1/cancelledClasses/{id}:
     delete:
       operationId: CancelledClassesV1_delete
@@ -498,6 +476,8 @@ paths:
           description: Access is unauthorized.
         '404':
           description: The server cannot find the requested resource.
+        '409':
+          description: The request conflicts with the current state of the server.
       tags:
         - Faculties
   /v1/facultyRooms:
@@ -532,7 +512,10 @@ paths:
         - FacultyRooms
     post:
       operationId: FacultyRoomsV1_create
-      description: 教員室を追加する
+      description: |-
+        教員室を追加する
+
+        同一年度で同じ教員または同じ教室が既に登録されている場合は409を返す。
       parameters: []
       responses:
         '201':
@@ -548,6 +531,8 @@ paths:
                   - facultyRoom
         '401':
           description: Access is unauthorized.
+        '409':
+          description: The request conflicts with the current state of the server.
       tags:
         - FacultyRooms
       requestBody:
@@ -734,28 +719,6 @@ paths:
             schema:
               $ref: '#/components/schemas/AcademicService.MakeupClassRequest'
         description: 作成する補講の情報
-    put:
-      operationId: MakeupClassesV1_fetch
-      description: 教務システムから補講を取得する
-      parameters: []
-      responses:
-        '200':
-          description: 新たに取得された補講
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  makeupClasses:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AcademicService.MakeupClass'
-                required:
-                  - makeupClasses
-        '401':
-          description: Access is unauthorized.
-      tags:
-        - MakeupClasses
   /v1/makeupClasses/{id}:
     delete:
       operationId: MakeupClassesV1_delete
@@ -788,7 +751,6 @@ paths:
           schema:
             type: string
             format: date
-          explode: false
       responses:
         '200':
           description: メニューのリスト
@@ -815,14 +777,14 @@ paths:
         - name: notifyAtFrom
           in: query
           required: false
-          description: 通知予定日時の開始日時 (notifyAt >= notifyAtFrom)
+          description: '通知予定期間の開始日時（通知ウィンドウがこの範囲と重なるものを抽出: notifyBefore >= notifyAtFrom）'
           schema:
             type: string
             format: date-time
         - name: notifyAtTo
           in: query
           required: false
-          description: 通知予定日時の終了日時 (notifyAt <= notifyAtTo)
+          description: '通知予定期間の終了日時（通知ウィンドウがこの範囲と重なるものを抽出: notifyAfter <= notifyAtTo）'
           schema:
             type: string
             format: date-time
@@ -847,6 +809,8 @@ paths:
                       $ref: '#/components/schemas/UserService.Notification'
                 required:
                   - notifications
+        '401':
+          description: Access is unauthorized.
       tags:
         - Notifications
     post:
@@ -867,6 +831,8 @@ paths:
                     $ref: '#/components/schemas/UserService.Notification'
                 required:
                   - notification
+        '401':
+          description: Access is unauthorized.
       tags:
         - Notifications
       requestBody:
@@ -876,6 +842,49 @@ paths:
             schema:
               $ref: '#/components/schemas/UserService.NotificationRequest'
         description: 作成する通知の情報
+  /v1/notifications/dispatch:
+    post:
+      operationId: NotificationV1_dispatch
+      description: |-
+        指定したIDの通知を、送信状態や送信可能期間に関わらずまとめて送信する
+
+        `notificationIds` が空配列の場合は `400 Bad Request` を返す。
+        存在しないIDが含まれる場合でもエラーにはせず、送信に成功した通知のみをレスポンスに含める。
+      parameters: []
+      responses:
+        '200':
+          description: 送信に成功した通知の一覧
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserService.Notification'
+                required:
+                  - notifications
+        '400':
+          description: The server could not understand the request due to invalid syntax.
+        '401':
+          description: Access is unauthorized.
+      tags:
+        - Notifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notificationIds:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - notificationIds
+        description: 送信対象の通知IDリスト
   /v1/notifications/{id}:
     put:
       operationId: NotificationV1_update
@@ -899,6 +908,8 @@ paths:
                     $ref: '#/components/schemas/UserService.Notification'
                 required:
                   - notification
+        '401':
+          description: Access is unauthorized.
         '404':
           description: The server cannot find the requested resource.
       tags:
@@ -923,6 +934,8 @@ paths:
       responses:
         '204':
           description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
         '404':
           description: The server cannot find the requested resource.
       tags:
@@ -1043,34 +1056,6 @@ paths:
               $ref: '#/components/schemas/AcademicService.ReservationRequest'
         description: 予約する教室の情報
   /v1/reservations/{id}:
-    get:
-      operationId: ReservationsV1_detail
-      description: 予約を詳細取得する
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: 予約ID
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 予約の詳細
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  reservation:
-                    $ref: '#/components/schemas/AcademicService.Reservation'
-                required:
-                  - reservation
-        '401':
-          description: Access is unauthorized.
-        '404':
-          description: The server cannot find the requested resource.
-      tags:
-        - Reservations
     delete:
       operationId: ReservationsV1_delete
       description: 予約を削除する
@@ -1163,28 +1148,6 @@ paths:
             schema:
               $ref: '#/components/schemas/AcademicService.RoomChangeRequest'
         description: 作成する教室変更の情報
-    put:
-      operationId: RoomChangesV1_fetch
-      description: 教務システムから教室変更を取得する
-      parameters: []
-      responses:
-        '200':
-          description: 新たに取得された教室変更
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  roomChanges:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AcademicService.RoomChange'
-                required:
-                  - roomChanges
-        '401':
-          description: Access is unauthorized.
-      tags:
-        - RoomChanges
   /v1/roomChanges/{id}:
     delete:
       operationId: RoomChangesV1_delete
@@ -1352,6 +1315,8 @@ paths:
           description: Access is unauthorized.
         '404':
           description: The server cannot find the requested resource.
+        '409':
+          description: The request conflicts with the current state of the server.
       tags:
         - Rooms
   /v1/subjects:
@@ -1503,6 +1468,8 @@ paths:
           description: Access is unauthorized.
         '404':
           description: The server cannot find the requested resource.
+        '409':
+          description: The request conflicts with the current state of the server.
       tags:
         - Subjects
   /v1/timetableItmes:
@@ -1856,15 +1823,15 @@ components:
       type: object
       required:
         - id
-        - roomId
+        - room
         - startAt
         - endAt
         - title
       properties:
         id:
           type: string
-        roomId:
-          type: string
+        room:
+          $ref: '#/components/schemas/AcademicService.Room'
         startAt:
           type: string
           format: date-time
@@ -2334,7 +2301,8 @@ components:
         - id
         - title
         - message
-        - notifyAt
+        - notifyAfter
+        - notifyBefore
         - isNotified
         - targetUserIds
       properties:
@@ -2349,10 +2317,14 @@ components:
           description: |-
             通知をタップした時に開くURL
             アプリを開くのみの場合はnull
-        notifyAt:
+        notifyAfter:
           type: string
           format: date-time
-          description: 通知予定日時
+          description: 通知送信可能になる日時（この時刻以降に送信対象となる）
+        notifyBefore:
+          type: string
+          format: date-time
+          description: 通知送信期限日時（この時刻を過ぎた場合は送信しない）
         isNotified:
           type: boolean
           description: 通知が送信されたかどうか
@@ -2366,7 +2338,8 @@ components:
       required:
         - title
         - message
-        - notifyAt
+        - notifyAfter
+        - notifyBefore
         - targetUserIds
       properties:
         title:
@@ -2375,7 +2348,10 @@ components:
           type: string
         url:
           type: string
-        notifyAt:
+        notifyAfter:
+          type: string
+          format: date-time
+        notifyBefore:
           type: string
           format: date-time
         targetUserIds:

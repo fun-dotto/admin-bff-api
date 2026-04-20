@@ -86,6 +86,32 @@ func (h *Handler) NotificationV1Update(c *gin.Context, id string) {
 	c.JSON(http.StatusOK, response.JSON200)
 }
 
+// NotificationV1Dispatch 通知を即時配信する
+func (h *Handler) NotificationV1Dispatch(c *gin.Context) {
+	if !middleware.RequireAnyClaim(c, "admin", "developer") {
+		return
+	}
+
+	var req user_api.NotificationV1DispatchJSONRequestBody
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	response, err := h.userClient.NotificationV1DispatchWithResponse(c.Request.Context(), req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if response.JSON200 == nil {
+		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response.JSON200)
+}
+
 // NotificationV1Delete 通知を削除する
 func (h *Handler) NotificationV1Delete(c *gin.Context, id string) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
