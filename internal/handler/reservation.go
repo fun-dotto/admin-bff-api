@@ -60,26 +60,6 @@ func (h *Handler) ReservationsV1Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, response.JSON201)
 }
 
-// ReservationsV1Detail 予約を詳細取得する
-func (h *Handler) ReservationsV1Detail(c *gin.Context, id string) {
-	if !middleware.RequireAnyClaim(c, "admin", "developer") {
-		return
-	}
-
-	response, err := h.academicClient.ReservationsV1DetailWithResponse(c.Request.Context(), id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if response.JSON200 == nil {
-		c.JSON(response.StatusCode(), gin.H{"error": "unexpected response from upstream"})
-		return
-	}
-
-	c.JSON(http.StatusOK, response.JSON200)
-}
-
 // ReservationsV1Delete 予約を削除する
 func (h *Handler) ReservationsV1Delete(c *gin.Context, id string) {
 	if !middleware.RequireAnyClaim(c, "admin", "developer") {
