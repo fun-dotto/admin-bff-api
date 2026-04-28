@@ -514,17 +514,14 @@ type UserServiceNotification struct {
 	// ImageUrl 通知に表示する画像のURL
 	ImageUrl *string `json:"imageUrl,omitempty"`
 
-	// IsNotified 通知が送信されたかどうか
-	IsNotified bool `json:"isNotified"`
-
 	// NotifyAfter 通知送信可能になる日時（この時刻以降に送信対象となる）
 	NotifyAfter time.Time `json:"notifyAfter"`
 
 	// NotifyBefore 通知送信期限日時（この時刻を過ぎた場合は送信しない）
 	NotifyBefore time.Time `json:"notifyBefore"`
 
-	// TargetUserIds 対象ユーザーIDのリスト
-	TargetUserIds []string `json:"targetUserIds"`
+	// TargetUsers 対象ユーザーのリスト
+	TargetUsers []UserServiceNotificationTargetUser `json:"targetUsers"`
 
 	// Title 通知タイトル
 	Title string `json:"title"`
@@ -589,6 +586,17 @@ type UserServiceNotificationRequest struct {
 
 	// WebpushLink Web Push 通知をクリックした際に開くURL
 	WebpushLink *string `json:"webpushLink,omitempty"`
+}
+
+// UserServiceNotificationTargetUser defines model for UserService.NotificationTargetUser.
+type UserServiceNotificationTargetUser struct {
+	// NotifiedAt 通知送信日時
+	//
+	// 通知が送信された日時。送信前は null
+	NotifiedAt *time.Time `json:"notifiedAt,omitempty"`
+
+	// UserId ユーザーID
+	UserId string `json:"userId"`
 }
 
 // UserServiceUser defines model for UserService.User.
