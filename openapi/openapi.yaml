@@ -769,6 +769,33 @@ paths:
           description: Access is unauthorized.
       tags:
         - MenuItems
+    post:
+      operationId: MenuItemsV1_create
+      description: メニューを作成する
+      parameters: []
+      responses:
+        '201':
+          description: 作成されたメニュー
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  menuItem:
+                    $ref: '#/components/schemas/FunchService.MenuItem'
+                required:
+                  - menuItem
+        '401':
+          description: Access is unauthorized.
+      tags:
+        - MenuItems
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FunchService.MenuItemRequest'
+        description: 作成するメニューの情報
   /v1/notifications:
     get:
       operationId: NotificationV1_list
@@ -2229,6 +2256,29 @@ components:
       properties:
         id:
           type: string
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+        category:
+          $ref: '#/components/schemas/FunchService.Category'
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunchService.Price'
+    FunchService.MenuItemRequest:
+      type: object
+      required:
+        - date
+        - name
+        - imageUrl
+        - category
+        - prices
+      properties:
         date:
           type: string
           format: date
